@@ -1,0 +1,755 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PetCare Cloud</title>
+<meta name="description" content="Daily pet care log, medication reminders, health tracking and caretaker handoff.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐾</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+
+<!-- blocks the dashboard until we know who is signed in -->
+<div class="boot" id="boot"><span class="boot-mark">🐾</span><p>Loading your dashboard…</p></div>
+<script>
+  // This app is built from ES modules, which every browser refuses to run
+  // from a file:// URL (no server = no scripts = a spinner stuck forever
+  // with no error). Catch that specific case immediately, before the
+  // module script even gets a chance to be blocked, and say so plainly.
+  if (location.protocol === "file:") {
+    var b = document.getElementById("boot");
+    b.className = "boot boot-warn";
+    b.innerHTML =
+      '<span class="boot-mark">🐾</span>' +
+      '<p class="boot-warn-title">This page needs to run from a server, not a double-clicked file.</p>' +
+      '<p>From the project folder, run:</p>' +
+      '<code>npm run dev</code>' +
+      '<p>then open <b>http://localhost:5173</b> in the browser — not this file directly.</p>';
+  }
+</script>
+
+<!-- ================= TOP BAR ================= -->
+<header class="topbar">
+  <button class="brand" id="brand" title="Double-click for the demo panel">
+    <span class="brand-mark">🐾</span>
+    <span class="brand-name">PetCare<strong>Cloud</strong></span>
+  </button>
+
+  <a class="icon-btn" id="btnGoHome" href="./home.html" title="Back to Home" aria-label="Back to Home">🏠</a>
+
+  <div class="pet-switcher" id="petSwitcher" hidden>
+    <button class="pet-switcher-btn" id="petSwitcherBtn" type="button" aria-haspopup="listbox" aria-expanded="false">
+      <span class="pet-switcher-avatar" id="petSwitcherAvatar">🐾</span>
+      <span class="pet-switcher-name" id="petSwitcherName">—</span>
+      <span class="pet-switcher-caret">▾</span>
+    </button>
+    <div class="pet-switcher-menu" id="petSwitcherMenu" hidden role="listbox" aria-label="Switch pet"></div>
+  </div>
+
+  <div class="topbar-right">
+    <span class="mode-badge" id="modeBadge" data-mode="loading">
+      <i class="dot"></i><span id="modeText">Connecting…</span>
+    </span>
+
+    <div class="user-chip">
+      <div class="user-avatar" id="userInitial">?</div>
+      <div class="user-meta">
+        <b id="userName">—</b>
+        <span class="role-chip owner" id="userRole">—</span>
+      </div>
+      <button class="icon-btn" id="btnSignOut" title="Sign out" aria-label="Sign out">⏻</button>
+    </div>
+  </div>
+</header>
+
+<!-- ================= ALERT STRIP ================= -->
+<div id="alertStrip" class="alert-strip" hidden></div>
+<div id="overFeedingBanner" class="alert-strip is-warn" hidden></div>
+
+<!-- ================= EMPTY STATE (zero pets) ================= -->
+<main class="empty-dash" id="emptyDash" hidden>
+  <div class="empty-dash-card">
+    <span class="empty-dash-mark">🐾</span>
+    <h1>No pets yet</h1>
+    <p>Add your first pet to start logging care, tracking medications and health, and getting reminders.</p>
+    <button class="btn btn-primary btn-lg" id="btnEmptyAddPet">+ Add your first pet</button>
+  </div>
+</main>
+
+<main class="layout" id="layout" aria-busy="true">
+
+  <!-- ===== primary column ===== -->
+  <div class="col col-main">
+
+    <!-- pet profile -->
+    <section class="pet-card card" aria-label="Pet profile">
+      <div class="pet-avatar" id="petAvatar">🐶</div>
+      <div class="pet-id">
+        <div class="pet-id-row">
+          <h1 id="petName">—</h1>
+          <button class="icon-btn pet-edit-btn" id="btnEditPet" type="button" title="Edit pet" aria-label="Edit pet" hidden>✎</button>
+        </div>
+        <p class="pet-sub"><span id="petBreed">—</span> · <span id="petAge">—</span> · <span id="petWeight">—</span></p>
+        <p class="streak" id="streak" hidden></p>
+      </div>
+      <div class="pet-progress">
+        <div class="ring" id="dayRing" style="--pct:0"><span id="dayPct">0%</span></div>
+        <p class="ring-label">today's care</p>
+      </div>
+    </section>
+
+    <!-- one-click logging -->
+    <section aria-label="Log care">
+      <h2 class="section-title">Today's care</h2>
+      <div class="actions">
+        <button class="action" data-log="feeding">
+          <span class="action-icon">🍖</span>
+          <span class="action-text">
+            <b>Log Feeding</b><i id="cntFeeding">0 / 3</i>
+            <small class="action-last" id="ldFeeding">Last done: not yet</small>
+          </span>
+        </button>
+        <button class="action" data-log="walk">
+          <span class="action-icon">🚶</span>
+          <span class="action-text">
+            <b>Log Walk</b><i id="cntWalk">0 / 2</i>
+            <small class="action-last" id="ldWalk">Last done: not yet</small>
+          </span>
+        </button>
+        <button class="action" data-log="medication">
+          <span class="action-icon">💊</span>
+          <span class="action-text">
+            <b>Log Medication</b><i id="cntMed">0 / 0</i>
+            <small class="action-last" id="ldMedication">Last done: not yet</small>
+          </span>
+        </button>
+      </div>
+    </section>
+
+    <!-- feeding schedule -->
+    <section class="card" id="feedingScheduleCard" aria-label="Feeding schedule">
+      <div class="card-head">
+        <h2>Feeding schedule</h2>
+        <button class="btn btn-ghost btn-sm" id="btnOpenCalendar">📅 Calendar</button>
+      </div>
+      <ul class="med-list" id="feedingScheduleList"></ul>
+    </section>
+
+    <!-- medication schedule -->
+    <section class="card" aria-label="Medication schedule">
+      <div class="card-head">
+        <h2>Medication schedule</h2>
+        <button class="btn btn-ghost btn-sm" id="btnManageMeds">Manage</button>
+      </div>
+      <ul class="med-list" id="medList"></ul>
+    </section>
+
+    <!-- health -->
+    <section class="card" aria-label="Health">
+      <div class="card-head">
+        <h2>Health</h2>
+        <button class="btn btn-ghost btn-sm" id="btnLogWeight">Record weight</button>
+      </div>
+
+      <div class="health-top">
+        <div class="weight-block">
+          <p class="card-kicker">Weight</p>
+          <p class="weight-value"><b id="weightValue">—</b><span class="weight-delta" id="weightDelta" hidden></span></p>
+          <p class="weight-when" id="weightWhen">—</p>
+        </div>
+        <div class="spark" id="weightSpark"></div>
+      </div>
+      <p class="spark-count" id="weightCount"></p>
+      <p class="weight-alert" id="weightAlert" hidden></p>
+
+      <p class="card-kicker vac-head">Vaccinations &amp; treatments</p>
+      <ul class="vac-list" id="vacList"></ul>
+    </section>
+
+    <!-- timeline -->
+    <section class="card" aria-label="Today's timeline">
+      <div class="card-head">
+        <h2>Today's timeline</h2>
+        <div class="card-head-actions">
+          <span class="hint" id="timelineDate">—</span>
+          <button class="btn btn-ghost btn-sm" id="btnOpenBin" type="button" title="Deleted entries can be restored here">🗑 Bin<span class="bin-count" id="binCount"></span></button>
+        </div>
+      </div>
+      <ol class="timeline" id="timeline"></ol>
+      <p class="empty" id="timelineEmpty" hidden>Nothing logged yet today. Yesterday's history is still saved — the checklist resets, the record doesn't.</p>
+    </section>
+
+    <!-- memories -->
+    <section class="card" aria-label="Memories">
+      <div class="card-head">
+        <h2>Memories</h2>
+        <button class="btn btn-ghost btn-sm" id="btnAddMemory" type="button">+ Add memory</button>
+      </div>
+      <p class="hint memory-hint">First day home, birthdays, walks, training, growth — the moments worth keeping.</p>
+      <div class="memory-gallery" id="memoryGallery"></div>
+      <p class="empty" id="memoryEmpty" hidden>No memories yet. Add the first one to start this pet's story.</p>
+    </section>
+
+  </div>
+
+  <!-- ===== side column ===== -->
+  <div class="col col-side">
+
+    <section class="card next-card" id="nextCard" aria-label="Next medication">
+      <p class="card-kicker">Next medication</p>
+      <p class="next-name" id="nextName">—</p>
+      <p class="next-time" id="nextTime">—</p>
+      <span class="pill" id="nextStatus">—</span>
+      <button class="btn btn-primary btn-block" id="nextAction" hidden>Mark as given</button>
+    </section>
+
+    <section class="card" aria-label="Last completed activity">
+      <p class="card-kicker">Last done</p>
+      <ul class="lastdone" id="lastDone"></ul>
+    </section>
+
+    <section class="card instr-card" aria-label="Special instructions">
+      <p class="card-kicker">Special instructions</p>
+      <dl class="instr" id="instructions"></dl>
+      <div class="vet-line">
+        <span>🏥 <b id="vetName">—</b></span>
+        <a class="btn btn-ghost btn-sm" id="vetCall" href="#">Call</a>
+      </div>
+      <div class="vet-line" id="vetEmergencyLine" hidden>
+        <span>🚨 <b>Emergency vet</b></span>
+        <a class="btn btn-ghost btn-sm" id="vetEmergencyCall" href="#">Call</a>
+      </div>
+    </section>
+
+    <!-- care team -->
+    <section class="card" aria-label="Care team">
+      <div class="card-head">
+        <h2>Care team</h2>
+        <button class="btn btn-primary btn-sm" id="btnAddCaretaker">+ Add</button>
+      </div>
+
+      <div class="joincode" id="joinCodeBox" hidden>
+        <div>
+          <p class="card-kicker" style="margin:0 0 3px">Care code</p>
+          <b id="joinCodeValue">—</b>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="btnCopyCode">Copy</button>
+      </div>
+      <p class="joincode-help" id="joinCodeHelp">Share this code — a caretaker enters it when they sign up and gets access to this pet.</p>
+      <p class="empty" id="ctReadonlyNote" hidden>Only the owner can add or remove caretakers.</p>
+
+      <ul class="ct-list" id="caretakerList"></ul>
+      <button class="btn btn-ghost btn-block" id="btnHandoff">Generate care handoff</button>
+    </section>
+
+    <section class="card" aria-label="Care metrics">
+      <p class="card-kicker">Care metrics <span class="tag-proto">prototype</span></p>
+      <div class="kpi-grid" id="kpiGrid"></div>
+      <canvas id="kpiChart" height="130" aria-label="Seven day completion rate"></canvas>
+    </section>
+
+    <section class="card" aria-label="Export">
+      <p class="card-kicker">Export</p>
+      <button class="btn btn-primary btn-block" id="btnExportLog">Export Log (text)</button>
+      <button class="btn btn-ghost btn-block" id="btnExportCsv">Export care log (CSV)</button>
+      <button class="btn btn-ghost btn-block" id="btnExportPlan">Export caretaker plan</button>
+    </section>
+
+  </div>
+</main>
+
+<footer class="foot">
+  <span>PetCare Cloud · Firebase Hosting + Cloud Firestore + Firebase Auth + Cloud Functions + Gemini</span>
+  <span id="footMode">—</span>
+</footer>
+
+<!-- ================= AI ASSISTANT ================= -->
+<button class="ai-fab" id="aiFab" aria-expanded="false" aria-controls="aiPanel">
+  <span class="ai-fab-icon">💬</span>
+  <span class="ai-fab-label">Ask PetCare AI</span>
+</button>
+
+<section class="ai-panel" id="aiPanel" hidden aria-label="PetCare AI assistant">
+  <header class="ai-head">
+    <div>
+      <b>🐾 PetCare AI</b>
+      <p id="aiSource">General care guidance</p>
+    </div>
+    <button class="icon-btn" id="aiClose" aria-label="Close assistant">✕</button>
+  </header>
+  <div class="ai-body" id="aiBody"></div>
+  <div class="ai-suggest" id="aiSuggest"></div>
+  <form class="ai-form" id="aiForm">
+    <input id="aiInput" type="text" autocomplete="off" placeholder="Ask about feeding, meds, symptoms…" aria-label="Your question">
+    <button class="btn btn-primary" type="submit" aria-label="Send">➤</button>
+  </form>
+  <p class="ai-disclaimer" id="aiDisclaimer"></p>
+</section>
+
+<!-- ================= MODALS ================= -->
+<div class="modal" id="medModal" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="medModalTitle">
+    <header class="modal-head">
+      <h3 id="medModalTitle">Which dose?</h3>
+      <button class="icon-btn" data-close-modal aria-label="Close">✕</button>
+    </header>
+    <ul class="med-list" id="medModalList"></ul>
+  </div>
+</div>
+
+<div class="modal" id="vetModal" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="vetModalTitle">
+    <header class="modal-head">
+      <h3 id="vetModalTitle">Nearby veterinary care</h3>
+      <button class="icon-btn" data-close-modal aria-label="Close">✕</button>
+    </header>
+    <p class="modal-note" id="vetModalNote"></p>
+    <ul class="vet-list" id="vetList"></ul>
+    <p class="sample-note">Sample directory for the prototype. Live clinic data via Google Places is a roadmap item.</p>
+  </div>
+</div>
+
+<!-- add caretaker -->
+<div class="modal" id="caretakerModal" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="ctModalTitle">
+    <header class="modal-head">
+      <h3 id="ctModalTitle">Add a caretaker</h3>
+      <button class="icon-btn" data-close-modal aria-label="Close">✕</button>
+    </header>
+    <form id="addCaretakerForm" class="stack-form">
+      <label>
+        <span>Name</span>
+        <input type="text" id="ctName2" placeholder="Arun" required>
+      </label>
+      <label>
+        <span>Email <i>optional</i></span>
+        <input type="email" id="ctEmail" placeholder="arun@example.com">
+      </label>
+      <label>
+        <span>Note <i>optional</i></span>
+        <input type="text" id="ctNote2" placeholder="Neighbour — has the spare key">
+      </label>
+      <p class="auth-error" id="addCtError" hidden></p>
+      <p class="modal-note">They'll appear on the care team straight away. To let them log care from their own account, share the care code with them.</p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" data-close-modal>Cancel</button>
+        <button type="submit" class="btn btn-primary">Add caretaker</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- confirm removal -->
+<div class="modal" id="removeModal" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="removeTitle">
+    <header class="modal-head">
+      <h3 id="removeTitle">Remove <span id="removeName">this caretaker</span>?</h3>
+      <button class="icon-btn" data-close-modal aria-label="Close">✕</button>
+    </header>
+    <p class="modal-note">They lose access to this pet immediately and can no longer log care. Everything they already logged stays on the timeline and in the export — the record of who did what is not rewritten.</p>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-ghost" data-close-modal>Keep them</button>
+      <button type="button" class="btn btn-crit" id="removeConfirm">Remove</button>
+    </div>
+  </div>
+</div>
+
+<!-- edit pet -->
+<div class="modal" id="editPetModal" hidden>
+  <div class="modal-box modal-box-lg" role="dialog" aria-modal="true" aria-labelledby="editPetTitle">
+    <header class="modal-head">
+      <h3 id="editPetTitle">Edit pet</h3>
+      <button class="icon-btn" data-close-modal aria-label="Close">✕</button>
+    </header>
+    <form id="editPetForm" class="onb-form">
+      <label class="onb-field">
+        <span>Pet name <i>required</i></span>
+        <input type="text" id="epName" required>
+      </label>
+
+      <div class="onb-field">
+        <span>Species <i>required</i></span>
+        <div class="species-grid" id="epSpeciesGrid" role="group" aria-label="Species"></div>
+      </div>
+
+      <div class="field-row">
+        <label class="onb-field">
+          <span id="epBreedLabel">Breed</span>
+          <select id="epBreed" disabled>
+            <option value="">Choose a pet type first</option>
+          </select>
+        </label>
+        <label class="onb-field">
+          <span>Age <i>years, optional</i></span>
+          <input type="number" id="epAge" min="0" max="40" step="1">
+        </label>
+      </div>
+
+      <div class="onb-field" id="epBreedOtherWrap" hidden>
+        <span>Enter breed / type</span>
+        <input type="text" id="epBreedOther" placeholder="Type the breed or species">
+      </div>
+
+      <div class="field-row">
+        <label class="onb-field">
+          <span>Gender <i>optional</i></span>
+          <select id="epGender">
+            <option value="">Not specified</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+        </label>
+        <label class="onb-field">
+          <span>Weight <i>kg, optional</i></span>
+          <input type="number" id="epWeight" min="0" max="150" step="0.1">
+        </label>
+      </div>
+
+      <div class="onb-field">
+        <span>Profile photo <i>optional</i></span>
+        <div class="photo-picker">
+          <div class="photo-preview" id="epPhotoPreview">🐾</div>
+          <label class="btn btn-ghost btn-sm photo-upload-btn">
+            Choose photo
+            <input type="file" id="epPhoto" accept="image/*" hidden>
+          </label>
+          <button type="button" class="btn btn-ghost btn-sm" id="epPhotoClear" hidden>Remove</button>
+        </div>
+      </div>
+
+      <div class="onb-field">
+        <span>Feeding schedule</span>
+        <div class="feed-time-list" id="epFeedingTimesEditor"></div>
+      </div>
+
+      <label class="onb-field">
+        <span>Food allergies / medical warnings <i>optional</i></span>
+        <input type="text" id="epAllergy" placeholder="e.g. Chicken, peanuts, penicillin">
+      </label>
+
+      <label class="onb-field">
+        <span>Special instructions <i>optional</i></span>
+        <textarea id="epNotes" rows="2" placeholder="Care routine, anything a caretaker should know"></textarea>
+      </label>
+
+      <div class="onb-field">
+        <span>Veterinarian contact <i id="epVetHint">optional</i></span>
+        <p class="field-note" id="epVetLockedNote" hidden>Only the pet's owner can add or change vet details. You can view and call this number, but not edit it here.</p>
+        <div class="field-row">
+          <label class="onb-field">
+            <span>Vet / clinic name</span>
+            <input type="text" id="epVetName" placeholder="e.g. Dr. Nair, Whiskers Clinic">
+          </label>
+          <label class="onb-field">
+            <span>Vet phone number</span>
+            <input type="tel" id="epVetPhone" placeholder="e.g. 98765 43210">
+          </label>
+        </div>
+        <label class="onb-field">
+          <span>Emergency vet phone <i>optional</i></span>
+          <input type="tel" id="epVetEmergencyPhone" placeholder="e.g. 98765 00000">
+        </label>
+      </div>
+
+      <p class="auth-error" id="editPetError" hidden></p>
+      <div class="modal-actions modal-actions-split">
+        <button type="button" class="btn btn-crit-ghost" id="btnArchivePet">Remove this pet</button>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" data-close-modal>Cancel</button>
+          <button type="submit" class="btn btn-primary">Save changes</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- confirm archive pet -->
+<div class="modal" id="archivePetModal" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="archivePetTitle">
+    <header class="modal-head">
+      <h3 id="archivePetTitle">Remove <span id="archivePetName">this pet</span>?</h3>
+      <button class="icon-btn" data-close-modal aria-label="Close">✕</button>
+    </header>
+    <p class="modal-note">This hides <span id="archivePetName2">this pet</span> from your dashboard and pet switcher. Every care log, medication and caretaker record is kept — nothing is deleted.</p>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-ghost" data-close-modal>Keep this pet</button>
+      <button type="button" class="btn btn-crit" id="archivePetConfirm">Remove pet</button>
+    </div>
+  </div>
+</div>
+
+<!-- feeding calendar -->
+<div class="modal" id="calendarModal" hidden>
+  <div class="modal-box modal-box-lg" role="dialog" aria-modal="true" aria-labelledby="calModalTitle">
+    <header class="modal-head">
+      <h3 id="calModalTitle">Care calendar</h3>
+      <button class="icon-btn" data-close-modal aria-label="Close">✕</button>
+    </header>
+
+    <div class="cal-toolbar">
+      <div class="cal-tabs" role="tablist">
+        <button type="button" class="cal-tab is-on" id="calTabMonth">Month</button>
+        <button type="button" class="cal-tab" id="calTabWeek">Week</button>
+      </div>
+      <div class="cal-nav">
+        <button type="button" class="icon-btn" id="calPrev" aria-label="Previous">‹</button>
+        <span class="cal-title" id="calTitle">—</span>
+        <button type="button" class="icon-btn" id="calNext" aria-label="Next">›</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="calToday">Today</button>
+      </div>
+    </div>
+
+    <div class="cal-tabs cal-data-tabs" role="tablist" id="calDataTabs">
+      <button type="button" class="cal-tab is-on" id="calDataFeeding">🍖 Feeding</button>
+      <button type="button" class="cal-tab" id="calDataMedication">💊 Medication</button>
+    </div>
+
+    <div id="calMonthBody">
+      <div class="cal-legend">
+        <span><i class="cal-dot cal-dot-ok"></i> Completed</span>
+        <span><i class="cal-dot cal-dot-warn"></i> Partial</span>
+        <span><i class="cal-dot cal-dot-crit"></i> Missed</span>
+        <span><i class="cal-dot cal-dot-today"></i> Today</span>
+        <span><i class="cal-dot cal-dot-none"></i> No record</span>
+      </div>
+      <div class="cal-grid" id="calMonthGrid"></div>
+    </div>
+
+    <div id="calWeekBody" hidden>
+      <div class="cal-week-list" id="calWeekList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- manage medications: list + add/edit/delete -->
+<div class="modal" id="medManageModal" hidden>
+  <div class="modal-box modal-box-lg" role="dialog" aria-modal="true" aria-labelledby="medManageTitle">
+    <header class="modal-head">
+      <h3 id="medManageTitle">Medications</h3>
+      <button class="icon-btn" data-close-modal aria-label="Close">✕</button>
+    </header>
+    <p class="hint" id="medManageReadonlyNote" hidden>Only the owner can add, edit or remove medications.</p>
+    <ul class="med-manage-list" id="medManageList"></ul>
+    <button class="btn btn-primary btn-block" id="btnAddMed">+ Add medication</button>
+  </div>
+</div>
+
+<!-- add / edit one medication -->
+<div class="modal" id="medFormModal" hidden>
+  <div class="modal-box modal-box-lg" role="dialog" aria-modal="true" aria-labelledby="medFormTitle">
+    <header class="modal-head">
+      <h3 id="medFormTitle">Add medication</h3>
+      <button class="icon-btn" data-close-modal aria-label="Close">✕</button>
+    </header>
+    <form id="medForm" class="onb-form">
+      <label class="onb-field">
+        <span>Medication name <i>required</i></span>
+        <input type="text" id="medName" placeholder="Amoxicillin" required>
+      </label>
+
+      <div class="field-row">
+        <label class="onb-field">
+          <span>Type <i>optional</i></span>
+          <select id="medType">
+            <option value="">Select type…</option>
+            <option value="Tablet">Tablet</option>
+            <option value="Capsule">Capsule</option>
+            <option value="Syrup">Syrup</option>
+            <option value="Liquid">Liquid</option>
+            <option value="Injection">Injection</option>
+            <option value="Drops">Drops</option>
+            <option value="Cream/Ointment">Cream/Ointment</option>
+            <option value="Powder">Powder</option>
+            <option value="Other">Other</option>
+          </select>
+        </label>
+        <label class="onb-field">
+          <span>Dosage <i>required</i></span>
+          <input type="text" id="medDosage" placeholder="e.g. 1 tablet, 5 ml, 2 drops" required>
+        </label>
+      </div>
+
+      <div class="field-row">
+        <label class="onb-field">
+          <span>Frequency <i>required</i></span>
+          <select id="medFrequency" required>
+            <option value="Once daily">Once daily</option>
+            <option value="Twice daily">Twice daily</option>
+            <option value="Three times daily">Three times daily</option>
+            <option value="Custom schedule">Custom schedule</option>
+          </select>
+        </label>
+        <label class="onb-field">
+          <span>Feeding relation <i>optional</i></span>
+          <select id="medFeedingRelation">
+            <option value="">Any time</option>
+            <option value="Before food">Before food</option>
+            <option value="After food">After food</option>
+            <option value="With food">With food</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="onb-field" id="medFrequencyCustomWrap" hidden>
+        <span>Describe the custom schedule</span>
+        <input type="text" id="medFrequencyCustom" placeholder="e.g. Every other day, or Mon/Wed/Fri only">
+      </div>
+
+      <div class="onb-field">
+        <span>Scheduled times <i>required</i></span>
+        <div class="feed-time-list" id="medTimesEditor"></div>
+      </div>
+
+      <div class="field-row">
+        <label class="onb-field">
+          <span>Start date <i>optional</i></span>
+          <input type="date" id="medStartDate">
+        </label>
+        <label class="onb-field">
+          <span>End date <i>optional</i></span>
+          <input type="date" id="medEndDate">
+        </label>
+      </div>
+
+      <label class="onb-field">
+        <span>Instructions / notes <i>optional</i></span>
+        <textarea id="medInstructions" rows="2" placeholder="After food. Complete the full course."></textarea>
+      </label>
+
+      <p class="auth-error" id="medFormError" hidden></p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" data-close-modal>Cancel</button>
+        <button type="submit" class="btn btn-primary" id="medFormSubmit">Save medication</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- bin: soft-deleted timeline entries -->
+<div class="modal" id="binModal" hidden>
+  <div class="modal-box modal-box-lg" role="dialog" aria-modal="true" aria-labelledby="binTitle">
+    <header class="modal-head">
+      <h3 id="binTitle">Bin</h3>
+      <button class="icon-btn" data-close-modal aria-label="Close">✕</button>
+    </header>
+    <p class="hint">Deleted timeline entries stay here until you restore them or delete them permanently.</p>
+    <ul class="med-manage-list" id="binList"></ul>
+  </div>
+</div>
+
+<!-- add / edit one memory -->
+<div class="modal" id="memoryFormModal" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="memoryFormTitle">
+    <header class="modal-head">
+      <h3 id="memoryFormTitle">Add memory</h3>
+      <button class="icon-btn" data-close-modal aria-label="Close">✕</button>
+    </header>
+    <form id="memoryForm" class="onb-form">
+      <label class="onb-field">
+        <span>Title <i>required</i></span>
+        <input type="text" id="memTitle" placeholder="First day home" required>
+      </label>
+      <label class="onb-field">
+        <span>Date <i>required</i></span>
+        <input type="date" id="memDate" required>
+      </label>
+      <label class="onb-field">
+        <span>Description <i>optional</i></span>
+        <textarea id="memDescription" rows="3" placeholder="A short caption for this moment…"></textarea>
+      </label>
+      <div class="onb-field">
+        <span>Photo <i>optional</i></span>
+        <div class="photo-picker">
+          <div class="photo-preview" id="memPhotoPreview">🐾</div>
+          <label class="btn btn-ghost btn-sm photo-upload-btn">
+            Choose photo
+            <input type="file" id="memPhoto" accept="image/*" hidden>
+          </label>
+          <button type="button" class="btn btn-ghost btn-sm" id="memPhotoClear" hidden>Remove</button>
+        </div>
+      </div>
+      <p class="auth-error" id="memoryFormError" hidden></p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" data-close-modal>Cancel</button>
+        <button type="submit" class="btn btn-primary" id="memoryFormSubmit">Save memory</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- record weight -->
+<div class="modal" id="weightModal" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="weightTitle">
+    <header class="modal-head">
+      <h3 id="weightTitle">Record weight</h3>
+      <button class="icon-btn" data-close-modal aria-label="Close">✕</button>
+    </header>
+    <form id="weightForm" class="stack-form">
+      <label>
+        <span>Weight <i>kg</i></span>
+        <input type="number" id="weightInput" step="0.1" min="0" max="150" placeholder="28.5" required>
+      </label>
+      <label>
+        <span>Note <i>optional</i></span>
+        <input type="text" id="weightNotes" placeholder="After the vet visit">
+      </label>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" data-close-modal>Cancel</button>
+        <button type="submit" class="btn btn-primary">Save reading</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- record vaccination -->
+<div class="modal" id="vacModal" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="vacTitle">
+    <header class="modal-head">
+      <h3 id="vacTitle">Record <span id="vacRecordName">vaccination</span></h3>
+      <button class="icon-btn" data-close-modal aria-label="Close">✕</button>
+    </header>
+    <div class="stack-form">
+      <label>
+        <span>Date given</span>
+        <input type="date" id="vacGivenOn">
+      </label>
+      <label>
+        <span>Next due</span>
+        <input type="date" id="vacNextDue">
+      </label>
+      <p class="modal-note">The next-due date defaults to the same interval as last time.</p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" data-close-modal>Cancel</button>
+        <button type="button" class="btn btn-primary" id="vacRecordSave">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= DEMO PANEL ================= -->
+<aside class="devpanel" id="devPanel" hidden aria-label="Demo controls">
+  <header>
+    <b>Demo controls</b>
+    <button class="icon-btn" id="devClose" aria-label="Close">✕</button>
+  </header>
+  <p class="dev-note">Jump the app clock to whichever state you want to show. Each button works out the offset from the next pending dose, so it lands correctly whatever time you demo at.</p>
+  <div class="dev-shift">
+    <button data-jump="real" class="is-on">Real time</button>
+    <button data-jump="due">Due now</button>
+    <button data-jump="overdue">Overdue</button>
+    <button data-jump="nextday">Next day</button>
+  </div>
+  <p class="dev-clock">App time: <b id="devClock">—</b> <span id="devOffset"></span></p>
+  <button class="btn btn-ghost btn-block" id="devReseed">Reseed demo data</button>
+</aside>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script type="module" src="./js/app.js"></script>
+</body>
+</html>

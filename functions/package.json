@@ -1,0 +1,16 @@
+{
+  "name": "petcare-cloud-functions",
+  "description": "PetCare Cloud — AI assistant proxy",
+  "private": true,
+  "main": "index.js",
+  "engines": {
+    "node": "20"
+  },
+  "scripts": {
+    "serve": "firebase emulators:start --only functions",
+    "logs": "firebase functions:log"
+  },
+  "dependencies": {
+    "firebase-functions": "^5.0.1"
+  }
+}
