@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign in · PetCare</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐾</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="./css/styles.css">
+</head>
+<body class="auth-body">
+
+<div class="boot" id="fileWarnBoot" hidden></div>
+<script>
+  // Same file:// guard as index.html — see the comment there. Without a
+  // server, login.js never runs, so the tabs/buttons/forms below stay
+  // completely inert with no visible error at all.
+  if (location.protocol === "file:") {
+    var b = document.getElementById("fileWarnBoot");
+    b.hidden = false;
+    b.className = "boot boot-warn";
+    b.innerHTML =
+      '<span class="boot-mark">🐾</span>' +
+      '<p class="boot-warn-title">This page needs to run from a server, not a double-clicked file.</p>' +
+      '<p>From the project folder, run:</p>' +
+      '<code>npm run dev</code>' +
+      '<p>then open <b>http://localhost:5173</b> in the browser — not this file directly.</p>';
+  }
+</script>
+
+<main class="auth-split">
+
+  <!-- ===== left: what this is ===== -->
+  <aside class="auth-pitch">
+    <div class="auth-brand">
+      <span class="brand-mark">🐾</span>
+      <span class="brand-name">PetCare</span>
+    </div>
+
+    <h1>Smart, connected care for every pet.</h1>
+
+    <ul class="auth-points">
+      <li><span class="auth-check">✓</span> Personalized pet care</li>
+      <li><span class="auth-check">✓</span> Smart reminders</li>
+      <li><span class="auth-check">✓</span> Caretaker collaboration</li>
+      <li><span class="auth-check">✓</span> AI-powered pet assistance</li>
+    </ul>
+
+  </aside>
+
+  <!-- ===== right: the form ===== -->
+  <section class="auth-panel">
+    <div class="auth-card">
+
+      <div class="auth-tabs" role="tablist">
+        <button role="tab" data-tab="login"  class="is-on">Log in</button>
+        <button role="tab" data-tab="signup">Sign up</button>
+      </div>
+
+      <p class="auth-mode" id="authMode"></p>
+
+      <!-- ---------- LOG IN ---------- -->
+      <form id="loginForm" class="auth-form">
+        <label>
+          <span>Email</span>
+          <input type="email" id="loginEmail" autocomplete="email" placeholder="Enter your username or email" required>
+        </label>
+        <label>
+          <span>Password</span>
+          <input type="password" id="loginPassword" autocomplete="current-password" placeholder="Your password" required>
+        </label>
+
+        <p class="auth-error" id="loginError" hidden></p>
+        <button class="btn btn-primary btn-block" type="submit" id="loginSubmit">Log in</button>
+
+        <div class="auth-demo">
+          <p>Demo accounts</p>
+          <div>
+            <button type="button" class="btn btn-ghost btn-sm" data-demo="owner">Owner · Revanth</button>
+            <button type="button" class="btn btn-ghost btn-sm" data-demo="caretaker">Caretaker · Arun</button>
+          </div>
+        </div>
+      </form>
+
+      <!-- ---------- SIGN UP ---------- -->
+      <form id="signupForm" class="auth-form" hidden>
+        <div class="field-row">
+          <label>
+            <span>First Name <i>required</i></span>
+            <input type="text" id="suFirstName" autocomplete="given-name" placeholder="Enter your first name" required>
+          </label>
+          <label>
+            <span>Middle Name <i>optional</i></span>
+            <input type="text" id="suMiddleName" autocomplete="additional-name" placeholder="Enter your middle name">
+          </label>
+        </div>
+        <label>
+          <span>Last Name <i>required</i></span>
+          <input type="text" id="suLastName" autocomplete="family-name" placeholder="Enter your last name" required>
+        </label>
+        <label>
+          <span>Email</span>
+          <input type="email" id="suEmail" autocomplete="email" placeholder="you@example.com" required>
+        </label>
+        <label>
+          <span>Password</span>
+          <input type="password" id="suPassword" autocomplete="new-password" placeholder="At least 6 characters" required>
+        </label>
+
+        <div class="seg" role="group" aria-label="What are you signing up for">
+          <button type="button" data-path="owner" class="is-on">I'm the owner</button>
+          <button type="button" data-path="join">I'm a caretaker</button>
+        </div>
+
+        <div id="ownerFields">
+        </div>
+
+        <div id="joinFields" hidden>
+          <label>
+            <span>Care code</span>
+            <input type="text" id="suJoinCode" placeholder="BUDDY-4821" class="mono-input" autocapitalize="characters">
+          </label>
+          <p class="auth-help">The owner finds this in the Caretakers panel on their dashboard.</p>
+        </div>
+
+        <p class="auth-error" id="signupError" hidden></p>
+        <button class="btn btn-primary btn-block" type="submit" id="signupSubmit">Create account</button>
+      </form>
+
+      <p class="auth-note" id="authNote"></p>
+    </div>
+  </section>
+</main>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+<script type="module" src="./js/login.js"></script>
+</body>
+</html>

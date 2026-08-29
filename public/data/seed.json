@@ -1,0 +1,316 @@
+{
+  "_note": "Single source of demo data. Used by scripts/seed.js (Firestore) and js/store-mock.js (demo mode). All vets, phone numbers and accounts are fictional sample records.",
+  "pet": {
+    "id": "buddy",
+    "name": "Buddy",
+    "species": "dog",
+    "breed": "Golden Retriever",
+    "ageYears": 3,
+    "gender": "male",
+    "weightKg": 28.5,
+    "ownerName": "Revanth",
+    "emoji": "🐶",
+    "photoURL": "",
+    "status": "active",
+    "dailyTargets": {
+      "feeding": 3,
+      "walk": 2
+    },
+    "specialInstructions": {
+      "allergy": "Chicken — no chicken-based food or treats",
+      "medication": "Give all tablets after food, never on an empty stomach",
+      "notes": "Pulls hard on the leash near traffic. Use the harness, not the collar."
+    },
+    "vet": {
+      "name": "Happy Paws Veterinary Clinic",
+      "phone": "+91 90000 11223"
+    },
+    "joinCode": "BUDDY-4821"
+  },
+  "medications": [
+    {
+      "id": "med-amox",
+      "name": "Amoxicillin 250mg",
+      "dosage": "1 tablet",
+      "instructions": "After food. Complete the full 7-day course.",
+      "scheduledTimes": [
+        "08:00",
+        "20:00"
+      ],
+      "frequency": "daily",
+      "active": true
+    },
+    {
+      "id": "med-joint",
+      "name": "Joint supplement",
+      "dosage": "1 chew",
+      "instructions": "With breakfast.",
+      "scheduledTimes": [
+        "09:00"
+      ],
+      "frequency": "daily",
+      "active": true
+    }
+  ],
+  "caretakers": [
+    {
+      "id": "ct-arun",
+      "name": "Arun",
+      "email": "arun@petcare.demo",
+      "role": "caretaker",
+      "status": "active",
+      "note": "Neighbour — has the spare key"
+    }
+  ],
+  "vets": [
+    {
+      "id": "vet-happy-paws",
+      "name": "Happy Paws Veterinary Clinic",
+      "location": "R.S. Puram, Coimbatore",
+      "phone": "+91 90000 11223",
+      "distanceKm": 2.4,
+      "emergency24x7": false,
+      "hours": "9:00 AM – 8:00 PM",
+      "specialty": "General pet care, vaccinations"
+    },
+    {
+      "id": "vet-city-emergency",
+      "name": "City Pet Emergency Hospital",
+      "location": "Avinashi Road, Coimbatore",
+      "phone": "+91 90000 44556",
+      "distanceKm": 4.8,
+      "emergency24x7": true,
+      "hours": "Open 24 hours",
+      "specialty": "Emergency and critical care, surgery"
+    },
+    {
+      "id": "vet-greenfield",
+      "name": "Greenfield Animal Hospital",
+      "location": "Peelamedu, Coimbatore",
+      "phone": "+91 90000 77889",
+      "distanceKm": 6.1,
+      "emergency24x7": true,
+      "hours": "Open 24 hours",
+      "specialty": "Emergency, diagnostics, imaging"
+    },
+    {
+      "id": "vet-petwell",
+      "name": "PetWell Veterinary Care",
+      "location": "Saibaba Colony, Coimbatore",
+      "phone": "+91 90000 22334",
+      "distanceKm": 3.6,
+      "emergency24x7": false,
+      "hours": "10:00 AM – 7:00 PM",
+      "specialty": "Dermatology, nutrition"
+    },
+    {
+      "id": "vet-companion",
+      "name": "Companion Care Veterinary Centre",
+      "location": "Ganapathy, Coimbatore",
+      "phone": "+91 90000 55667",
+      "distanceKm": 7.9,
+      "emergency24x7": false,
+      "hours": "9:30 AM – 6:30 PM",
+      "specialty": "Orthopaedics, physiotherapy"
+    }
+  ],
+  "todayLogs": [
+    {
+      "type": "feeding",
+      "time": "08:00",
+      "performedBy": "Revanth",
+      "role": "owner",
+      "notes": "Morning meal"
+    },
+    {
+      "type": "medication",
+      "time": "08:05",
+      "performedBy": "Revanth",
+      "role": "owner",
+      "notes": "Given after food",
+      "medicationId": "med-amox",
+      "slot": "08:00"
+    },
+    {
+      "type": "medication",
+      "time": "09:10",
+      "performedBy": "Revanth",
+      "role": "owner",
+      "notes": "With breakfast",
+      "medicationId": "med-joint",
+      "slot": "09:00"
+    },
+    {
+      "type": "walk",
+      "time": "10:00",
+      "performedBy": "Arun",
+      "role": "caretaker",
+      "notes": "20 minutes, park loop"
+    },
+    {
+      "type": "feeding",
+      "time": "13:00",
+      "performedBy": "Arun",
+      "role": "caretaker",
+      "notes": "Half portion — rice and curd"
+    }
+  ],
+  "historyPlan": [
+    {
+      "dayOffset": -6,
+      "feeding": 2,
+      "walk": 1,
+      "medSlots": [
+        "08:00",
+        "09:00"
+      ]
+    },
+    {
+      "dayOffset": -5,
+      "feeding": 3,
+      "walk": 1,
+      "medSlots": [
+        "08:00",
+        "20:00"
+      ]
+    },
+    {
+      "dayOffset": -4,
+      "feeding": 3,
+      "walk": 2,
+      "medSlots": [
+        "08:00",
+        "09:00",
+        "20:00"
+      ]
+    },
+    {
+      "dayOffset": -3,
+      "feeding": 3,
+      "walk": 2,
+      "medSlots": [
+        "08:00",
+        "09:00",
+        "20:00"
+      ]
+    },
+    {
+      "dayOffset": -2,
+      "feeding": 3,
+      "walk": 1,
+      "medSlots": [
+        "08:00",
+        "09:00",
+        "20:00"
+      ]
+    },
+    {
+      "dayOffset": -1,
+      "feeding": 3,
+      "walk": 2,
+      "medSlots": [
+        "08:00",
+        "09:00",
+        "20:00"
+      ]
+    }
+  ],
+  "demoAccounts": [
+    {
+      "email": "owner@petcare.demo",
+      "password": "petcare123",
+      "name": "Revanth",
+      "role": "owner"
+    },
+    {
+      "email": "arun@petcare.demo",
+      "password": "petcare123",
+      "name": "Arun",
+      "role": "caretaker"
+    }
+  ],
+  "vaccinations": [
+    {
+      "id": "vac-rabies",
+      "name": "Rabies booster",
+      "lastGivenOn": "2025-09-14",
+      "nextDueOn": "2026-09-14",
+      "vet": "Happy Paws Veterinary Clinic",
+      "notes": "Annual, legally required"
+    },
+    {
+      "id": "vac-dhpp",
+      "name": "DHPP (distemper, hepatitis, parvo, parainfluenza)",
+      "lastGivenOn": "2025-11-02",
+      "nextDueOn": "2026-11-02",
+      "vet": "Happy Paws Veterinary Clinic",
+      "notes": "Annual booster"
+    },
+    {
+      "id": "vac-lepto",
+      "name": "Leptospirosis",
+      "lastGivenOn": "2025-08-05",
+      "nextDueOn": "2026-08-05",
+      "vet": "PetWell Veterinary Care",
+      "notes": "Higher risk during monsoon"
+    },
+    {
+      "id": "vac-deworm",
+      "name": "Deworming",
+      "lastGivenOn": "2026-06-20",
+      "nextDueOn": "2026-09-20",
+      "vet": "Happy Paws Veterinary Clinic",
+      "notes": "Every three months"
+    }
+  ],
+  "weightHistory": [
+    {
+      "dayOffset": -168,
+      "valueKg": 27.2,
+      "recordedBy": "Revanth",
+      "notes": "Annual check-up"
+    },
+    {
+      "dayOffset": -140,
+      "valueKg": 27.6,
+      "recordedBy": "Revanth",
+      "notes": ""
+    },
+    {
+      "dayOffset": -112,
+      "valueKg": 28.1,
+      "recordedBy": "Revanth",
+      "notes": ""
+    },
+    {
+      "dayOffset": -84,
+      "valueKg": 28.9,
+      "recordedBy": "Revanth",
+      "notes": "Treats need cutting back"
+    },
+    {
+      "dayOffset": -56,
+      "valueKg": 29.4,
+      "recordedBy": "Revanth",
+      "notes": ""
+    },
+    {
+      "dayOffset": -28,
+      "valueKg": 28.7,
+      "recordedBy": "Arun",
+      "notes": "Off food for two days"
+    },
+    {
+      "dayOffset": -14,
+      "valueKg": 28.2,
+      "recordedBy": "Revanth",
+      "notes": "Started antibiotics"
+    },
+    {
+      "dayOffset": -3,
+      "valueKg": 28.5,
+      "recordedBy": "Revanth",
+      "notes": "Eating normally again"
+    }
+  ]
+}

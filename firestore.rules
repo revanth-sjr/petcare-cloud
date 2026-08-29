@@ -1,0 +1,188 @@
+rules_version = '2';
+
+/* =====================================================================
+  PetCare — Firestore security rules.
+   Pod A owns this file. Deploy at H+2, before any demo data lands:
+
+     firebase deploy --only firestore:rules
+
+   The model in one sentence: a pet document lists its members, and every
+   read and write is checked against that list. Access is data, not a
+   client-side flag — removing a caretaker in the UI genuinely revokes
+   their ability to write.
+   ===================================================================== */
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    /* ---------- the shared veterinary directory ---------- */
+    match /vets/{vetId} {
+      allow read:  if signedIn();
+      allow write: if false;              // seeded with the Admin SDK
+    }
+
+    /* ---------- code → pet lookup, read before you are a member ------ */
+    match /joinCodes/{code} {
+      allow read:   if signedIn();
+      allow create: if signedIn() && request.auth.uid == request.resource.data.ownerUid;
+      allow update, delete: if signedIn() && request.auth.uid == resource.data.ownerUid;
+    }
+
+    /* ---------- a person's own profile ---------- */
+    match /users/{uid} {
+      allow read, write: if signedIn() && request.auth.uid == uid;
+    }
+
+    /* ---------- pets ---------- */
+    match /pets/{petId} {
+
+      function pet()      { return get(/databases/$(database)/documents/pets/$(petId)).data; }
+      function isOwner()  { return signedIn() && request.auth.uid == pet().ownerUid; }
+      function isMember() { return signedIn() && request.auth.uid in pet().memberUids; }
+
+      /* Adding yourself — and only yourself — to memberUids is how a
+         caretaker redeems a care code. They are not a member yet at that
+         moment, so this cannot require membership. */
+      function joiningWithOwnUid() {
+        return signedIn()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberUids'])
+          && request.resource.data.memberUids.hasAll(resource.data.memberUids)
+          && request.resource.data.memberUids.hasOnly(
+               resource.data.memberUids.concat([request.auth.uid]));
+      }
+
+      /* Any member may update the denormalised current weight; everything
+         else about the pet is the owner's. */
+      function memberWeightUpdate() {
+        return isMember()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['weightKg']);
+      }
+
+      /* A caretaker may edit the pet's own details — name, breed, age,
+         gender, weight, photo, feeding schedule, notes, everything the
+         edit-pet form touches — but never ownership, membership, the
+         archive flag, the join code, or (as of the vet-contact feature)
+         the veterinarian's name/phone/emergency phone. This is what
+         actually stops a caretaker from deleting/reassigning a pet, or
+         from changing who the vet is: the UI already hides/locks those
+         controls for them, but a hidden button is not security — this is. */
+      function memberDetailUpdate() {
+        return isMember()
+          && !request.resource.data.diff(resource.data).affectedKeys().hasAny(
+               ['ownerUid', 'ownerName', 'memberUids', 'status', 'joinCode', 'vet']);
+      }
+
+      allow read:   if signedIn() && request.auth.uid in resource.data.memberUids;
+      allow create: if signedIn()
+                    && request.auth.uid == request.resource.data.ownerUid
+                    && request.resource.data.memberUids.hasOnly([request.auth.uid]);
+      allow update: if isOwner() || joiningWithOwnUid() || memberWeightUpdate() || memberDetailUpdate();
+      allow delete: if isOwner();
+
+      /* ---------- medications: configuration, owner writes ---------- */
+      match /medications/{medId} {
+        allow read:  if isMember();
+        allow write: if isOwner();
+      }
+
+      /* ---------- vaccinations: owner records, everyone can see ------ */
+      match /vaccinations/{vacId} {
+        allow read:  if isMember();
+        allow write: if isOwner();
+      }
+
+      /* ---------- weight readings: any member, append-only ---------- */
+      match /weights/{weightId} {
+        allow read:   if isMember();
+        allow create: if isMember()
+                      && request.resource.data.valueKg is number
+                      && request.resource.data.valueKg > 0
+                      && request.resource.data.valueKg < 150;
+        allow update, delete: if isOwner();
+      }
+
+      /* ---------- the care team ----------
+         The owner manages the roster. The one exception is a caretaker
+         introducing themselves at the moment they redeem a care code —
+         they may create exactly their own document, and nothing else. */
+      match /caretakers/{caretakerId} {
+        allow read:   if isMember();
+        allow create: if isOwner()
+                      || (signedIn()
+                          && caretakerId == request.auth.uid
+                          && request.resource.data.uid == request.auth.uid
+                          && request.resource.data.role == 'caretaker');
+        allow update, delete: if isOwner();
+      }
+
+      /* ---------- care logs: append-only, with one narrow exception ----
+         You can add a record and read history, but you cannot quietly
+         rewrite what somebody else logged. That is the property the
+         caretaker feature actually needs — accountability, not just
+         shared access. `selfUndo()` is the one deliberate exception: the
+         "Feeding recorded • Undo" toast needs to actually remove a
+         mistouch, not just hide it client-side. It only ever lets the
+         log's own creator delete THIS log, and only within a short window
+         of when it was created — never someone else's entry, never after
+         the window closes, never an update. Every other actor and every
+         other action on this collection is exactly as immutable as
+         before. */
+      function selfUndo() {
+        return isMember()
+          && resource.data.performedByUid == request.auth.uid
+          && request.time < resource.data.at + duration.value(12, 's');
+      }
+
+      match /careLogs/{logId} {
+        allow read:   if isMember();
+        allow create: if isMember()
+                      && request.resource.data.keys().hasAll(
+                           ['type', 'performedBy', 'performedByRole', 'at', 'dayKey'])
+                      && request.resource.data.type in ['feeding', 'walk', 'medication']
+                      && request.resource.data.performedByRole in ['owner', 'caretaker']
+                      && request.resource.data.performedBy is string
+                      && request.resource.data.performedBy.size() > 0
+                      && request.resource.data.dayKey is string
+                      && request.resource.data.performedByUid == request.auth.uid;
+        allow update: if false;
+        allow delete: if selfUndo();
+      }
+
+      /* ---------- trash: soft-deleted tracking records ----------
+         Moving a careLog to the bin never touches the careLogs collection
+         above — that stays exactly as append-only as it always was. A
+         "delete" from the Bin's point of view is: snapshot the record
+         here, and the app's own queries filter out any log whose id
+         shows up in this collection. Restoring removes the marker;
+         permanently deleting flips `permanent` (so the Bin stops listing
+         it) rather than ever deleting the underlying careLog — the audit
+         trail this app is built around is never actually erased. */
+      match /trash/{trashId} {
+        allow read:   if isMember();
+        allow create: if isMember()
+                      && request.resource.data.deletedByUid == request.auth.uid
+                      && request.resource.data.petId == petId;
+        allow update: if isMember()
+                      && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['permanent']);
+        allow delete: if isMember();
+      }
+
+      /* ---------- memories: photos + milestones, owned by the pet ----
+         Same member-read / any-member-write split as weights — any
+         caretaker can add a memory (a first walk photographed by whoever
+         was there), but editing or deleting one is scoped to whoever
+         created it, or the owner, so a caretaker cannot silently rewrite
+         someone else's memory. */
+      match /memories/{memoryId} {
+        allow read:   if isMember();
+        allow create: if isMember() && request.resource.data.createdByUid == request.auth.uid;
+        allow update, delete: if isMember()
+                      && (isOwner() || resource.data.createdByUid == request.auth.uid);
+      }
+    }
+  }
+}

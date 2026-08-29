@@ -1,0 +1,207 @@
+/* =====================================================================
+   chat.js — the AI bubble.
+   Pod C owns this file.
+   ---------------------------------------------------------------------
+   Calls the Cloud Function when AI_ENDPOINT is set, and falls back to the
+   local keyword responder otherwise — or when the call fails. The panel
+   always answers, which is what makes the demo safe.
+   ===================================================================== */
+
+import { $, esc } from "./ui.js";
+import { AI_ENDPOINT, isAiConfigured } from "./config.js";
+import { answerLocally, DISCLAIMER } from "./ai-fallback.js";
+import { showVets } from "./vets.js";
+
+const OPENERS = [
+  "My pet is not eating",
+  "What if I missed a dose?",
+  "Find a vet nearby",
+  "What counts as an emergency?"
+];
+
+let busy = false;
+let currentPet = null;   // whichever pet is open on the dashboard right now
+
+/** app.js calls this on every pet switch, so a question asked as "my pet"
+    always resolves to whichever pet is currently selected — never a pet
+    left over from before the switch. */
+export function setPetContext(pet) { currentPet = pet; }
+
+export function init() {
+  $("#aiDisclaimer").textContent = DISCLAIMER;
+  $("#aiSource").textContent = isAiConfigured()
+    ? "Powered by Gemini · general care guidance"
+    : "Rule-based responder · general care guidance";
+
+  $("#aiFab").addEventListener("click", open);
+  $("#aiClose").addEventListener("click", close);
+
+  $("#aiForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const input = $("#aiInput");
+    const q = input.value.trim();
+    if (!q || busy) return;
+    input.value = "";
+    ask(q);
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !$("#aiPanel").hidden) close();
+  });
+
+  greet();
+}
+
+export function open() {
+  $("#aiPanel").hidden = false;
+  $("#aiFab").classList.add("is-hidden");
+  $("#aiFab").setAttribute("aria-expanded", "true");
+  setTimeout(() => $("#aiInput").focus(), 60);
+}
+
+export function close() {
+  $("#aiPanel").hidden = true;
+  $("#aiFab").classList.remove("is-hidden");
+  $("#aiFab").setAttribute("aria-expanded", "false");
+}
+
+/** Ask a question from outside the panel (e.g. a dashboard shortcut). */
+export function askFromOutside(q) { open(); ask(q); }
+
+function greet() {
+  bubble("bot", "Hi! How can I help with your pet? I can answer general care questions and help you find veterinary care.");
+  suggestions(OPENERS);
+}
+
+async function ask(question) {
+  busy = true;
+  bubble("user", question);
+  suggestions([]);
+  const typing = showTyping();
+
+  let reply;
+  try {
+    reply = isAiConfigured() ? await callFunction(question) : answerLocally(question, currentPet);
+  } catch (err) {
+    console.warn("[PetCare] AI call failed, using local responder.", err);
+    reply = answerLocally(question, currentPet);
+  }
+  typing.remove();
+  renderReply(reply);
+  busy = false;
+}
+
+async function callFunction(question) {
+  const res = await fetch(AI_ENDPOINT, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ question, petId: currentPet?.id || null, pet: petContextPayload() }),
+    signal: AbortSignal.timeout ? AbortSignal.timeout(12_000) : undefined
+  });
+  if (!res.ok) throw new Error(`AI endpoint returned ${res.status}`);
+  return await res.json();
+}
+
+/** Only the fields the system prompt actually needs — never the whole
+    pet document (memberUids, joinCode, and so on have no business
+    leaving the browser for this call). */
+function petContextPayload() {
+  if (!currentPet) return null;
+  return {
+    name: currentPet.name,
+    species: currentPet.species,
+    breed: currentPet.breed,
+    ageYears: currentPet.ageYears,
+    specialInstructions: currentPet.specialInstructions || {}
+  };
+}
+
+function renderReply(reply) {
+  const urgency = reply.urgency || "routine";
+  bubble("bot", reply.answer, urgency);
+
+  $("#aiSource").textContent = reply.source === "gemini"
+    ? "Powered by Gemini · general care guidance"
+    : "Rule-based responder · general care guidance";
+
+  if (reply.showVets) {
+    const note = urgency === "emergency"
+      ? "This may be an emergency. Contact a veterinary hospital now."
+      : "";
+    /* emergencies open the list immediately — no extra click on stage */
+    if (urgency === "emergency") {
+      showVets("emergency", note, true);
+    } else {
+      actionRow([
+        { label: "🏥 Find a vet", run: () => showVets(reply.vetFilter, "", false) }
+      ]);
+    }
+  }
+  suggestions(reply.suggestions?.length ? reply.suggestions : OPENERS);
+}
+
+/* ---------------- rendering helpers ---------------- */
+
+function bubble(who, text, urgency) {
+  const body = $("#aiBody");
+  const div = document.createElement("div");
+  div.className = `msg ${who}` + (urgency && urgency !== "routine" ? ` u-${urgency}` : "");
+  const flag = urgency === "emergency" ? "Seek veterinary care now"
+             : urgency === "soon"      ? "Contact a vet if this continues"
+             : "";
+  div.innerHTML = (flag ? `<span class="u-flag">${esc(flag)}</span>` : "") + esc(text);
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+  return div;
+}
+
+function showTyping() {
+  const body = $("#aiBody");
+  const el = document.createElement("div");
+  el.className = "typing";
+  el.innerHTML = "<i></i><i></i><i></i>";
+  body.appendChild(el);
+  body.scrollTop = body.scrollHeight;
+  return el;
+}
+
+function actionRow(actions) {
+  const body = $("#aiBody");
+  const row = document.createElement("div");
+  row.className = "ai-suggest";
+  row.style.padding = "0";
+  for (const a of actions) {
+    const b = document.createElement("button");
+    b.textContent = a.label;
+    b.addEventListener("click", a.run);
+    row.appendChild(b);
+  }
+  body.appendChild(row);
+  body.scrollTop = body.scrollHeight;
+}
+
+function suggestions(items) {
+  const wrap = $("#aiSuggest");
+  wrap.innerHTML = "";
+  for (const s of items) {
+    const b = document.createElement("button");
+    b.textContent = s;
+    b.addEventListener("click", () => {
+      if (/24\/7|hospital/i.test(s)) { showVets("emergency", "", false); return; }
+      if (/export/i.test(s)) { document.getElementById("btnExportCsv")?.click(); return; }
+      if (!busy) ask(s);
+    });
+    wrap.appendChild(b);
+  }
+}
+
+/* Warms the Cloud Function so the first question on stage is not the one
+   that pays for the cold start. Called once at boot. */
+export function prewarm() {
+  if (!isAiConfigured()) return;
+  fetch(AI_ENDPOINT, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ question: "__warmup__" })
+  }).catch(() => {});
+}

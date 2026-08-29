@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Set up your pet · PetCare</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐾</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="./css/styles.css">
+</head>
+<body class="onb-body">
+
+<div class="boot" id="boot"><span class="boot-mark">🐾</span><p>Loading…</p></div>
+
+<main class="onb-shell">
+  <header class="onb-top">
+    <div class="auth-brand">
+      <span class="brand-mark">🐾</span>
+      <span class="brand-name">PetCare</span>
+    </div>
+    <a class="btn btn-ghost btn-sm home-link" href="./home.html" title="Back to Home">
+      <span aria-hidden="true">🏠</span><span>Home</span>
+    </a>
+    <div class="onb-progress" id="onbProgress" hidden>
+      <span class="onb-dot" data-step="profile">●</span>
+      <span class="onb-dot-line"></span>
+      <span class="onb-dot" data-step="done">○</span>
+    </div>
+  </header>
+
+  <!-- ================= WELCOME ================= -->
+  <section class="onb-screen onb-welcome" id="screenWelcome" hidden>
+    <span class="onb-hero-mark">🐾</span>
+    <h1>Welcome to PetCare</h1>
+    <p class="onb-lede">Let's get your pet's care profile ready. We'll use these details to
+       personalize your care dashboard, reminders and AI assistant.</p>
+    <button class="btn btn-primary btn-lg" id="btnGetStarted">Get started →</button>
+    <button class="onb-skip" id="btnSkip" type="button">Skip for now</button>
+  </section>
+
+  <!-- ================= ADD / EDIT PET ================= -->
+  <section class="onb-screen onb-form-screen" id="screenAddPet" hidden>
+    <h1 id="addPetTitle">Tell us about your pet</h1>
+    <p class="onb-lede onb-lede-sm">Only the name and species are required — add as much or as
+       little else as you like.</p>
+
+    <form id="petForm" class="onb-form">
+      <label class="onb-field">
+        <span>Pet name <i>required</i></span>
+        <input type="text" id="fName" placeholder="Pet name" required>
+      </label>
+
+      <div class="onb-field">
+        <span>Species <i>required</i></span>
+        <div class="species-grid" id="speciesGrid" role="group" aria-label="Species"></div>
+      </div>
+
+      <div class="field-row">
+        <label class="onb-field">
+          <span id="fBreedLabel">Breed</span>
+          <select id="fBreed" disabled>
+            <option value="">Choose a pet type first</option>
+          </select>
+        </label>
+        <label class="onb-field">
+          <span>Age <i>years, optional</i></span>
+          <input type="number" id="fAge" min="0" max="40" step="1" placeholder="4">
+        </label>
+      </div>
+
+      <div class="onb-field" id="fBreedOtherWrap" hidden>
+        <span>Enter breed / type</span>
+        <input type="text" id="fBreedOther" placeholder="Type the breed or species">
+      </div>
+
+      <div class="field-row">
+        <label class="onb-field">
+          <span>Gender <i>optional</i></span>
+          <select id="fGender">
+            <option value="">Not specified</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+        </label>
+        <label class="onb-field">
+          <span>Weight <i>kg, optional</i></span>
+          <input type="number" id="fWeight" min="0" max="150" step="0.1" placeholder="24">
+        </label>
+      </div>
+
+      <div class="onb-field">
+        <span>Profile photo <i>optional</i></span>
+        <div class="photo-picker">
+          <div class="photo-preview" id="photoPreview">🐾</div>
+          <label class="btn btn-ghost btn-sm photo-upload-btn">
+            Choose photo
+            <input type="file" id="fPhoto" accept="image/*" hidden>
+          </label>
+          <button type="button" class="btn btn-ghost btn-sm" id="photoClear" hidden>Remove</button>
+        </div>
+      </div>
+
+      <div class="onb-field">
+        <span>Feeding schedule <i>customize anytime later</i></span>
+        <div class="feed-time-list" id="feedingTimesEditor"></div>
+      </div>
+
+      <label class="onb-field">
+        <span>Walk schedule <i>customize anytime later</i></span>
+        <input type="number" id="fWalkTarget" min="0" max="20" step="1" value="2" placeholder="2">
+      </label>
+
+      <label class="onb-field">
+        <span>Special instructions <i>optional</i></span>
+        <textarea id="fNotes" rows="2" placeholder="Allergies, medication routine, anything a caretaker should know"></textarea>
+      </label>
+
+      <p class="auth-error" id="petFormError" hidden></p>
+      <button class="btn btn-primary btn-block btn-lg" type="submit" id="petFormSubmit">Save pet</button>
+      <button type="button" class="btn btn-ghost btn-block" id="petFormCancel" hidden>Cancel</button>
+    </form>
+  </section>
+
+  <!-- ================= PET ADDED ================= -->
+  <section class="onb-screen onb-added" id="screenPetAdded" hidden>
+    <p class="onb-check">✓ <span id="addedName">Your pet</span> added successfully!</p>
+
+    <div class="pet-preview-card" id="petPreviewCard"></div>
+
+    <p class="onb-added-list" id="addedTally" hidden></p>
+
+    <div class="onb-added-actions">
+      <button class="btn btn-ghost btn-block" id="btnAddAnother">+ Add Another Pet</button>
+      <button class="btn btn-primary btn-block btn-lg" id="btnFinish">Continue to Dashboard →</button>
+    </div>
+  </section>
+
+</main>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+<script type="module" src="./js/onboarding.js"></script>
+</body>
+</html>

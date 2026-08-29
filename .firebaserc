@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "default": "petcare-cloud-cts"
+  },
+  "targets": {},
+  "etags": {}
+}

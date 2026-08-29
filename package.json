@@ -1,0 +1,27 @@
+{
+  "name": "petcare-cloud",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Pet care log, medication reminders, caretaker handoff and AI assistant. Firebase Hosting + Cloud Firestore + Cloud Functions + Gemini.",
+  "scripts": {
+    "dev": "npx --yes serve public -l 5173 --single",
+    "emulate": "firebase emulators:start",
+    "seed": "node scripts/seed.js",
+    "seed:reset": "node scripts/seed.js --reset",
+    "sync-fallback": "node scripts/sync-fallback.js",
+    "test:onboarding": "node scripts/test-onboarding.js",
+    "test:regression": "node scripts/test-regression.js",
+    "test:features": "node scripts/test-features.js",
+    "test:home": "node scripts/test-home.js",
+    "test:bin": "node scripts/test-bin.js",
+    "test:memories": "node scripts/test-memories.js",
+    "deploy": "firebase deploy --only hosting",
+    "deploy:all": "firebase deploy",
+    "deploy:rules": "firebase deploy --only firestore:rules",
+    "deploy:functions": "firebase deploy --only functions"
+  },
+  "devDependencies": {
+    "firebase-admin": "^12.1.0",
+    "playwright": "^1.45.0"
+  }
+}
