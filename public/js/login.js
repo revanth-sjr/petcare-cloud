@@ -16,14 +16,9 @@ boot();
 async function boot() {
   auth = await initAuth();
 
-  $("#authMode").innerHTML = auth.mode === "live"
-    ? `<span class="mode-badge" data-mode="live"><i class="dot"></i>Firebase Authentication</span>`
-    : `<span class="mode-badge" data-mode="demo"><i class="dot"></i>Demo accounts — stored in this browser</span>`;
-
-  $("#authNote").textContent = auth.mode === "live"
-    ? "Your password is handled by Firebase Authentication and never reaches this app."
-    : "";
-  $("#authNote").hidden = auth.mode !== "live";
+  $("#authMode").innerHTML = `<span class="mode-badge" data-mode="live"><i class="dot"></i>Firebase Authentication</span>`;
+  $("#authNote").textContent = "Your password is handled by Firebase Authentication and never reaches this app.";
+  $("#authNote").hidden = false;
 
   /* already signed in? send them wherever they left off */
   const existing = await auth.ready;
