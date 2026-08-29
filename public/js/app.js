@@ -115,7 +115,6 @@ async function boot() {
   await openPet(initialId);
 
   setInterval(repaint, 30_000);
-  setInterval(paintDevClock, 1_000);
 }
 
 /* ------------------------------------------------------------------
@@ -654,88 +653,15 @@ function wireStaticUi() {
   $("#btnHandoff").addEventListener("click", () => exportHandoff(dash));
   $("#vetName").addEventListener("click", () => showVets(null, "", false));
 
-  /* demo panel: double-click the logo */
-  $("#brand").addEventListener("dblclick", () => {
-    const p = $("#devPanel");
-    p.hidden = !p.hidden;
-    paintDevClock();
-  });
-  $("#devClose").addEventListener("click", () => { $("#devPanel").hidden = true; });
-  $$(".dev-shift button").forEach((btn) => {
-    btn.addEventListener("click", () => jumpTo(btn.dataset.jump, btn));
-  });
-  $("#devReseed").addEventListener("click", async () => {
-    try {
-      await store.reseed();
-      jumpTo("real");
-      toast("Demo data reseeded", "ok");
-    } catch (err) {
-      toast(err.message, "err");
-    }
-  });
-}
-
-/* ------------------------------------------------------------------
-   Demo clock. Jumps to a STATE rather than a fixed offset, so the same
-   button lands correctly whether you rehearse at 10am or demo at 9pm.
-   ------------------------------------------------------------------ */
-function jumpTo(kind, btn) {
-  setTimeOffsetMs(0);
-  const real = realNow();
-  let target = null;
-  let message = "Clock reset to real time";
-
-  if (kind !== "real") {
-    const fresh = buildDashboard(state, real);
-    const pending = fresh.medications.find((m) => m.status !== "COMPLETED");
-
-    if (kind === "nextday") {
-      target = new Date(istTimeToday("00:00", new Date(real.getTime() + 86_400_000)).getTime() + 30 * 60_000);
-      message = "Jumped past IST midnight — checklist resets, history stays";
-    } else if (!pending) {
-      toast(
-        state.medications?.length
-          ? "Every dose is already logged — reseed to demo Due / Overdue"
-          : "No medications to jump to — reseed first",
-        "err"
-      );
-      return;
-    } else if (kind === "due") {
-      target = new Date(istTimeToday(pending.slot, real).getTime() + 5 * 60_000);
-      message = `Clock set to ${fmtClock(target)} — ${pending.name} is due`;
-    } else if (kind === "overdue") {
-      target = new Date(istTimeToday(pending.slot, real).getTime() + (GRACE_MINUTES + 30) * 60_000);
-      message = `Clock set to ${fmtClock(target)} — ${pending.name} is overdue`;
-    }
-    if (target) setTimeOffsetMs(target - real);
-  }
-
-  const active = btn || document.querySelector(`.dev-shift button[data-jump="${kind}"]`);
-  $$(".dev-shift button").forEach((b) => b.classList.toggle("is-on", b === active));
-
-  repaint();
-  paintDevClock();
-  toast(message);
 }
 
 /* ------------------------------------------------------------------ */
 function setMode(mode, label) {
   const badge = $("#modeBadge");
-  badge.dataset.mode = mode;
-  $("#modeText").textContent = mode === "live" ? "Live · Firestore" : "Demo mode";
-  $("#footMode").textContent = label;
-  $("#devReseed").hidden = mode !== "demo";
-  if (mode === "demo") {
-    console.info("[PetCare] Demo mode. Add your Firebase config to js/config.js to go live.");
-  }
+  if (badge) badge.dataset.mode = mode;
+  const txt = $("#modeText");
+  if (txt) txt.textContent = mode === "live" ? "Live · Firestore" : "Demo mode";
+  const foot = $("#footMode");
+  if (foot) foot.textContent = label;
 }
 
-function paintDevClock() {
-  const el = $("#devClock");
-  if (el) el.textContent = `${fmtClock(now())}, ${fmtDate(now())}`;
-  const off = $("#devOffset");
-  if (off) {
-    const h = getTimeOffsetMs() / 3_600_000;
-    off.textContent = Math.abs(h) < 0.01 ? "" : `(${h > 0 ? "+" : ""}${h.toFixed(1)}h)`;
-  }
-}
