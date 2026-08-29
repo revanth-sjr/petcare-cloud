@@ -20,6 +20,7 @@ import { isFirebaseConfigured } from "./config.js";
 let auth = null;
 let session = null;
 let pets = [];
+const petStoreMap = new Map();
 
 boot();
 
@@ -47,14 +48,15 @@ async function boot() {
 
     renderWelcome();
 
-    const cards = await Promise.all(pets.map(peekPet));
-
-    renderOverview(cards);
-    renderAlerts(cards);
-    renderGallery(cards);
+    /* Setup live store subscriptions so when a care task is logged or completed,
+       overdue alerts, KPIs, and pet cards update automatically in real time. */
+    await setupLiveStores();
 
     $("#boot").hidden = true;
     $("#homeMain").hidden = false;
+
+    /* 30s periodic repaint to keep overdue/due-now timers accurate without refreshing */
+    setInterval(updateHomeView, 30_000);
   } catch (err) {
     console.error("[PetCare] Home page failed to load", err);
     const b = $("#boot");
@@ -68,32 +70,49 @@ async function boot() {
 }
 
 /* ------------------------------------------------------------------
-   Per-pet "peek": open the exact same store index.html would open,
-   take one snapshot, build the exact same dashboard contract, then
-   dispose. A pet this account can no longer reach (access revoked,
-   flaky connection) resolves to dash:null after a short timeout
-   instead of hanging the whole page — it still shows as a card, just
-   one that says so, rather than silently vanishing from the gallery.
+   Live per-pet store subscription: opens real-time listeners for all
+   user's pets. As care logs are completed or added, store updates fire
+   and updateHomeView() automatically clears completed overdue alerts!
    ------------------------------------------------------------------ */
-function peekPet(pet) {
-  return new Promise((resolve) => {
-    let settled = false;
-    const finish = (store, dash) => {
-      if (settled) return;
-      settled = true;
-      try { store?.dispose?.(); } catch { /* best effort */ }
-      resolve({ pet, dash });
-    };
-
-    createStore(pet.id, { uid: session.uid, email: session.email, name: session.name, role: pet.role })
-      .then((store) => {
-        store.subscribe((state) => {
-          finish(store, state?.pet ? buildDashboard(state, now()) : null);
+async function setupLiveStores() {
+  const promises = pets.map((pet) => {
+    return new Promise((resolve) => {
+      let settled = false;
+      createStore(pet.id, { uid: session.uid, email: session.email, name: session.name, role: pet.role })
+        .then((store) => {
+          petStoreMap.set(pet.id, { pet, store, dash: null });
+          store.subscribe((state) => {
+            const dash = state?.pet ? buildDashboard(state, now()) : null;
+            const entry = petStoreMap.get(pet.id);
+            if (entry) {
+              entry.dash = dash;
+              updateHomeView();
+            }
+            if (!settled) {
+              settled = true;
+              resolve();
+            }
+          });
+          setTimeout(() => {
+            if (!settled) { settled = true; resolve(); }
+          }, 6000);
+        })
+        .catch(() => {
+          petStoreMap.set(pet.id, { pet, store: null, dash: null });
+          if (!settled) { settled = true; resolve(); }
         });
-        setTimeout(() => finish(store, null), 6000);
-      })
-      .catch(() => finish(null, null));
+    });
   });
+
+  await Promise.all(promises);
+  updateHomeView();
+}
+
+function updateHomeView() {
+  const cards = pets.map((pet) => petStoreMap.get(pet.id) || { pet, dash: null });
+  renderOverview(cards);
+  renderAlerts(cards);
+  renderGallery(cards);
 }
 
 /* ------------------------------------------------------------------ */
