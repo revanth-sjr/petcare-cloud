@@ -76,15 +76,7 @@ function wireLogin() {
     }, "#loginError");
   });
 
-  /* one-click demo accounts — worth their weight on stage */
-  $$("[data-demo]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const owner = btn.dataset.demo === "owner";
-      $("#loginEmail").value    = owner ? "owner@petcare.demo" : "arun@petcare.demo";
-      $("#loginPassword").value = "petcare123";
-      $("#loginForm").requestSubmit();
-    });
-  });
+
 }
 
 /* ------------------------------------------------------------------ */
