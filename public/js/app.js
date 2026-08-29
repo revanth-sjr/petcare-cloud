@@ -392,7 +392,16 @@ function wirePetSelector() {
   });
 }
 
-function openPetMenu()  { renderPetMenu(); $("#petSwitcherMenu").hidden = false; $("#petSwitcherBtn").setAttribute("aria-expanded", "true"); }
+function openPetMenu() {
+  renderPetMenu();
+  $("#petSwitcherMenu").hidden = false;
+  $("#petSwitcherBtn").setAttribute("aria-expanded", "true");
+  const searchInput = $("#petSearchInput");
+  if (searchInput) {
+    searchInput.value = "";
+    setTimeout(() => searchInput.focus(), 50);
+  }
+}
 function closePetMenu() { $("#petSwitcherMenu").hidden = true;  $("#petSwitcherBtn").setAttribute("aria-expanded", "false"); }
 
 function updatePetSelectorUi() {
@@ -407,24 +416,59 @@ function updatePetSelectorUi() {
   $("#petSwitcherName").textContent = currentPet.name;
 }
 
-function renderPetMenu() {
+function renderPetMenu(filterText = "") {
   const menu = $("#petSwitcherMenu");
-  menu.innerHTML = "";
+  menu.innerHTML = `
+    <div class="pet-search-wrap">
+      <input type="text" id="petSearchInput" placeholder="🔍 Search pet..." class="pet-search-input" value="${esc(filterText)}">
+    </div>
+    <div class="pet-switcher-list" id="petSwitcherList"></div>
+  `;
 
-  for (const p of pets) {
-    const meta = speciesMeta(p.species);
-    const item = document.createElement("button");
-    item.type = "button";
-    item.setAttribute("role", "option");
-    item.className = `pet-switcher-item${p.id === selectedPetId ? " is-on" : ""}`;
-    item.innerHTML = `
-      <span class="pet-switcher-item-avatar"${p.photoURL ? ` style="background-image:url(${esc(p.photoURL)})"` : ""}>${p.photoURL ? "" : meta.icon}</span>
-      <span class="pet-switcher-item-info"><b>${esc(p.name)}</b><i>${esc(p.role)}</i></span>`;
-    item.addEventListener("click", () => {
-      closePetMenu();
-      if (p.id !== selectedPetId) openPet(p.id);
+  const searchInput = $("#petSearchInput");
+  if (searchInput) {
+    searchInput.addEventListener("input", (e) => {
+      e.stopPropagation();
+      filterPetItems(e.target.value);
     });
-    menu.appendChild(item);
+    searchInput.addEventListener("click", (e) => e.stopPropagation());
+    searchInput.addEventListener("keydown", (e) => e.stopPropagation());
+  }
+
+  filterPetItems(filterText);
+}
+
+function filterPetItems(term) {
+  const listContainer = $("#petSwitcherList");
+  if (!listContainer) return;
+  listContainer.innerHTML = "";
+
+  const query = (term || "").trim().toLowerCase();
+  const filtered = pets.filter((p) =>
+    !query ||
+    (p.name || "").toLowerCase().includes(query) ||
+    (p.breed || "").toLowerCase().includes(query) ||
+    (p.species || "").toLowerCase().includes(query)
+  );
+
+  if (!filtered.length) {
+    listContainer.innerHTML = `<p class="pet-search-empty">No pets match "${esc(term)}"</p>`;
+  } else {
+    for (const p of filtered) {
+      const meta = speciesMeta(p.species);
+      const item = document.createElement("button");
+      item.type = "button";
+      item.setAttribute("role", "option");
+      item.className = `pet-switcher-item${p.id === selectedPetId ? " is-on" : ""}`;
+      item.innerHTML = `
+        <span class="pet-switcher-item-avatar"${p.photoURL ? ` style="background-image:url(${esc(p.photoURL)})"` : ""}>${p.photoURL ? "" : meta.icon}</span>
+        <span class="pet-switcher-item-info"><b>${esc(p.name)}</b><i>${esc(p.role)}</i></span>`;
+      item.addEventListener("click", () => {
+        closePetMenu();
+        if (p.id !== selectedPetId) openPet(p.id);
+      });
+      listContainer.appendChild(item);
+    }
   }
 
   if (currentPet?.role === "owner") {
@@ -433,7 +477,7 @@ function renderPetMenu() {
     addItem.className = "pet-switcher-item pet-switcher-add";
     addItem.textContent = "+ Add a pet";
     addItem.addEventListener("click", () => { window.location.href = "./onboarding.html?mode=add"; });
-    menu.appendChild(addItem);
+    listContainer.appendChild(addItem);
   }
 }
 
