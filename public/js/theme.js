@@ -19,7 +19,11 @@ export function initTheme() {
 
   function updateButtons(currentTheme) {
     toggleBtns.forEach((btn) => {
-      btn.textContent = currentTheme === "dark" ? "🌙 Dark" : "☀️ Light";
+      const icon = currentTheme === "dark"
+        ? '<img src="https://img.icons8.com/ios-filled/50/moon-symbol.png" alt="Dark" class="ui-icon">'
+        : '<img src="https://img.icons8.com/ios-filled/50/sun.png" alt="Light" class="ui-icon">';
+      const label = currentTheme === "dark" ? "Dark" : "Light";
+      btn.innerHTML = `${icon} ${label}`;
       btn.title = `Current theme: ${currentTheme.toUpperCase()} (Click to toggle)`;
     });
   }

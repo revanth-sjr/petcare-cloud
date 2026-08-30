@@ -324,11 +324,15 @@ function renderAlerts(cards) {
 
   if (toggleBtn && !toggleBtn._wired) {
     toggleBtn._wired = true;
+    list.hidden = true;
+    toggleBtn.textContent = `Show details (${rows.length})`;
     toggleBtn.addEventListener("click", () => {
-      const collapsed = list.hidden;
-      list.hidden = !collapsed;
-      toggleBtn.textContent = collapsed ? "Collapse" : `Show details (${rows.length})`;
+      const isCollapsed = list.hidden;
+      list.hidden = !isCollapsed;
+      toggleBtn.textContent = !isCollapsed ? `Show details (${rows.length})` : "Collapse";
     });
+  } else if (toggleBtn) {
+    toggleBtn.textContent = list.hidden ? `Show details (${rows.length})` : "Collapse";
   }
 
   list.innerHTML = "";
