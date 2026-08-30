@@ -119,10 +119,31 @@ export async function create() {
       return () => listeners.delete(cb);
     },
 
-    async sendOtpForEmail(email, name = "") {
+    async sendOtpForEmail(email, name = "", options = {}) {
       const cleanEmail = String(email || "").trim().toLowerCase();
-      if (!cleanEmail || !cleanEmail.includes("@")) throw new Error("Enter a valid email address.");
-      
+      if (!cleanEmail || !cleanEmail.endsWith("@gmail.com")) {
+        throw new Error("Only legitimate @gmail.com email addresses are allowed.");
+      }
+
+      if (options.isLogin) {
+        let exists = false;
+        try {
+          const methods = await authMod.fetchSignInMethodsForEmail(auth, cleanEmail);
+          exists = methods && methods.length > 0;
+        } catch (e) {
+          try {
+            const q = fs.query(fs.collection(db, "users"), fs.where("email", "==", cleanEmail));
+            const snap = await fs.getDocs(q);
+            exists = !snap.empty;
+          } catch {
+            exists = true; // fail open if query fails
+          }
+        }
+        if (!exists) {
+          throw new Error("No PetCare account found with this Gmail address. Please check your email or click Sign Up to create an account.");
+        }
+      }
+
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
       
       try {

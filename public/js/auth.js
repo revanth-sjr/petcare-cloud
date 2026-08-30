@@ -66,10 +66,15 @@ const DISPOSABLE_EMAIL_DOMAINS = new Set([
 
 export function emailValidationError(v) {
   const clean = String(v || "").trim().toLowerCase();
-  if (!clean) return "Enter your email address.";
+  if (!clean) return "Enter your Gmail address.";
   if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(clean)) return "Enter a valid email address.";
+  
+  if (!clean.endsWith("@gmail.com")) {
+    return "Only legitimate @gmail.com email addresses are allowed.";
+  }
+  
   const domain = clean.split("@")[1];
-  if (DISPOSABLE_EMAIL_DOMAINS.has(domain)) return "Temporary/disposable emails are not allowed. Please use a real email.";
+  if (DISPOSABLE_EMAIL_DOMAINS.has(domain)) return "Temporary/disposable emails are not allowed. Please use your real Gmail address.";
   return null;
 }
 
