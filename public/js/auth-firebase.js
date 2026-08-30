@@ -108,7 +108,22 @@ export async function create() {
     async signIn({ email, password }) {
       const cred = await authMod.signInWithEmailAndPassword(auth, email.trim(), password);
       session = await hydrate(cred.user);
+      if (!cred.user.emailVerified) {
+        const snap = await fs.getDoc(fs.doc(db, "users", cred.user.uid));
+        let otp = snap.exists() ? snap.data()?.otpCode : null;
+        if (!otp) {
+          otp = Math.floor(100000 + Math.random() * 900000).toString();
+          await saveProfile(cred.user.uid, { otpCode: otp });
+        }
+      }
       return session;
+    },
+
+    async getOtpCode() {
+      const user = auth.currentUser;
+      if (!user) return null;
+      const snap = await fs.getDoc(fs.doc(db, "users", user.uid));
+      return snap.exists() ? snap.data()?.otpCode || null : null;
     },
 
     async resendVerificationEmail() {

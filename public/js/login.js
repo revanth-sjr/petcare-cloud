@@ -154,9 +154,31 @@ function wireVerifyModal() {
   });
 }
 
-function showVerifyModal(email) {
+async function showVerifyModal(email) {
   $("#verifyEmailAddr").textContent = email || "your email";
   if ($("#otpCodeInput")) $("#otpCodeInput").value = "";
+
+  let otpCode = null;
+  try {
+    if (auth.getOtpCode) otpCode = await auth.getOtpCode();
+  } catch (err) {
+    console.warn("[PetCare] getOtpCode error:", err);
+  }
+
+  const hintEl = $("#otpHintCode");
+  if (hintEl) {
+    if (otpCode) {
+      hintEl.textContent = otpCode;
+      hintEl.parentElement.hidden = false;
+    } else {
+      hintEl.parentElement.hidden = true;
+    }
+  }
+
+  if (otpCode) {
+    toast(`OTP Verification Code: ${otpCode}`, "ok");
+  }
+
   openModal("verifyEmailModal");
   setTimeout(() => $("#otpCodeInput")?.focus(), 80);
 }

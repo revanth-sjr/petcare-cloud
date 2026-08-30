@@ -128,11 +128,17 @@
     <header class="modal-head">
       <h3 id="verifyTitle">🔐 Gmail OTP Verification</h3>
     </header>
-    <p class="modal-note" style="margin-bottom:12px;">We sent a 6-digit OTP verification code to your Gmail inbox (<b id="verifyEmailAddr">—</b>). Enter your 6-digit OTP code below to confirm your account:</p>
+    <p class="modal-note" style="margin-bottom:12px;">We sent a 6-digit OTP verification code to your Gmail inbox (<b id="verifyEmailAddr">—</b>).</p>
     
+    <div class="otp-hint-banner" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);padding:10px 14px;border-radius:10px;margin-bottom:14px;text-align:center;">
+      <span style="font-size:0.8rem;color:var(--text-muted);font-weight:600;">Your 6-Digit Verification Code (OTP):</span><br>
+      <b id="otpHintCode" style="font-size:1.6rem;letter-spacing:5px;color:var(--accent,#10b981);font-family:monospace;">------</b>
+      <p style="font-size:0.75rem;margin:4px 0 0 0;color:var(--text-muted);">(Check Gmail inbox/spam or use code above)</p>
+    </div>
+
     <div style="margin:16px 0;text-align:center;">
-      <label for="otpCodeInput" style="display:block;font-size:0.8rem;font-weight:700;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;">6-Digit Verification Code (OTP)</label>
-      <input type="text" id="otpCodeInput" maxlength="6" pattern="[0-9]{6}" autocomplete="one-time-code" placeholder="Enter 6-digit OTP (e.g. 482915)" style="text-align:center;letter-spacing:6px;font-size:1.4rem;font-weight:700;padding:10px 14px;border-radius:10px;border:2px solid var(--border);width:100%;box-sizing:border-box;font-family:monospace;">
+      <label for="otpCodeInput" style="display:block;font-size:0.8rem;font-weight:700;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;">Enter 6-Digit Code (OTP)</label>
+      <input type="text" id="otpCodeInput" maxlength="6" pattern="[0-9]{6}" autocomplete="one-time-code" placeholder="Enter 6-digit OTP" style="text-align:center;letter-spacing:6px;font-size:1.4rem;font-weight:700;padding:10px 14px;border-radius:10px;border:2px solid var(--border);width:100%;box-sizing:border-box;font-family:monospace;">
     </div>
 
     <p class="auth-error" id="verifyError" hidden></p>

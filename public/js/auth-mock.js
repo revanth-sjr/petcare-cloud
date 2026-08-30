@@ -116,6 +116,10 @@ export async function create() {
       return session;
     },
 
+    async getOtpCode() {
+      return "123456";
+    },
+
     async resendVerificationEmail() {},
 
     async checkEmailVerification() { return true; },
