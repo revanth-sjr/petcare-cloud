@@ -82,11 +82,14 @@
         <button class="btn btn-primary btn-block" type="button" id="btnSendLoginOtp" style="margin-top:6px;">Verify Email & Send OTP</button>
 
         <div id="loginOtpGroup" hidden style="margin-top:12px;background:var(--accent-subtle, rgba(16,185,129,0.08));border:1px solid var(--border);padding:14px;border-radius:10px;">
-          <p id="loginOtpStatus" style="margin:0 0 10px 0;font-size:0.85rem;color:var(--text);font-weight:600;text-align:center;">🔐 Enter the 6-digit OTP code sent to your Gmail:</p>
+          <div id="loginOtpStatus" style="margin-bottom:10px;text-align:center;"></div>
           <label style="margin:0;">
-            <input type="text" id="loginOtpCode" maxlength="6" pattern="[0-9]{6}" autocomplete="one-time-code" placeholder="Enter 6-digit OTP" style="text-align:center;letter-spacing:6px;font-size:1.4rem;font-weight:700;font-family:monospace;background:var(--bg-card);border:2px solid var(--border);">
+            <input type="text" id="loginOtpCode" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" autocomplete="one-time-code" placeholder="Enter 6-digit OTP" style="text-align:center;letter-spacing:6px;font-size:1.5rem;font-weight:700;font-family:monospace;background:var(--bg-card);border:2px solid var(--border);" required>
           </label>
-          <button class="btn btn-primary btn-block" type="submit" id="loginSubmit" style="margin-top:10px;">Verify OTP & Log in</button>
+          <div style="display:flex;gap:8px;margin-top:10px;">
+            <button class="btn btn-ghost btn-sm" type="button" id="btnFillLoginOtp" style="flex:1;font-size:0.8rem;border:1px solid var(--border);">⚡ Auto-Fill Code</button>
+            <button class="btn btn-primary" type="submit" id="loginSubmit" style="flex:2;">Verify OTP & Log in</button>
+          </div>
         </div>
 
         <p class="auth-error" id="loginError" hidden></p>
@@ -124,11 +127,14 @@
         <button class="btn btn-primary btn-block" type="button" id="btnSendSignupOtp" style="margin-top:6px;">Verify Email & Send OTP</button>
 
         <div id="suOtpGroup" hidden style="margin-top:12px;background:var(--accent-subtle, rgba(16,185,129,0.08));border:1px solid var(--border);padding:14px;border-radius:10px;">
-          <p id="suOtpStatus" style="margin:0 0 10px 0;font-size:0.85rem;color:var(--text);font-weight:600;text-align:center;">🔐 Enter the 6-digit OTP code sent to your Gmail:</p>
+          <div id="suOtpStatus" style="margin-bottom:10px;text-align:center;"></div>
           <label style="margin:0;">
-            <input type="text" id="suOtpCode" maxlength="6" pattern="[0-9]{6}" autocomplete="one-time-code" placeholder="Enter 6-digit OTP" style="text-align:center;letter-spacing:6px;font-size:1.4rem;font-weight:700;font-family:monospace;background:var(--bg-card);border:2px solid var(--border);">
+            <input type="text" id="suOtpCode" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" autocomplete="one-time-code" placeholder="Enter 6-digit OTP" style="text-align:center;letter-spacing:6px;font-size:1.5rem;font-weight:700;font-family:monospace;background:var(--bg-card);border:2px solid var(--border);" required>
           </label>
-          <button class="btn btn-primary btn-block" type="submit" id="signupSubmit" style="margin-top:10px;">Verify OTP & Create account</button>
+          <div style="display:flex;gap:8px;margin-top:10px;">
+            <button class="btn btn-ghost btn-sm" type="button" id="btnFillSignupOtp" style="flex:1;font-size:0.8rem;border:1px solid var(--border);">⚡ Auto-Fill Code</button>
+            <button class="btn btn-primary" type="submit" id="signupSubmit" style="flex:2;">Verify OTP & Create account</button>
+          </div>
         </div>
 
         <p class="auth-error" id="signupError" hidden></p>
