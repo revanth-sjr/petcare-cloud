@@ -274,9 +274,11 @@ function renderOverview(cards) {
    and states the status in words.
    ------------------------------------------------------------------ */
 function renderAlerts(cards) {
-  const wrap = $("#homeAlerts");
-  const list = $("#homeAlertList");
-  const rows = [];
+  const wrap  = $("#homeAlerts");
+  const list  = $("#homeAlertList");
+  const count = $("#homeAlertCount");
+  const toggleBtn = $("#btnToggleAlerts");
+  const rows  = [];
 
   for (const { pet, dash } of cards) {
     if (!dash) continue;
@@ -311,6 +313,17 @@ function renderAlerts(cards) {
   }
 
   wrap.hidden = false;
+  if (count) count.textContent = String(rows.length);
+
+  if (toggleBtn && !toggleBtn._wired) {
+    toggleBtn._wired = true;
+    toggleBtn.addEventListener("click", () => {
+      const collapsed = list.hidden;
+      list.hidden = !collapsed;
+      toggleBtn.textContent = collapsed ? "Collapse" : `Show details (${rows.length})`;
+    });
+  }
+
   list.innerHTML = "";
   for (const row of rows) {
     const li = document.createElement("li");

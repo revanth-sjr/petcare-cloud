@@ -26,6 +26,9 @@
   --walk:#2C6C93;  --walk-bg:#E3EFF6;
   --med:#6A4A9C;   --med-bg:#EDE7F7;
 
+  --auth-pitch-bg:#16211E;
+  --topbar-bg:rgba(255,255,255,.92);
+
   --r:14px;
   --r-sm:9px;
   --shadow:0 1px 2px rgba(22,33,30,.05), 0 10px 30px -20px rgba(22,33,30,.35);
@@ -38,111 +41,64 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg:#0B132B;
-    --surface:#1C2541;
-    --surface-2:#2A365C;
-    --ink:#F1F5F9;
-    --ink-2:#CBD5E1;
-    --ink-3:#94A3B8;
-    --line:#2E3A62;
-    --line-2:#3E4C7A;
+    --bg:#090F1E;
+    --surface:#151F34;
+    --surface-2:#212D45;
+    --ink:#F8FAFC;
+    --ink-2:#94A3B8;
+    --ink-3:#64748B;
+    --line:#26334D;
+    --line-2:#334366;
 
     --accent:#2DD4BF;
     --accent-ink:#5EEAD4;
-    --accent-bg:#134E4A;
+    --accent-bg:#0F3836;
     --coral:#F97316;
 
-    --ok:#4ADE80;     --ok-bg:#14532D;
-    --warn:#FACC15;   --warn-bg:#713F12;
-    --crit:#F87171;   --crit-bg:#7F1D1D;
+    --ok:#4ADE80;     --ok-bg:#103B23;
+    --warn:#FACC15;   --warn-bg:#42290B;
+    --crit:#F87171;   --crit-bg:#481717;
 
-    --feed:#FB923C;   --feed-bg:#7C2D12;
-    --walk:#38BDF8;   --walk-bg:#0C4A6E;
-    --med:#C084FC;    --med-bg:#581C87;
+    --feed:#FB923C;   --feed-bg:#4A1D0B;
+    --walk:#38BDF8;   --walk-bg:#0C3652;
+    --med:#C084FC;    --med-bg:#3B165C;
 
-    --shadow:0 1px 3px rgba(0,0,0,.4), 0 10px 30px -10px rgba(0,0,0,.6);
-    --shadow-lg:0 20px 50px -15px rgba(0,0,0,.8);
+    --auth-pitch-bg:#060C1A;
+    --topbar-bg:rgba(21, 31, 52, 0.92);
+
+    --shadow:0 4px 20px rgba(0,0,0,.5);
+    --shadow-lg:0 20px 50px rgba(0,0,0,.7);
   }
 }
 
 [data-theme="dark"] {
-  --bg:#0B132B;
-  --surface:#1C2541;
-  --surface-2:#2A365C;
-  --ink:#F1F5F9;
-  --ink-2:#CBD5E1;
-  --ink-3:#94A3B8;
-  --line:#2E3A62;
-  --line-2:#3E4C7A;
+  --bg:#090F1E;
+  --surface:#151F34;
+  --surface-2:#212D45;
+  --ink:#F8FAFC;
+  --ink-2:#94A3B8;
+  --ink-3:#64748B;
+  --line:#26334D;
+  --line-2:#334366;
 
   --accent:#2DD4BF;
   --accent-ink:#5EEAD4;
-  --accent-bg:#134E4A;
+  --accent-bg:#0F3836;
   --coral:#F97316;
 
-  --ok:#4ADE80;     --ok-bg:#14532D;
-  --warn:#FACC15;   --warn-bg:#713F12;
-  --crit:#F87171;   --crit-bg:#7F1D1D;
+  --ok:#4ADE80;     --ok-bg:#103B23;
+  --warn:#FACC15;   --warn-bg:#42290B;
+  --crit:#F87171;   --crit-bg:#481717;
 
-  --feed:#FB923C;   --feed-bg:#7C2D12;
-  --walk:#38BDF8;   --walk-bg:#0C4A6E;
-  --med:#C084FC;    --med-bg:#581C87;
+  --feed:#FB923C;   --feed-bg:#4A1D0B;
+  --walk:#38BDF8;   --walk-bg:#0C3652;
+  --med:#C084FC;    --med-bg:#3B165C;
 
-  --shadow:0 1px 3px rgba(0,0,0,.4), 0 10px 30px -10px rgba(0,0,0,.6);
-  --shadow-lg:0 20px 50px -15px rgba(0,0,0,.8);
-}
+  --auth-pitch-bg:#060C1A;
+  --topbar-bg:rgba(21, 31, 52, 0.92);
 
-[data-theme="dark"] .topbar,
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .topbar {
-    background: rgba(28, 37, 65, 0.85);
-  }
-}
-
-[data-theme="dark"] .auth-pitch,
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .auth-pitch {
-    background: #060B18;
-  }
-}
-
-[data-theme="dark"] input,
-[data-theme="dark"] select,
-[data-theme="dark"] textarea,
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) input,
-  :root:not([data-theme="light"]) select,
-  :root:not([data-theme="light"]) textarea {
-    background: var(--surface-2);
-    color: var(--ink);
-    border-color: var(--line);
-  }
-}
-
-[data-theme="dark"] .modal-box,
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .modal-box {
-    background: var(--surface);
-    color: var(--ink);
-    border: 1px solid var(--line);
-  }
-}
-
-[data-theme="dark"] .pet-switcher-menu,
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .pet-switcher-menu {
-    background: var(--surface);
-    border-color: var(--line);
-  }
-}
-
-[data-theme="dark"] .pet-search-input,
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .pet-search-input {
-    background: var(--surface-2);
-    color: var(--ink);
-    border-color: var(--line);
-  }
+  --shadow:0 4px 20px rgba(0,0,0,.5);
+  --shadow-lg:0 20px 50px rgba(0,0,0,.7);
 }
 
 *{box-sizing:border-box}
@@ -166,7 +122,7 @@ button{font-family:inherit;font-size:inherit;color:inherit}
   position:sticky;top:0;z-index:40;
   display:flex;align-items:center;justify-content:space-between;gap:16px;
   padding:12px 24px;
-  background:rgba(255,255,255,.9);
+  background:var(--topbar-bg);
   backdrop-filter:saturate(1.4) blur(10px);
   border-bottom:1px solid var(--line);
 }
@@ -629,7 +585,7 @@ button{font-family:inherit;font-size:inherit;color:inherit}
    short headline, four one-line value points. No gradients, no imagery,
    no long paragraphs — the login form on the right stays the focus. */
 .auth-pitch{
-  background:var(--ink);color:#EAF1EF;
+  background:var(--auth-pitch-bg);color:#EAF1EF;
   padding:68px 56px;display:flex;flex-direction:column;
 }
 .auth-brand{display:flex;align-items:center;gap:12px;margin-bottom:56px}
@@ -1143,17 +1099,39 @@ button{font-family:inherit;font-size:inherit;color:inherit}
 .overview-card.is-bad .overview-body b{color:var(--crit)}
 
 /* ---------------- cross-pet alerts ---------------- */
-.home-alerts .section-title{margin-bottom:10px}
-.home-alert-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.home-alerts{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  padding:16px 20px;box-shadow:var(--shadow);
+}
+.home-alerts-head{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin-bottom:12px;
+}
+.home-alerts-title{display:flex;align-items:center;gap:8px}
+.home-alerts-title .section-title{margin:0}
+.home-alert-badge{font-size:18px}
+.home-alert-list{
+  list-style:none;margin:0;padding:0;
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;
+}
 .home-alert-item{
   width:100%;display:flex;align-items:center;gap:10px;text-align:left;
-  padding:11px 14px;border-radius:var(--r-sm);
-  border:1px solid var(--line);background:var(--surface);
-  font:inherit;font-size:13.5px;color:inherit;cursor:pointer;
+  padding:9px 13px;border-radius:var(--r-sm);
+  border:1px solid var(--line);background:var(--surface-2);
+  font:inherit;font-size:13px;font-weight:500;color:var(--ink);cursor:pointer;
+  transition:border-color .15s ease, transform .12s ease;
 }
-.home-alert-item:hover{border-color:var(--line-2)}
+.home-alert-item:hover{border-color:var(--line-2);transform:translateY(-1px)}
 .home-alert-item.is-crit{background:var(--crit-bg);border-color:var(--crit);color:var(--crit)}
 .home-alert-item.is-warn{background:var(--warn-bg);border-color:var(--warn);color:var(--warn)}
+[data-theme="dark"] .home-alert-item.is-crit,
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .home-alert-item.is-crit { color:#FCA5A5; }
+}
+[data-theme="dark"] .home-alert-item.is-warn,
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .home-alert-item.is-warn { color:#FDE047; }
+}
 .home-alert-icon{font-size:16px;flex:none}
 
 /* ---------------- pet gallery: flash cards ---------------- */

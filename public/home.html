@@ -89,7 +89,14 @@
   <section class="overview-grid" id="overviewGrid" aria-label="Today's overview across all pets"></section>
 
   <section class="home-alerts" id="homeAlerts" hidden aria-label="Needs attention">
-    <h2 class="section-title">Needs attention</h2>
+    <div class="home-alerts-head">
+      <div class="home-alerts-title">
+        <span class="home-alert-badge">⚠️</span>
+        <h2 class="section-title" style="margin:0;">Needs attention</h2>
+        <span class="pill pill-crit" id="homeAlertCount" style="margin-left:6px;">0</span>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="btnToggleAlerts" type="button">Collapse</button>
+    </div>
     <ul class="home-alert-list" id="homeAlertList"></ul>
   </section>
 
