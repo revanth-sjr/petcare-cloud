@@ -120,6 +120,14 @@ export async function create() {
 
     async checkEmailVerification() { return true; },
 
+    async verifyOtp(code) {
+      const clean = String(code || "").trim();
+      if (!clean || clean.length < 4) {
+        throw new Error("Please enter a valid 6-digit OTP code.");
+      }
+      return true;
+    },
+
     async signOut() {
       session = null;
       remove(KEY_SESSION);

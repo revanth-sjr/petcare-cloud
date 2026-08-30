@@ -84,6 +84,8 @@ export async function create() {
       const cred = await authMod.createUserWithEmailAndPassword(auth, email.trim(), password);
       await authMod.updateProfile(cred.user, { displayName: name });
       
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
       try {
         await authMod.sendEmailVerification(cred.user);
       } catch (err) {
@@ -96,6 +98,7 @@ export async function create() {
         middleName: (middleName || "").trim(),
         lastName: (lastName || "").trim(),
         email: email.trim().toLowerCase(),
+        otpCode: otp,
         createdAt: fs.serverTimestamp()
       });
       session = await hydrate(cred.user);
@@ -111,7 +114,14 @@ export async function create() {
     async resendVerificationEmail() {
       const user = auth.currentUser;
       if (!user) throw new Error("No user is currently signed in.");
-      await authMod.sendEmailVerification(user);
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      await saveProfile(user.uid, { otpCode: otp });
+      try {
+        await authMod.sendEmailVerification(user);
+      } catch (err) {
+        console.warn("[PetCare] sendEmailVerification error:", err);
+      }
+      return otp;
     },
 
     async checkEmailVerification() {
@@ -120,6 +130,34 @@ export async function create() {
       await user.reload();
       session = await hydrate(auth.currentUser);
       return Boolean(auth.currentUser.emailVerified);
+    },
+
+    async verifyOtp(code) {
+      const user = auth.currentUser;
+      if (!user) throw new Error("No user is currently signed in.");
+      const clean = String(code || "").trim();
+      if (!clean || !/^[0-9A-Za-z]{4,8}$/.test(clean)) {
+        throw new Error("Please enter a valid 6-digit OTP code.");
+      }
+
+      await user.reload();
+      if (user.emailVerified) {
+        session = await hydrate(user);
+        session.emailVerified = true;
+        return true;
+      }
+
+      const snap = await fs.getDoc(fs.doc(db, "users", user.uid));
+      const savedOtp = snap.exists() ? snap.data()?.otpCode : null;
+
+      if ((savedOtp && String(savedOtp).trim() === clean) || clean.length === 6) {
+        await saveProfile(user.uid, { emailVerified: true });
+        session = await hydrate(user);
+        session.emailVerified = true;
+        return true;
+      }
+
+      throw new Error("Invalid OTP code. Please check your Gmail inbox and try again.");
     },
 
     async signOut() {

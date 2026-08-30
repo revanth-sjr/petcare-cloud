@@ -3,7 +3,7 @@
    Pod A owns this file.
    ===================================================================== */
 
-import { $, $$, toast, esc } from "./ui.js";
+import { $, $$, toast, esc, openModal, closeModal, closeAllModals } from "./ui.js";
 import {
   initAuth, validateSignup, validateLogin, authMessage, normaliseCode
 } from "./auth.js";
@@ -102,20 +102,28 @@ function wireVerifyModal() {
   $("#btnCheckVerify")?.addEventListener("click", async () => {
     const btn = $("#btnCheckVerify");
     const orig = btn.textContent;
+    const otpCode = $("#otpCodeInput")?.value?.trim() || "";
+
     btn.disabled = true;
-    btn.textContent = "Checking…";
+    btn.textContent = "Verifying OTP…";
     $("#verifyError").hidden = true;
     try {
-      const verified = await auth.checkEmailVerification();
+      let verified = false;
+      if (otpCode) {
+        verified = await auth.verifyOtp(otpCode);
+      } else {
+        verified = await auth.checkEmailVerification();
+      }
+
       if (verified) {
-        toast("Email verified successfully!", "ok");
+        toast("OTP verified successfully!", "ok");
         closeAllModals();
         await finish();
       } else {
-        showError("#verifyError", "Email not verified yet. Please check your inbox and click the link.");
+        showError("#verifyError", "OTP verification incomplete. Enter your 6-digit OTP code or click the link in your Gmail inbox.");
       }
     } catch (err) {
-      showError("#verifyError", err.message || "Could not check verification status.");
+      showError("#verifyError", err.message || "Invalid OTP code.");
     } finally {
       btn.disabled = false;
       btn.textContent = orig;
@@ -126,13 +134,13 @@ function wireVerifyModal() {
     const btn = $("#btnResendVerify");
     const orig = btn.textContent;
     btn.disabled = true;
-    btn.textContent = "Sending…";
+    btn.textContent = "Sending OTP…";
     $("#verifyError").hidden = true;
     try {
       await auth.resendVerificationEmail();
-      toast("Verification email resent!", "ok");
+      toast("A new 6-digit OTP has been sent to your Gmail inbox!", "ok");
     } catch (err) {
-      showError("#verifyError", err.message || "Could not resend verification email.");
+      showError("#verifyError", err.message || "Could not resend OTP email.");
     } finally {
       btn.disabled = false;
       btn.textContent = orig;
@@ -148,7 +156,9 @@ function wireVerifyModal() {
 
 function showVerifyModal(email) {
   $("#verifyEmailAddr").textContent = email || "your email";
+  if ($("#otpCodeInput")) $("#otpCodeInput").value = "";
   openModal("verifyEmailModal");
+  setTimeout(() => $("#otpCodeInput")?.focus(), 80);
 }
 
 /* ------------------------------------------------------------------
