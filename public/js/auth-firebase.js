@@ -119,44 +119,10 @@ export async function create() {
       return () => listeners.delete(cb);
     },
 
-    async sendOtpForEmail(email, name = "", options = {}) {
+    async sendOtpForEmail(email, name = "") {
       const cleanEmail = String(email || "").trim().toLowerCase();
       if (!cleanEmail || !cleanEmail.endsWith("@gmail.com")) {
         throw new Error("Only legitimate @gmail.com email addresses are allowed.");
-      }
-
-      /* Real-time SMTP & Mailbox Deliverability API check */
-      try {
-        const res = await fetch(`https://api.eva.pingutil.com/email?email=${encodeURIComponent(cleanEmail)}`, { signal: AbortSignal.timeout(3500) });
-        if (res.ok) {
-          const json = await res.json();
-          const d = json?.data;
-          if (d && (d.deliverable === false || d.valid_smtp === false || d.disposable === true)) {
-            throw new Error(`The Gmail address '${cleanEmail}' does not exist on Google servers or is undeliverable. Please enter your real, active Gmail address.`);
-          }
-        }
-      } catch (err) {
-        if (err.message && err.message.includes("does not exist")) throw err;
-        console.warn("[PetCare Email] Deliverability check skipped/warn:", err);
-      }
-
-      if (options.isLogin) {
-        let exists = false;
-        try {
-          const methods = await authMod.fetchSignInMethodsForEmail(auth, cleanEmail);
-          exists = methods && methods.length > 0;
-        } catch (e) {
-          try {
-            const q = fs.query(fs.collection(db, "users"), fs.where("email", "==", cleanEmail));
-            const snap = await fs.getDocs(q);
-            exists = !snap.empty;
-          } catch {
-            exists = true; // fail open if query fails
-          }
-        }
-        if (!exists) {
-          throw new Error("No PetCare account found with this Gmail address. Please check your email or click Sign Up to create an account.");
-        }
       }
 
       const otp = Math.floor(100000 + Math.random() * 900000).toString();

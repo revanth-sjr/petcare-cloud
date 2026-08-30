@@ -72,7 +72,7 @@ function wireLogin() {
     btn.textContent = "Sending OTP…";
     hideErrors();
     try {
-      await auth.sendOtpForEmail(creds.email, "", { isLogin: true });
+      await auth.sendOtpForEmail(creds.email);
       $("#loginOtpGroup").hidden = false;
       setTimeout(() => $("#loginOtpCode")?.focus(), 80);
     } catch (err) {
