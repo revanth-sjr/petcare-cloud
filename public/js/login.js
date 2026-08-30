@@ -56,9 +56,6 @@ function wireTabs() {
   });
 }
 
-let loginCurrentOtp = "";
-let signupCurrentOtp = "";
-
 /* ------------------------------------------------------------------ */
 function wireLogin() {
   $("#btnSendLoginOtp")?.addEventListener("click", async () => {
@@ -75,29 +72,14 @@ function wireLogin() {
     btn.textContent = "Sending OTP…";
     hideErrors();
     try {
-      const otpCode = await auth.sendOtpForEmail(creds.email);
-      loginCurrentOtp = otpCode;
+      await auth.sendOtpForEmail(creds.email);
       $("#loginOtpGroup").hidden = false;
-      if ($("#loginOtpStatus")) {
-        $("#loginOtpStatus").innerHTML = `
-          <p style="margin:0 0 4px 0;font-size:0.9rem;font-weight:700;">🔐 Your 6-Digit OTP Code is: <b style="font-size:1.3rem;color:var(--accent-strong,#10b981);letter-spacing:4px;font-family:monospace;">${otpCode}</b></p>
-          <p style="margin:0;font-size:0.8rem;color:var(--text-muted);">Enter the 6-digit numeric code <b>${otpCode}</b> below or click Auto-Fill:</p>
-        `;
-      }
-      toast(`Your 6-digit OTP code is ${otpCode}!`, "ok");
       setTimeout(() => $("#loginOtpCode")?.focus(), 80);
     } catch (err) {
       showError("#loginError", err.message || "Could not send OTP email.");
     } finally {
       btn.disabled = false;
       btn.textContent = orig;
-    }
-  });
-
-  $("#btnFillLoginOtp")?.addEventListener("click", () => {
-    if (loginCurrentOtp) {
-      $("#loginOtpCode").value = loginCurrentOtp;
-      toast(`Auto-filled 6-digit OTP: ${loginCurrentOtp}`, "ok");
     }
   });
 
@@ -112,7 +94,7 @@ function wireLogin() {
     if (problem) return showError("#loginError", problem);
 
     if (!creds.otpCode || creds.otpCode.length !== 6 || !/^[0-9]{6}$/.test(creds.otpCode)) {
-      return showError("#loginError", "Enter the 6-digit numeric OTP code (e.g. " + (loginCurrentOtp || "392328") + "). Do not enter hex letters.");
+      return showError("#loginError", "Please enter the 6-digit OTP code received in your Gmail inbox.");
     }
 
     await busy("#loginSubmit", "Logging in…", async () => {
@@ -141,29 +123,14 @@ function wireSignup() {
     btn.textContent = "Sending OTP…";
     hideErrors();
     try {
-      const otpCode = await auth.sendOtpForEmail(details.email, details.firstName);
-      signupCurrentOtp = otpCode;
+      await auth.sendOtpForEmail(details.email, details.firstName);
       $("#suOtpGroup").hidden = false;
-      if ($("#suOtpStatus")) {
-        $("#suOtpStatus").innerHTML = `
-          <p style="margin:0 0 4px 0;font-size:0.9rem;font-weight:700;">🔐 Your 6-Digit OTP Code is: <b style="font-size:1.3rem;color:var(--accent-strong,#10b981);letter-spacing:4px;font-family:monospace;">${otpCode}</b></p>
-          <p style="margin:0;font-size:0.8rem;color:var(--text-muted);">Enter the 6-digit numeric code <b>${otpCode}</b> below or click Auto-Fill:</p>
-        `;
-      }
-      toast(`Your 6-digit OTP code is ${otpCode}!`, "ok");
       setTimeout(() => $("#suOtpCode")?.focus(), 80);
     } catch (err) {
       showError("#signupError", err.message || "Could not send OTP email.");
     } finally {
       btn.disabled = false;
       btn.textContent = orig;
-    }
-  });
-
-  $("#btnFillSignupOtp")?.addEventListener("click", () => {
-    if (signupCurrentOtp) {
-      $("#suOtpCode").value = signupCurrentOtp;
-      toast(`Auto-filled 6-digit OTP: ${signupCurrentOtp}`, "ok");
     }
   });
 
@@ -182,7 +149,7 @@ function wireSignup() {
     if (problem) return showError("#signupError", problem);
 
     if (!details.otpCode || details.otpCode.length !== 6 || !/^[0-9]{6}$/.test(details.otpCode)) {
-      return showError("#signupError", "Enter the 6-digit numeric OTP code (e.g. " + (signupCurrentOtp || "392328") + "). Do not enter hex letters.");
+      return showError("#signupError", "Please enter the 6-digit OTP code received in your Gmail inbox.");
     }
 
     await busy("#signupSubmit", "Creating account…", async () => {
