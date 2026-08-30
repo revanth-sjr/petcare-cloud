@@ -474,17 +474,21 @@ function filterPetItems(term) {
     }
   }
 
-  const joinItem = document.createElement("button");
-  joinItem.type = "button";
-  joinItem.className = "pet-switcher-item pet-switcher-add";
-  joinItem.textContent = "+ Join a pet";
-  joinItem.addEventListener("click", () => {
-    closePetMenu();
-    openJoinModalOnDashboard();
-  });
-  listContainer.appendChild(joinItem);
+  const isOwner = session?.role === "owner" || currentPet?.role === "owner";
 
-  if (currentPet?.role === "owner") {
+  if (!isOwner) {
+    const joinItem = document.createElement("button");
+    joinItem.type = "button";
+    joinItem.className = "pet-switcher-item pet-switcher-add";
+    joinItem.textContent = "+ Join a pet";
+    joinItem.addEventListener("click", () => {
+      closePetMenu();
+      openJoinModalOnDashboard();
+    });
+    listContainer.appendChild(joinItem);
+  }
+
+  if (isOwner) {
     const addItem = document.createElement("button");
     addItem.type = "button";
     addItem.className = "pet-switcher-item pet-switcher-add";

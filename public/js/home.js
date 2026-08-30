@@ -124,16 +124,23 @@ function paintUser() {
 }
 
 function renderRoleUi() {
-  const owned = pets.some((pet) => pet.role === "owner");
-  const caretakerOnly = pets.length > 0 && !owned;
-  const allCaretaker = pets.length > 0 && pets.every((pet) => pet.role === "caretaker");
-  const role = $("#userRole");
+  const owned = pets.some((p) => p.role === "owner");
+  const caretakerOnly = pets.length > 0 && pets.every((p) => p.role === "caretaker");
+  const allCaretaker  = pets.length > 0 && pets.every((p) => p.role === "caretaker");
 
-  role.textContent = allCaretaker ? "caretaker" : owned ? "owner" : "—";
-  role.className = `role-chip ${allCaretaker ? "caretaker" : "owner"}`;
-  $("#btnAddPetHome").hidden = caretakerOnly;
-  $("#btnEmptyAddPet").hidden = caretakerOnly;
-  if (caretakerOnly) {
+  const showOwnerActions = session?.role === "owner" || (session?.role !== "caretaker" && (owned || pets.length === 0));
+
+  const role = $("#userRole");
+  role.textContent = showOwnerActions ? "owner" : "caretaker";
+  role.className = `role-chip ${role.textContent}`;
+
+  if ($("#btnAddPetHome")) $("#btnAddPetHome").hidden = !showOwnerActions;
+  if ($("#btnEmptyAddPet")) $("#btnEmptyAddPet").hidden = !showOwnerActions;
+
+  if ($("#btnJoinPetHome")) $("#btnJoinPetHome").hidden = showOwnerActions;
+  if ($("#btnEmptyJoinPet")) $("#btnEmptyJoinPet").hidden = showOwnerActions;
+
+  if (!showOwnerActions) {
     $("#welcomeSub").textContent = "Caretaker dashboard: keep every pet's care on track today.";
   }
 }
