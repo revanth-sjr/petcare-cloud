@@ -125,6 +125,21 @@ export async function create() {
         throw new Error("Only legitimate @gmail.com email addresses are allowed.");
       }
 
+      /* Real-time SMTP & Mailbox Deliverability API check */
+      try {
+        const res = await fetch(`https://api.eva.pingutil.com/email?email=${encodeURIComponent(cleanEmail)}`, { signal: AbortSignal.timeout(3500) });
+        if (res.ok) {
+          const json = await res.json();
+          const d = json?.data;
+          if (d && (d.deliverable === false || d.valid_smtp === false || d.disposable === true)) {
+            throw new Error(`The Gmail address '${cleanEmail}' does not exist on Google servers or is undeliverable. Please enter your real, active Gmail address.`);
+          }
+        }
+      } catch (err) {
+        if (err.message && err.message.includes("does not exist")) throw err;
+        console.warn("[PetCare Email] Deliverability check skipped/warn:", err);
+      }
+
       if (options.isLogin) {
         let exists = false;
         try {
