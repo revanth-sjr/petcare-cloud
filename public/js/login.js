@@ -25,7 +25,7 @@ async function boot() {
   wireTabs();
   wireLogin();
   wireSignup();
-  wireVerifyModal();
+  wireOtpForm();
 
   /* already signed in? send them wherever they left off */
   const existing = await auth.ready;
@@ -98,69 +98,65 @@ function wireSignup() {
   });
 }
 
-function wireVerifyModal() {
-  $("#btnCheckVerify")?.addEventListener("click", async () => {
-    const btn = $("#btnCheckVerify");
-    const orig = btn.textContent;
-    const otpCode = $("#otpCodeInput")?.value?.trim() || "";
+function wireOtpForm() {
+  $("#otpForm")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const code = $("#otpCodeInput")?.value?.trim() || "";
 
-    btn.disabled = true;
-    btn.textContent = "Verifying OTP…";
-    $("#verifyError").hidden = true;
-    try {
-      let verified = false;
-      if (otpCode) {
-        verified = await auth.verifyOtp(otpCode);
-      } else {
-        verified = await auth.checkEmailVerification();
-      }
+    if (!code || code.length !== 6) {
+      return showError("#otpError", "Please enter the complete 6-digit OTP code received in your Gmail inbox.");
+    }
 
+    await busy("#btnVerifyOtp", "Verifying OTP…", async () => {
+      const verified = await auth.verifyOtp(code);
       if (verified) {
         toast("OTP verified successfully!", "ok");
-        closeAllModals();
         await finish();
       } else {
-        showError("#verifyError", "OTP verification incomplete. Enter your 6-digit OTP code or click the link in your Gmail inbox.");
+        showError("#otpError", "Incorrect OTP code. Please check your Gmail inbox and enter the 6-digit code.");
       }
-    } catch (err) {
-      showError("#verifyError", err.message || "Invalid OTP code.");
-    } finally {
-      btn.disabled = false;
-      btn.textContent = orig;
-    }
+    }, "#otpError");
   });
 
-  $("#btnResendVerify")?.addEventListener("click", async () => {
-    const btn = $("#btnResendVerify");
+  $("#btnResendOtp")?.addEventListener("click", async () => {
+    const btn = $("#btnResendOtp");
     const orig = btn.textContent;
     btn.disabled = true;
-    btn.textContent = "Sending OTP…";
-    $("#verifyError").hidden = true;
+    btn.textContent = "Sending…";
+    $("#otpError").hidden = true;
     try {
       await auth.resendVerificationEmail();
-      toast("A new 6-digit OTP has been sent to your Gmail inbox!", "ok");
+      toast("A new 6-digit OTP code has been sent to your Gmail inbox!", "ok");
     } catch (err) {
-      showError("#verifyError", err.message || "Could not resend OTP email.");
+      showError("#otpError", err.message || "Could not resend OTP email.");
     } finally {
       btn.disabled = false;
       btn.textContent = orig;
     }
   });
 
-  $("#btnSignOutVerify")?.addEventListener("click", async () => {
-    await auth.signOut();
-    closeAllModals();
-    location.reload();
+  $("#btnBackToLogin")?.addEventListener("click", async () => {
+    try { await auth.signOut(); } catch { /* ignore */ }
+    $("#otpForm").hidden = true;
+    $$(".auth-tabs").forEach(e => e.hidden = false);
+    const activeTab = $$(".auth-tabs button").find(b => b.classList.contains("is-on"))?.dataset?.tab || "login";
+    $("#loginForm").hidden = activeTab !== "login";
+    $("#signupForm").hidden = activeTab !== "signup";
+    hideErrors();
   });
 }
 
-async function showVerifyModal(email) {
-  $("#verifyEmailAddr").textContent = email || "your email";
+function showOtpSection(email) {
+  $$(".auth-tabs").forEach(e => e.hidden = true);
+  $("#loginForm").hidden = true;
+  $("#signupForm").hidden = true;
+
+  $("#otpForm").hidden = false;
+  $("#otpEmailTarget").textContent = email || "your Gmail address";
   if ($("#otpCodeInput")) $("#otpCodeInput").value = "";
+  $("#otpError").hidden = true;
 
-  toast(`6-digit OTP email sent to ${email}. Please check your Gmail inbox & Spam folder!`, "ok");
-
-  openModal("verifyEmailModal");
+  toast(`6-digit OTP sent to ${email}. Check your Gmail inbox & Spam folder!`, "ok");
   setTimeout(() => $("#otpCodeInput")?.focus(), 80);
 }
 
@@ -170,7 +166,7 @@ async function showVerifyModal(email) {
 async function finish() {
   const session = auth.current();
   if (auth.mode === "live" && session && session.otpVerified !== true) {
-    showVerifyModal(session.email);
+    showOtpSection(session.email);
     return;
   }
 
