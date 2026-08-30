@@ -171,6 +171,14 @@ function wireSignup() {
    Where next depends on whether this account has a pet yet — not on a
    flag, on the actual count, so it can never go stale. */
 async function finish() {
+  const session = auth.current();
+  if (auth.mode === "live" && session && session.otpVerified !== true) {
+    if ($("#loginEmail")) $("#loginEmail").value = session.email || "";
+    if ($("#loginOtpGroup")) $("#loginOtpGroup").hidden = false;
+    showError("#loginError", "Please click 'Verify Email & Send OTP' and enter your 6-digit OTP code to complete login.");
+    return;
+  }
+
   let hasPet = false;
   try { hasPet = (await auth.myPets()).length > 0; } catch { /* fail open to onboarding */ }
   if (hasPet || signupPath === "join") {

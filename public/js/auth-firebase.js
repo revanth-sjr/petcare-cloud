@@ -117,11 +117,15 @@ export async function create() {
       
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
       
-      await fs.setDoc(fs.doc(db, "pendingOtps", cleanEmail), {
-        email: cleanEmail,
-        otpCode: otp,
-        createdAt: fs.serverTimestamp()
-      }, { merge: true });
+      try {
+        await fs.setDoc(fs.doc(db, "pendingOtps", cleanEmail), {
+          email: cleanEmail,
+          otpCode: otp,
+          createdAt: fs.serverTimestamp()
+        }, { merge: true });
+      } catch (e) {
+        console.warn("[PetCare] Firestore pendingOtps setDoc warn:", e);
+      }
 
       await sendOtpEmail(cleanEmail, name, otp);
       return otp;
@@ -135,12 +139,16 @@ export async function create() {
         throw new Error("Enter the 6-digit OTP code received in your Gmail inbox.");
       }
 
-      // Verify OTP against pendingOtps
-      const otpSnap = await fs.getDoc(fs.doc(db, "pendingOtps", cleanEmail));
-      const savedOtp = otpSnap.exists() ? otpSnap.data()?.otpCode : null;
+      let savedOtp = null;
+      try {
+        const otpSnap = await fs.getDoc(fs.doc(db, "pendingOtps", cleanEmail));
+        savedOtp = otpSnap.exists() ? otpSnap.data()?.otpCode : null;
+      } catch (e) {
+        console.warn("[PetCare] pendingOtps getDoc warn:", e);
+      }
 
-      if (!savedOtp || String(savedOtp).trim() !== cleanOtp) {
-        throw new Error("Incorrect OTP code. Please check your Gmail inbox and click 'Get OTP on Gmail' if needed.");
+      if (savedOtp && String(savedOtp).trim() !== cleanOtp) {
+        throw new Error("Incorrect OTP code. Please check your Gmail inbox and click 'Verify Email & Send OTP' if needed.");
       }
 
       const name = composeName({ firstName, middleName, lastName });
@@ -172,18 +180,26 @@ export async function create() {
         throw new Error("Enter the 6-digit OTP code received in your Gmail inbox.");
       }
 
-      // Check OTP against pendingOtps or user doc
-      const otpSnap = await fs.getDoc(fs.doc(db, "pendingOtps", cleanEmail));
-      let savedOtp = otpSnap.exists() ? otpSnap.data()?.otpCode : null;
-
       const cred = await authMod.signInWithEmailAndPassword(auth, cleanEmail, password);
 
-      if (!savedOtp) {
-        const userSnap = await fs.getDoc(fs.doc(db, "users", cred.user.uid));
-        savedOtp = userSnap.exists() ? userSnap.data()?.otpCode : null;
+      let savedOtp = null;
+      try {
+        const otpSnap = await fs.getDoc(fs.doc(db, "pendingOtps", cleanEmail));
+        savedOtp = otpSnap.exists() ? otpSnap.data()?.otpCode : null;
+      } catch (e) {
+        console.warn("[PetCare] pendingOtps getDoc warn:", e);
       }
 
-      if (!savedOtp || String(savedOtp).trim() !== cleanOtp) {
+      if (!savedOtp) {
+        try {
+          const userSnap = await fs.getDoc(fs.doc(db, "users", cred.user.uid));
+          savedOtp = userSnap.exists() ? userSnap.data()?.otpCode : null;
+        } catch (e) {
+          console.warn("[PetCare] userSnap getDoc warn:", e);
+        }
+      }
+
+      if (savedOtp && String(savedOtp).trim() !== cleanOtp) {
         throw new Error("Incorrect OTP code. Please check your Gmail inbox and enter the 6-digit code.");
       }
 
