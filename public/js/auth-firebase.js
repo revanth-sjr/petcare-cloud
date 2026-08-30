@@ -65,6 +65,14 @@ export async function create() {
     };
   }
 
+  async function saveProfile(uid, patch) {
+    try {
+      await fs.setDoc(fs.doc(db, "users", uid), patch, { merge: true });
+    } catch (e) {
+      console.warn("[PetCare] saveProfile setDoc warn:", e);
+    }
+  }
+
   async function sendOtpEmail(targetEmail, targetName, otpCode) {
     const cleanEmail = targetEmail.trim().toLowerCase();
     
