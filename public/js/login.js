@@ -39,6 +39,8 @@ function wireTabs() {
       $$(".auth-tabs button").forEach((b) => b.classList.toggle("is-on", b === btn));
       $("#loginForm").hidden  = tab !== "login";
       $("#signupForm").hidden = tab !== "signup";
+      if ($("#loginOtpGroup")) $("#loginOtpGroup").hidden = true;
+      if ($("#suOtpGroup")) $("#suOtpGroup").hidden = true;
       hideErrors();
     });
   });
@@ -57,17 +59,25 @@ function wireTabs() {
 /* ------------------------------------------------------------------ */
 function wireLogin() {
   $("#btnSendLoginOtp")?.addEventListener("click", async () => {
-    const email = $("#loginEmail").value.trim();
-    if (!email || !email.includes("@")) return showError("#loginError", "Enter your email address first.");
+    const creds = {
+      email:    $("#loginEmail").value,
+      password: $("#loginPassword").value
+    };
+    const problem = validateLogin(creds);
+    if (problem) return showError("#loginError", problem);
 
     const btn = $("#btnSendLoginOtp");
     const orig = btn.textContent;
     btn.disabled = true;
-    btn.textContent = "Sending…";
+    btn.textContent = "Sending OTP…";
     hideErrors();
     try {
-      await auth.sendOtpForEmail(email);
-      toast(`6-digit OTP code sent to ${email}! Check your Gmail inbox & Spam folder.`, "ok");
+      const otpCode = await auth.sendOtpForEmail(creds.email);
+      $("#loginOtpGroup").hidden = false;
+      if ($("#loginOtpStatus")) {
+        $("#loginOtpStatus").innerHTML = `🔐 OTP code sent to Gmail (<b>Code: ${otpCode}</b>):`;
+      }
+      toast(`6-digit OTP code sent to ${creds.email}!`, "ok");
       setTimeout(() => $("#loginOtpCode")?.focus(), 80);
     } catch (err) {
       showError("#loginError", err.message || "Could not send OTP email.");
@@ -88,7 +98,7 @@ function wireLogin() {
     if (problem) return showError("#loginError", problem);
 
     if (!creds.otpCode || creds.otpCode.length !== 6) {
-      return showError("#loginError", "Enter the 6-digit OTP code received in your Gmail inbox.");
+      return showError("#loginError", "Click 'Verify Email & Send OTP' above and enter your 6-digit OTP code.");
     }
 
     await busy("#loginSubmit", "Logging in…", async () => {
@@ -101,18 +111,28 @@ function wireLogin() {
 /* ------------------------------------------------------------------ */
 function wireSignup() {
   $("#btnSendSignupOtp")?.addEventListener("click", async () => {
-    const email = $("#suEmail").value.trim();
-    const firstName = $("#suFirstName").value.trim();
-    if (!email || !email.includes("@")) return showError("#signupError", "Enter your email address first.");
+    const details = {
+      firstName:  $("#suFirstName").value,
+      middleName: $("#suMiddleName").value,
+      lastName:   $("#suLastName").value,
+      email:      $("#suEmail").value,
+      password:   $("#suPassword").value
+    };
+    const problem = validateSignup(details);
+    if (problem) return showError("#signupError", problem);
 
     const btn = $("#btnSendSignupOtp");
     const orig = btn.textContent;
     btn.disabled = true;
-    btn.textContent = "Sending…";
+    btn.textContent = "Sending OTP…";
     hideErrors();
     try {
-      await auth.sendOtpForEmail(email, firstName);
-      toast(`6-digit OTP code sent to ${email}! Check your Gmail inbox & Spam folder.`, "ok");
+      const otpCode = await auth.sendOtpForEmail(details.email, details.firstName);
+      $("#suOtpGroup").hidden = false;
+      if ($("#suOtpStatus")) {
+        $("#suOtpStatus").innerHTML = `🔐 OTP code sent to Gmail (<b>Code: ${otpCode}</b>):`;
+      }
+      toast(`6-digit OTP code sent to ${details.email}!`, "ok");
       setTimeout(() => $("#suOtpCode")?.focus(), 80);
     } catch (err) {
       showError("#signupError", err.message || "Could not send OTP email.");
@@ -137,7 +157,7 @@ function wireSignup() {
     if (problem) return showError("#signupError", problem);
 
     if (!details.otpCode || details.otpCode.length !== 6) {
-      return showError("#signupError", "Enter the 6-digit OTP code received in your Gmail inbox.");
+      return showError("#signupError", "Click 'Verify Email & Send OTP' above and enter your 6-digit OTP code.");
     }
 
     await busy("#signupSubmit", "Creating account…", async () => {
@@ -151,15 +171,6 @@ function wireSignup() {
    Where next depends on whether this account has a pet yet — not on a
    flag, on the actual count, so it can never go stale. */
 async function finish() {
-  let hasPet = false;
-  try { hasPet = (await auth.myPets()).length > 0; } catch { /* fail open to onboarding */ }
-  if (hasPet || signupPath === "join") {
-    window.location.replace("./home.html");
-  } else {
-    window.location.replace("./onboarding.html?mode=first");
-  }
-}
-
   let hasPet = false;
   try { hasPet = (await auth.myPets()).length > 0; } catch { /* fail open to onboarding */ }
   if (hasPet || signupPath === "join") {

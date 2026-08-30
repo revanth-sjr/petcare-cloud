@@ -69,34 +69,35 @@
       <p class="auth-mode" id="authMode"></p>
 
       <!-- ---------- LOG IN ---------- -->
-      <form id="loginForm" class="auth-form">
+      <form id="loginForm" class="auth-form" novalidate>
         <label>
           <span>Email</span>
-          <input type="email" id="loginEmail" autocomplete="email" placeholder="Enter your username or email" required>
+          <input type="email" id="loginEmail" autocomplete="email" placeholder="Enter your email address">
         </label>
         <label>
           <span>Password</span>
-          <input type="password" id="loginPassword" autocomplete="current-password" placeholder="Your password" required>
+          <input type="password" id="loginPassword" autocomplete="current-password" placeholder="Your password">
         </label>
 
-        <label style="margin-top:4px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-            <span>Gmail Verification OTP</span>
-            <button type="button" class="btn btn-ghost btn-sm" id="btnSendLoginOtp" style="padding:2px 8px;font-size:0.78rem;">Get OTP on Gmail</button>
-          </div>
-          <input type="text" id="loginOtpCode" maxlength="6" pattern="[0-9]{6}" autocomplete="one-time-code" placeholder="Enter 6-digit OTP from Gmail" style="text-align:center;letter-spacing:6px;font-weight:700;font-family:monospace;" required>
-        </label>
+        <button class="btn btn-primary btn-block" type="button" id="btnSendLoginOtp" style="margin-top:6px;">Verify Email & Send OTP</button>
+
+        <div id="loginOtpGroup" hidden style="margin-top:12px;background:var(--accent-subtle, rgba(16,185,129,0.08));border:1px solid var(--border);padding:14px;border-radius:10px;">
+          <p id="loginOtpStatus" style="margin:0 0 10px 0;font-size:0.85rem;color:var(--text);font-weight:600;text-align:center;">🔐 Enter the 6-digit OTP code sent to your Gmail:</p>
+          <label style="margin:0;">
+            <input type="text" id="loginOtpCode" maxlength="6" pattern="[0-9]{6}" autocomplete="one-time-code" placeholder="Enter 6-digit OTP" style="text-align:center;letter-spacing:6px;font-size:1.4rem;font-weight:700;font-family:monospace;background:var(--bg-card);border:2px solid var(--border);">
+          </label>
+          <button class="btn btn-primary btn-block" type="submit" id="loginSubmit" style="margin-top:10px;">Verify OTP & Log in</button>
+        </div>
 
         <p class="auth-error" id="loginError" hidden></p>
-        <button class="btn btn-primary btn-block" type="submit" id="loginSubmit">Log in</button>
       </form>
 
       <!-- ---------- SIGN UP ---------- -->
-      <form id="signupForm" class="auth-form" hidden>
+      <form id="signupForm" class="auth-form" hidden novalidate>
         <div class="field-row">
           <label>
             <span>First Name <i>required</i></span>
-            <input type="text" id="suFirstName" autocomplete="given-name" placeholder="Enter your first name" required>
+            <input type="text" id="suFirstName" autocomplete="given-name" placeholder="Enter your first name">
           </label>
           <label>
             <span>Middle Name <i>optional</i></span>
@@ -105,31 +106,32 @@
         </div>
         <label>
           <span>Last Name <i>required</i></span>
-          <input type="text" id="suLastName" autocomplete="family-name" placeholder="Enter your last name" required>
+          <input type="text" id="suLastName" autocomplete="family-name" placeholder="Enter your last name">
         </label>
         <label>
           <span>Email</span>
-          <input type="email" id="suEmail" autocomplete="email" placeholder="you@example.com" required>
+          <input type="email" id="suEmail" autocomplete="email" placeholder="you@example.com">
         </label>
         <label>
           <span>Password</span>
-          <input type="password" id="suPassword" autocomplete="new-password" placeholder="At least 6 characters" required>
+          <input type="password" id="suPassword" autocomplete="new-password" placeholder="At least 6 characters">
         </label>
         <div class="seg" role="group" aria-label="What are you signing up for">
           <button type="button" data-path="owner" class="is-on">I'm the owner</button>
           <button type="button" data-path="join">I'm a caretaker</button>
         </div>
 
-        <label style="margin-top:4px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-            <span>Gmail Verification OTP</span>
-            <button type="button" class="btn btn-ghost btn-sm" id="btnSendSignupOtp" style="padding:2px 8px;font-size:0.78rem;">Get OTP on Gmail</button>
-          </div>
-          <input type="text" id="suOtpCode" maxlength="6" pattern="[0-9]{6}" autocomplete="one-time-code" placeholder="Enter 6-digit OTP from Gmail" style="text-align:center;letter-spacing:6px;font-weight:700;font-family:monospace;" required>
-        </label>
+        <button class="btn btn-primary btn-block" type="button" id="btnSendSignupOtp" style="margin-top:6px;">Verify Email & Send OTP</button>
+
+        <div id="suOtpGroup" hidden style="margin-top:12px;background:var(--accent-subtle, rgba(16,185,129,0.08));border:1px solid var(--border);padding:14px;border-radius:10px;">
+          <p id="suOtpStatus" style="margin:0 0 10px 0;font-size:0.85rem;color:var(--text);font-weight:600;text-align:center;">🔐 Enter the 6-digit OTP code sent to your Gmail:</p>
+          <label style="margin:0;">
+            <input type="text" id="suOtpCode" maxlength="6" pattern="[0-9]{6}" autocomplete="one-time-code" placeholder="Enter 6-digit OTP" style="text-align:center;letter-spacing:6px;font-size:1.4rem;font-weight:700;font-family:monospace;background:var(--bg-card);border:2px solid var(--border);">
+          </label>
+          <button class="btn btn-primary btn-block" type="submit" id="signupSubmit" style="margin-top:10px;">Verify OTP & Create account</button>
+        </div>
 
         <p class="auth-error" id="signupError" hidden></p>
-        <button class="btn btn-primary btn-block" type="submit" id="signupSubmit">Create account</button>
       </form>
 
       <p class="auth-note" id="authNote"></p>
