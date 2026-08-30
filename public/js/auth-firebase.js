@@ -121,8 +121,8 @@ export async function create() {
 
     async sendOtpForEmail(email, name = "") {
       const cleanEmail = String(email || "").trim().toLowerCase();
-      if (!cleanEmail || !cleanEmail.endsWith("@gmail.com")) {
-        throw new Error("Only legitimate @gmail.com email addresses are allowed.");
+      if (!cleanEmail || !cleanEmail.includes("@")) {
+        throw new Error("Enter a valid email address.");
       }
 
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
