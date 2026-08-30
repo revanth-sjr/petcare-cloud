@@ -29,7 +29,7 @@ export function render(dash, session) {
     codeBox.hidden = true;
   }
 
-  $("#btnAddCaretaker").hidden = !isOwner;
+  if ($("#btnAddCaretaker")) $("#btnAddCaretaker").hidden = !isOwner;
   $("#ctReadonlyNote").hidden  = isOwner;
 
   const list = $("#caretakerList");
@@ -109,28 +109,8 @@ function confirmRemove(ct) {
 
 /* ------------------------------------------------------------------ */
 function wire() {
-  $("#btnAddCaretaker").addEventListener("click", () => {
-    $("#addCaretakerForm").reset();
-    $("#addCtError").hidden = true;
+  $("#btnAddCaretaker")?.addEventListener("click", () => {
     openModal("caretakerModal");
-    setTimeout(() => $("#ctName2").focus(), 60);
-  });
-
-  $("#addCaretakerForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const name  = $("#ctName2").value.trim();
-    const email = $("#ctEmail").value.trim();
-    const note  = $("#ctNote2").value.trim();
-
-    if (name.length < 2)            return fail("Enter the caretaker's name.");
-    if (email && !isEmail(email))   return fail("That email address doesn't look right.");
-
-    try {
-      await ctx.store.addCaretaker({ name, email, note });
-      closeAllModals();
-      toast(`${name} added to the care team`, "ok");
-      ctx.repaint();
-    } catch (err) { fail(err.message); }
   });
 
   $("#btnCopyCode").addEventListener("click", async () => {

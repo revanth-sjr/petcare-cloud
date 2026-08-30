@@ -16,6 +16,7 @@ import { initAuth, speciesMeta, normaliseCode } from "./auth.js";
 import { createStore, buildDashboard } from "./data.js";
 import { now, fmtClock, dayPeriod, istTimeToday } from "./time.js";
 import { isFirebaseConfigured } from "./config.js";
+import { initTheme } from "./theme.js";
 
 let auth = null;
 let session = null;
@@ -25,6 +26,7 @@ const petStoreMap = new Map();
 boot();
 
 async function boot() {
+  initTheme();
   try {
     auth = await initAuth();
     session = await auth.ready;

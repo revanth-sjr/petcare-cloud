@@ -16,6 +16,7 @@
 import { $, $$, toast, esc } from "./ui.js";
 import { initAuth, speciesMeta, validatePetForm } from "./auth.js";
 import { wireSpeciesGrid, wireBreedSelect, wireFeedingScheduleEditor, wirePhotoPicker } from "./pets-ui.js";
+import { initTheme } from "./theme.js";
 
 let auth = null;
 let session = null;
@@ -33,6 +34,7 @@ const mode = new URLSearchParams(location.search).get("mode") || "first";
 boot();
 
 async function boot() {
+  initTheme();
   auth = await initAuth();
   session = await auth.ready;
 

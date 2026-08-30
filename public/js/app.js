@@ -34,6 +34,7 @@ import * as memoriesView from "./memories.js";
 import * as chat from "./chat.js";
 import { setVets, showVets } from "./vets.js";
 import { exportCsv, exportHandoff, exportTxt } from "./export.js";
+import { initTheme } from "./theme.js";
 
 let auth = null;
 let session = null;          // identity only: {uid, email, name, lastSelectedPetId}
@@ -55,6 +56,7 @@ let epPhoto = null;           // edit-pet photo picker controller
 boot();
 
 async function boot() {
+  initTheme();
   auth = await initAuth();
   session = await auth.ready;
 

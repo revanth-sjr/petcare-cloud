@@ -10,6 +10,12 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
 <link rel="stylesheet" href="./css/styles.css">
+<script>
+  (function() {
+    var t = localStorage.getItem("petcare.theme");
+    if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t);
+  })();
+</script>
 </head>
 <body>
 
@@ -55,6 +61,7 @@
   </div>
 
   <div class="topbar-right">
+    <button class="btn btn-ghost btn-sm theme-toggle-btn" id="themeToggleBtn" type="button" title="Toggle theme">💻 System</button>
     <span class="mode-badge" id="modeBadge" data-mode="loading">
       <i class="dot"></i><span id="modeText">Connecting…</span>
     </span>
@@ -245,7 +252,6 @@
     <section class="card" id="careTeamCard" aria-label="Care team">
       <div class="card-head">
         <h2>Care team</h2>
-        <button class="btn btn-primary btn-sm" id="btnAddCaretaker">+ Add</button>
       </div>
 
       <div class="joincode" id="joinCodeBox" hidden>

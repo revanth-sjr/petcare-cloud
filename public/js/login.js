@@ -7,6 +7,7 @@ import { $, $$, toast, esc } from "./ui.js";
 import {
   initAuth, validateSignup, validateLogin, authMessage, normaliseCode
 } from "./auth.js";
+import { initTheme } from "./theme.js";
 
 let auth = null;
 let signupPath = "owner";     // 'owner' | 'join'
@@ -14,6 +15,7 @@ let signupPath = "owner";     // 'owner' | 'join'
 boot();
 
 async function boot() {
+  initTheme();
   auth = await initAuth();
 
   $("#authMode").innerHTML = `<span class="mode-badge" data-mode="live"><i class="dot"></i>Firebase Authentication</span>`;

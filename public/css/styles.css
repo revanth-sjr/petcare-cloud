@@ -36,6 +36,115 @@
   --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:#0B132B;
+    --surface:#1C2541;
+    --surface-2:#2A365C;
+    --ink:#F1F5F9;
+    --ink-2:#CBD5E1;
+    --ink-3:#94A3B8;
+    --line:#2E3A62;
+    --line-2:#3E4C7A;
+
+    --accent:#2DD4BF;
+    --accent-ink:#5EEAD4;
+    --accent-bg:#134E4A;
+    --coral:#F97316;
+
+    --ok:#4ADE80;     --ok-bg:#14532D;
+    --warn:#FACC15;   --warn-bg:#713F12;
+    --crit:#F87171;   --crit-bg:#7F1D1D;
+
+    --feed:#FB923C;   --feed-bg:#7C2D12;
+    --walk:#38BDF8;   --walk-bg:#0C4A6E;
+    --med:#C084FC;    --med-bg:#581C87;
+
+    --shadow:0 1px 3px rgba(0,0,0,.4), 0 10px 30px -10px rgba(0,0,0,.6);
+    --shadow-lg:0 20px 50px -15px rgba(0,0,0,.8);
+  }
+}
+
+[data-theme="dark"] {
+  --bg:#0B132B;
+  --surface:#1C2541;
+  --surface-2:#2A365C;
+  --ink:#F1F5F9;
+  --ink-2:#CBD5E1;
+  --ink-3:#94A3B8;
+  --line:#2E3A62;
+  --line-2:#3E4C7A;
+
+  --accent:#2DD4BF;
+  --accent-ink:#5EEAD4;
+  --accent-bg:#134E4A;
+  --coral:#F97316;
+
+  --ok:#4ADE80;     --ok-bg:#14532D;
+  --warn:#FACC15;   --warn-bg:#713F12;
+  --crit:#F87171;   --crit-bg:#7F1D1D;
+
+  --feed:#FB923C;   --feed-bg:#7C2D12;
+  --walk:#38BDF8;   --walk-bg:#0C4A6E;
+  --med:#C084FC;    --med-bg:#581C87;
+
+  --shadow:0 1px 3px rgba(0,0,0,.4), 0 10px 30px -10px rgba(0,0,0,.6);
+  --shadow-lg:0 20px 50px -15px rgba(0,0,0,.8);
+}
+
+[data-theme="dark"] .topbar,
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .topbar {
+    background: rgba(28, 37, 65, 0.85);
+  }
+}
+
+[data-theme="dark"] .auth-pitch,
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .auth-pitch {
+    background: #060B18;
+  }
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea,
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) input,
+  :root:not([data-theme="light"]) select,
+  :root:not([data-theme="light"]) textarea {
+    background: var(--surface-2);
+    color: var(--ink);
+    border-color: var(--line);
+  }
+}
+
+[data-theme="dark"] .modal-box,
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .modal-box {
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--line);
+  }
+}
+
+[data-theme="dark"] .pet-switcher-menu,
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .pet-switcher-menu {
+    background: var(--surface);
+    border-color: var(--line);
+  }
+}
+
+[data-theme="dark"] .pet-search-input,
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .pet-search-input {
+    background: var(--surface-2);
+    color: var(--ink);
+    border-color: var(--line);
+  }
+}
+
 *{box-sizing:border-box}
 /* .btn and .pill set display, which would otherwise beat the UA [hidden] rule */
 [hidden]{display:none!important}

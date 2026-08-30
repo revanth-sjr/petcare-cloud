@@ -9,6 +9,12 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
 <link rel="stylesheet" href="./css/styles.css">
+<script>
+  (function() {
+    var t = localStorage.getItem("petcare.theme");
+    if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t);
+  })();
+</script>
 </head>
 <body class="auth-body">
 
@@ -53,6 +59,9 @@
   <!-- ===== right: the form ===== -->
   <section class="auth-panel">
     <div class="auth-card">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+        <button class="btn btn-ghost btn-sm theme-toggle-btn" id="themeToggleBtnLogin" type="button" title="Toggle theme">💻 System</button>
+      </div>
 
       <div class="auth-tabs" role="tablist">
         <button role="tab" data-tab="login"  class="is-on">Log in</button>
