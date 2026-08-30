@@ -75,6 +75,36 @@ export function emailValidationError(v) {
   
   const domain = clean.split("@")[1];
   if (DISPOSABLE_EMAIL_DOMAINS.has(domain)) return "Temporary/disposable emails are not allowed. Please use your real Gmail address.";
+
+  const username = clean.split("@")[0];
+
+  // 1. Min length requirement for Gmail usernames (Gmail requires at least 6 characters)
+  const alphaNumeric = username.replace(/[^a-z0-9]/g, "");
+  if (alphaNumeric.length < 6) {
+    return "Gmail usernames must be at least 6 characters long.";
+  }
+
+  // 2. Reject keyboard mash patterns (e.g. asdfgh, dfghj, fghjk, ghjkl, qwerty, zxcvbn)
+  const mashPatterns = [/asdfgh/i, /dfghj/i, /fghjk/i, /ghjkl/i, /qwerty/i, /wertyu/i, /zxcvbn/i, /xcvbnm/i, /123456/i];
+  for (const pat of mashPatterns) {
+    if (pat.test(username)) {
+      return "Fake or random keyboard-mash Gmail addresses are not allowed. Please enter your real Gmail address.";
+    }
+  }
+
+  // 3. Reject high consonant cluster mashing (e.g. 5+ consecutive consonants like dftghjh)
+  const consonantClusters = username.match(/[^aeiouy0-9._]{5,}/g);
+  if (consonantClusters) {
+    return "Invalid or fake Gmail username detected. Please enter a legitimate, registered Gmail address.";
+  }
+
+  // 4. Vowel ratio check for longer usernames (>7 letters)
+  const vowels = (username.match(/[aeiouy]/g) || []).length;
+  const letters = (username.match(/[a-z]/g) || []).length;
+  if (letters >= 7 && vowels === 0) {
+    return "Invalid or fake Gmail username format. Please enter your real Gmail address.";
+  }
+
   return null;
 }
 
@@ -85,8 +115,13 @@ export const isEmail = (v) => !emailValidationError(v);
     the app already reads (performedBy, ownerName, chat context, …), so
     nothing downstream needed to change for this split. */
 export function validateSignup({ firstName, lastName, email, password }) {
-  if (!firstName || firstName.trim().length < 1) return "Enter your first name.";
-  if (!lastName || lastName.trim().length < 1)   return "Enter your last name.";
+  if (!firstName || firstName.trim().length < 2) return "Enter a valid first name (at least 2 characters).";
+  if (!lastName || lastName.trim().length < 2)   return "Enter a valid last name (at least 2 characters).";
+
+  const isMash = (str) => /[^aeiouy\s]{5,}/i.test(str) || /(.)\1{3,}/i.test(str);
+  if (isMash(firstName)) return "Please enter a valid first name.";
+  if (isMash(lastName)) return "Please enter a valid last name.";
+
   const emailErr = emailValidationError(email);
   if (emailErr) return emailErr;
   if (!password || password.length < RULES.passwordMin)
