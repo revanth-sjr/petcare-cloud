@@ -38,7 +38,7 @@ async function boot() {
   auth = await initAuth();
   session = await auth.ready;
 
-  if (!session || (auth.mode === "live" && session.emailVerified === false)) {
+  if (!session || (auth.mode === "live" && session.otpVerified !== true)) {
     window.location.replace("./login.html");
     return;
   }

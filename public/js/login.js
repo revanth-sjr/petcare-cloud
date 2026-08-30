@@ -158,26 +158,7 @@ async function showVerifyModal(email) {
   $("#verifyEmailAddr").textContent = email || "your email";
   if ($("#otpCodeInput")) $("#otpCodeInput").value = "";
 
-  let otpCode = null;
-  try {
-    if (auth.getOtpCode) otpCode = await auth.getOtpCode();
-  } catch (err) {
-    console.warn("[PetCare] getOtpCode error:", err);
-  }
-
-  const hintEl = $("#otpHintCode");
-  if (hintEl) {
-    if (otpCode) {
-      hintEl.textContent = otpCode;
-      hintEl.parentElement.hidden = false;
-    } else {
-      hintEl.parentElement.hidden = true;
-    }
-  }
-
-  if (otpCode) {
-    toast(`OTP Verification Code: ${otpCode}`, "ok");
-  }
+  toast(`6-digit OTP email sent to ${email}. Please check your Gmail inbox & Spam folder!`, "ok");
 
   openModal("verifyEmailModal");
   setTimeout(() => $("#otpCodeInput")?.focus(), 80);
@@ -188,7 +169,7 @@ async function showVerifyModal(email) {
    flag, on the actual count, so it can never go stale. */
 async function finish() {
   const session = auth.current();
-  if (auth.mode === "live" && session && session.emailVerified === false) {
+  if (auth.mode === "live" && session && session.otpVerified !== true) {
     showVerifyModal(session.email);
     return;
   }

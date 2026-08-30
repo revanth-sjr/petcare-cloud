@@ -61,7 +61,7 @@ async function boot() {
   session = await auth.ready;
 
   /* Auth guard. Everything past this line assumes a signed-in person. */
-  if (!session || (auth.mode === "live" && session.emailVerified === false)) {
+  if (!session || (auth.mode === "live" && session.otpVerified !== true)) {
     window.location.replace("./login.html");
     return;
   }
