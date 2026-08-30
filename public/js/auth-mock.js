@@ -69,7 +69,7 @@ export async function create() {
   const emit = () => listeners.forEach((cb) => cb(session));
 
   const sessionFor = (u) => ({
-    uid: u.uid, email: u.email, name: u.name,
+    uid: u.uid, email: u.email, emailVerified: true, name: u.name,
     firstName: u.firstName || "", middleName: u.middleName || "", lastName: u.lastName || "",
     lastSelectedPetId: u.lastSelectedPetId || null
   });
@@ -91,10 +91,6 @@ export async function create() {
       if (users[key]) { const e = new Error("in use"); e.code = "auth/email-already-in-use"; throw e; }
       users[key] = {
         uid: `u-${Math.random().toString(36).slice(2, 10)}`,
-        /* `name` stays the single composed string every existing consumer
-           reads (performedBy, ownerName, chat context, …) — firstName/
-           middleName/lastName are additional fields, kept alongside it so
-           nothing downstream had to change for this split. */
         name: composeName({ firstName, middleName, lastName }),
         firstName: (firstName || "").trim(),
         middleName: (middleName || "").trim(),
@@ -119,6 +115,10 @@ export async function create() {
       emit();
       return session;
     },
+
+    async resendVerificationEmail() {},
+
+    async checkEmailVerification() { return true; },
 
     async signOut() {
       session = null;

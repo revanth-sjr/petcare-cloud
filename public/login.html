@@ -123,6 +123,21 @@
   </section>
 </main>
 
+<div class="modal" id="verifyEmailModal" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="verifyTitle">
+    <header class="modal-head">
+      <h3 id="verifyTitle">Verify your email address</h3>
+    </header>
+    <p class="modal-note">A verification email has been sent to <b id="verifyEmailAddr">—</b>. Please check your inbox and click the verification link to confirm your account.</p>
+    <p class="auth-error" id="verifyError" hidden></p>
+    <div class="modal-actions" style="display:flex;flex-direction:column;gap:8px;margin-top:16px;">
+      <button type="button" class="btn btn-primary btn-block" id="btnCheckVerify">I've Verified My Email</button>
+      <button type="button" class="btn btn-ghost btn-block" id="btnResendVerify">Resend Verification Email</button>
+      <button type="button" class="btn btn-ghost btn-block" id="btnSignOutVerify" style="color:var(--crit)">Sign out / Change email</button>
+    </div>
+  </div>
+</div>
+
 <div class="toasts" id="toasts" aria-live="polite"></div>
 <script type="module" src="./js/login.js"></script>
 </body>

@@ -22,13 +22,14 @@ async function boot() {
   $("#authNote").textContent = "Your password is handled by Firebase Authentication and never reaches this app.";
   $("#authNote").hidden = false;
 
-  /* already signed in? send them wherever they left off */
-  const existing = await auth.ready;
-  if (existing) return finish();
-
   wireTabs();
   wireLogin();
   wireSignup();
+  wireVerifyModal();
+
+  /* already signed in? send them wherever they left off */
+  const existing = await auth.ready;
+  if (existing) return finish();
 }
 
 /* ------------------------------------------------------------------ */
@@ -70,8 +71,6 @@ function wireLogin() {
       await finish();
     }, "#loginError");
   });
-
-
 }
 
 /* ------------------------------------------------------------------ */
@@ -99,10 +98,69 @@ function wireSignup() {
   });
 }
 
+function wireVerifyModal() {
+  $("#btnCheckVerify")?.addEventListener("click", async () => {
+    const btn = $("#btnCheckVerify");
+    const orig = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "Checking…";
+    $("#verifyError").hidden = true;
+    try {
+      const verified = await auth.checkEmailVerification();
+      if (verified) {
+        toast("Email verified successfully!", "ok");
+        closeAllModals();
+        await finish();
+      } else {
+        showError("#verifyError", "Email not verified yet. Please check your inbox and click the link.");
+      }
+    } catch (err) {
+      showError("#verifyError", err.message || "Could not check verification status.");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = orig;
+    }
+  });
+
+  $("#btnResendVerify")?.addEventListener("click", async () => {
+    const btn = $("#btnResendVerify");
+    const orig = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "Sending…";
+    $("#verifyError").hidden = true;
+    try {
+      await auth.resendVerificationEmail();
+      toast("Verification email resent!", "ok");
+    } catch (err) {
+      showError("#verifyError", err.message || "Could not resend verification email.");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = orig;
+    }
+  });
+
+  $("#btnSignOutVerify")?.addEventListener("click", async () => {
+    await auth.signOut();
+    closeAllModals();
+    location.reload();
+  });
+}
+
+function showVerifyModal(email) {
+  $("#verifyEmailAddr").textContent = email || "your email";
+  openModal("verifyEmailModal");
+}
+
 /* ------------------------------------------------------------------
    Where next depends on whether this account has a pet yet — not on a
    flag, on the actual count, so it can never go stale. */
 async function finish() {
+  const session = auth.current();
+  if (auth.mode === "live" && session && session.emailVerified === false) {
+    showVerifyModal(session.email);
+    return;
+  }
+
   let hasPet = false;
   try { hasPet = (await auth.myPets()).length > 0; } catch { /* fail open to onboarding */ }
   if (hasPet || signupPath === "join") {

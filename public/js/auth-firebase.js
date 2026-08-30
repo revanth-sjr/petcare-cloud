@@ -57,6 +57,7 @@ export async function create() {
     return {
       uid:   user.uid,
       email: user.email,
+      emailVerified: Boolean(user.emailVerified),
       name:  profile.name || user.displayName || (user.email || "").split("@")[0],
       firstName: profile.firstName || "", middleName: profile.middleName || "", lastName: profile.lastName || "",
       lastSelectedPetId: profile.lastSelectedPetId || null
@@ -82,9 +83,14 @@ export async function create() {
       const name = composeName({ firstName, middleName, lastName });
       const cred = await authMod.createUserWithEmailAndPassword(auth, email.trim(), password);
       await authMod.updateProfile(cred.user, { displayName: name });
+      
+      try {
+        await authMod.sendEmailVerification(cred.user);
+      } catch (err) {
+        console.warn("[PetCare] sendEmailVerification error:", err);
+      }
+
       await saveProfile(cred.user.uid, {
-        /* `name` stays the single composed string every existing consumer
-           reads — firstName/middleName/lastName are additional fields. */
         name,
         firstName: (firstName || "").trim(),
         middleName: (middleName || "").trim(),
@@ -100,6 +106,20 @@ export async function create() {
       const cred = await authMod.signInWithEmailAndPassword(auth, email.trim(), password);
       session = await hydrate(cred.user);
       return session;
+    },
+
+    async resendVerificationEmail() {
+      const user = auth.currentUser;
+      if (!user) throw new Error("No user is currently signed in.");
+      await authMod.sendEmailVerification(user);
+    },
+
+    async checkEmailVerification() {
+      const user = auth.currentUser;
+      if (!user) return false;
+      await user.reload();
+      session = await hydrate(auth.currentUser);
+      return Boolean(auth.currentUser.emailVerified);
     },
 
     async signOut() {

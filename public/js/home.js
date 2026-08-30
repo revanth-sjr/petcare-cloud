@@ -33,7 +33,7 @@ async function boot() {
 
     /* Auth guard — same rule as index.html: nothing past this line
        assumes a signed-in person. */
-    if (!session) {
+    if (!session || (auth.mode === "live" && session.emailVerified === false)) {
       window.location.replace("./login.html");
       return;
     }

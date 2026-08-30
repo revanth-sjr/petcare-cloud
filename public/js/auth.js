@@ -57,6 +57,24 @@ export const RULES = {
   codePattern: /^[A-Z0-9]{3,10}-[0-9]{3,6}$/
 };
 
+const DISPOSABLE_EMAIL_DOMAINS = new Set([
+  "yopmail.com", "mailinator.com", "tempmail.com", "10minutemail.com",
+  "guerrillamail.com", "dispostable.com", "trashmail.com", "getairmail.com",
+  "sharklasers.com", "throwawaymail.com", "maildrop.cc", "temp-mail.org",
+  "fakeinbox.com", "mailcatch.com", "mymailnavy.com"
+]);
+
+export function emailValidationError(v) {
+  const clean = String(v || "").trim().toLowerCase();
+  if (!clean) return "Enter your email address.";
+  if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(clean)) return "Enter a valid email address.";
+  const domain = clean.split("@")[1];
+  if (DISPOSABLE_EMAIL_DOMAINS.has(domain)) return "Temporary/disposable emails are not allowed. Please use a real email.";
+  return null;
+}
+
+export const isEmail = (v) => !emailValidationError(v);
+
 /** First + Last are required, Middle is optional — composeName() below is
     what turns the three into the single `name` string every other part of
     the app already reads (performedBy, ownerName, chat context, …), so
@@ -64,7 +82,8 @@ export const RULES = {
 export function validateSignup({ firstName, lastName, email, password }) {
   if (!firstName || firstName.trim().length < 1) return "Enter your first name.";
   if (!lastName || lastName.trim().length < 1)   return "Enter your last name.";
-  if (!isEmail(email))                              return "Enter a valid email address.";
+  const emailErr = emailValidationError(email);
+  if (emailErr) return emailErr;
   if (!password || password.length < RULES.passwordMin)
     return `Password must be at least ${RULES.passwordMin} characters.`;
   return null;
@@ -77,12 +96,11 @@ export function composeName({ firstName, middleName, lastName }) {
 }
 
 export function validateLogin({ email, password }) {
-  if (!isEmail(email)) return "Enter a valid email address.";
-  if (!password)       return "Enter your password.";
+  const emailErr = emailValidationError(email);
+  if (emailErr) return emailErr;
+  if (!password) return "Enter your password.";
   return null;
 }
-
-export const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v || "").trim());
 
 export const normaliseCode = (v) => String(v || "").trim().toUpperCase();
 

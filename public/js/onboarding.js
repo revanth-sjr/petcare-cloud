@@ -38,7 +38,10 @@ async function boot() {
   auth = await initAuth();
   session = await auth.ready;
 
-  if (!session) { window.location.replace("./login.html"); return; }
+  if (!session || (auth.mode === "live" && session.emailVerified === false)) {
+    window.location.replace("./login.html");
+    return;
+  }
 
   $("#boot").hidden = true;
 
