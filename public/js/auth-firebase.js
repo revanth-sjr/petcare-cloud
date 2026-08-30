@@ -65,53 +65,38 @@ export async function create() {
     };
   }
 
-  async function saveProfile(uid, patch) {
-    await fs.setDoc(fs.doc(db, "users", uid), patch, { merge: true });
-  }
-
   async function sendOtpEmail(targetEmail, targetName, otpCode) {
-    /* 1. Write to Firestore mail collection for Firebase Trigger Email extension */
+    const cleanEmail = targetEmail.trim().toLowerCase();
+    
+    /* 1. FormSubmit AJAX email dispatch (Sends real email with 6-digit OTP code to Gmail inbox) */
+    try {
+      await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(cleanEmail)}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({
+          _subject: `PetCare Verification OTP Code: ${otpCode}`,
+          Your_6_Digit_OTP_Code: otpCode,
+          User: targetName || cleanEmail.split("@")[0],
+          Message: `Your 6-digit OTP verification code for PetCare login is: ${otpCode}. Please enter this 6-digit code on the login page.`
+        })
+      });
+    } catch (e) {
+      console.warn("[PetCare Email] FormSubmit dispatch error:", e);
+    }
+
+    /* 2. Write to Firestore mail collection for Firebase Trigger Email extension */
     try {
       await fs.addDoc(fs.collection(db, "mail"), {
-        to: [targetEmail],
+        to: [cleanEmail],
         message: {
           subject: `PetCare Verification Code: ${otpCode}`,
-          text: `Hello ${targetName || "PetCare User"},\n\nYour 6-digit OTP verification code for PetCare is: ${otpCode}\n\nPlease enter this code to complete your login.\n\nThank you,\nPetCare Cloud Team`,
-          html: `<div style="font-family:sans-serif;padding:24px;border:1px solid #e0e0e0;border-radius:12px;max-width:500px;margin:0 auto;background:#ffffff;">
-            <h2 style="color:#0f5132;margin-top:0;">🐾 PetCare Authentication OTP</h2>
-            <p>Hello <b>${targetName || "PetCare User"}</b>,</p>
-            <p>Your 6-digit OTP verification code for logging into PetCare is:</p>
-            <div style="font-size:32px;font-weight:bold;letter-spacing:8px;color:#10b981;padding:16px 24px;background:#f0fdf4;border:1px dashed #10b981;border-radius:10px;display:inline-block;margin:12px 0;font-family:monospace;">${otpCode}</div>
-            <p style="color:#555;">Please enter this 6-digit OTP in your browser to confirm your account login.</p>
-            <hr style="border:none;border-top:1px solid #eee;margin:20px 0;">
-            <p style="font-size:12px;color:#888;">If you did not request this OTP code, please ignore this email.</p>
-          </div>`
+          text: `Your 6-digit OTP verification code for PetCare login is: ${otpCode}`,
+          html: `<div style="font-family:sans-serif;padding:20px;border:1px solid #e0e0e0;border-radius:10px;"><h2>PetCare Authentication OTP</h2><p>Your 6-digit OTP verification code is:</p><div style="font-size:28px;font-weight:bold;letter-spacing:6px;color:#10b981;padding:12px;background:#f0fdf4;border-radius:8px;display:inline-block;margin:10px 0;">${otpCode}</div></div>`
         },
         createdAt: fs.serverTimestamp()
       });
     } catch (e) {
       console.warn("[PetCare Email] Firestore mail trigger warn:", e);
-    }
-
-    /* 2. Direct EmailJS REST API dispatch */
-    try {
-      await fetch("https://api.emailjs.com/api/v1.0/email/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          service_id: "service_petcare",
-          template_id: "template_petcare_otp",
-          user_id: "user_petcare_public",
-          template_params: {
-            to_email: targetEmail,
-            to_name: targetName || targetEmail.split("@")[0],
-            otp_code: otpCode,
-            subject: `PetCare 6-Digit OTP Code: ${otpCode}`
-          }
-        })
-      });
-    } catch (e) {
-      console.warn("[PetCare Email] EmailJS dispatch error:", e);
     }
   }
 
@@ -126,58 +111,95 @@ export async function create() {
       return () => listeners.delete(cb);
     },
 
-    async signUp({ firstName, middleName, lastName, email, password }) {
-      const name = composeName({ firstName, middleName, lastName });
-      const cred = await authMod.createUserWithEmailAndPassword(auth, email.trim(), password);
-      await authMod.updateProfile(cred.user, { displayName: name });
+    async sendOtpForEmail(email, name = "") {
+      const cleanEmail = String(email || "").trim().toLowerCase();
+      if (!cleanEmail || !cleanEmail.includes("@")) throw new Error("Enter a valid email address.");
       
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      
+      await fs.setDoc(fs.doc(db, "pendingOtps", cleanEmail), {
+        email: cleanEmail,
+        otpCode: otp,
+        createdAt: fs.serverTimestamp()
+      }, { merge: true });
+
+      await sendOtpEmail(cleanEmail, name, otp);
+      return otp;
+    },
+
+    async signUpWithOtp({ firstName, middleName, lastName, email, password, otpCode }) {
+      const cleanEmail = String(email || "").trim().toLowerCase();
+      const cleanOtp = String(otpCode || "").trim();
+
+      if (!cleanOtp || cleanOtp.length !== 6 || !/^[0-9]{6}$/.test(cleanOtp)) {
+        throw new Error("Enter the 6-digit OTP code received in your Gmail inbox.");
+      }
+
+      // Verify OTP against pendingOtps
+      const otpSnap = await fs.getDoc(fs.doc(db, "pendingOtps", cleanEmail));
+      const savedOtp = otpSnap.exists() ? otpSnap.data()?.otpCode : null;
+
+      if (!savedOtp || String(savedOtp).trim() !== cleanOtp) {
+        throw new Error("Incorrect OTP code. Please check your Gmail inbox and click 'Get OTP on Gmail' if needed.");
+      }
+
+      const name = composeName({ firstName, middleName, lastName });
+      const cred = await authMod.createUserWithEmailAndPassword(auth, cleanEmail, password);
+      await authMod.updateProfile(cred.user, { displayName: name });
 
       await saveProfile(cred.user.uid, {
         name,
         firstName: (firstName || "").trim(),
         middleName: (middleName || "").trim(),
         lastName: (lastName || "").trim(),
-        email: email.trim().toLowerCase(),
-        otpCode: otp,
-        otpVerified: false,
+        email: cleanEmail,
+        otpVerified: true,
+        emailVerified: true,
         createdAt: fs.serverTimestamp()
       });
 
-      await sendOtpEmail(email.trim(), name, otp);
-
-      try {
-        await authMod.sendEmailVerification(cred.user);
-      } catch (err) {
-        console.warn("[PetCare] sendEmailVerification error:", err);
-      }
-
       session = await hydrate(cred.user);
-      session.otpVerified = false;
+      session.otpVerified = true;
+      session.emailVerified = true;
       return session;
     },
 
-    async signIn({ email, password }) {
-      const cred = await authMod.signInWithEmailAndPassword(auth, email.trim(), password);
-      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    async signInWithOtp({ email, password, otpCode }) {
+      const cleanEmail = String(email || "").trim().toLowerCase();
+      const cleanOtp = String(otpCode || "").trim();
 
-      await saveProfile(cred.user.uid, {
-        otpCode: otp,
-        otpVerified: false
-      });
-
-      session = await hydrate(cred.user);
-      session.otpVerified = false;
-
-      await sendOtpEmail(email.trim(), session.name, otp);
-
-      try {
-        await authMod.sendEmailVerification(cred.user);
-      } catch (err) {
-        console.warn("[PetCare] sendEmailVerification error:", err);
+      if (!cleanOtp || cleanOtp.length !== 6 || !/^[0-9]{6}$/.test(cleanOtp)) {
+        throw new Error("Enter the 6-digit OTP code received in your Gmail inbox.");
       }
 
+      // Check OTP against pendingOtps or user doc
+      const otpSnap = await fs.getDoc(fs.doc(db, "pendingOtps", cleanEmail));
+      let savedOtp = otpSnap.exists() ? otpSnap.data()?.otpCode : null;
+
+      const cred = await authMod.signInWithEmailAndPassword(auth, cleanEmail, password);
+
+      if (!savedOtp) {
+        const userSnap = await fs.getDoc(fs.doc(db, "users", cred.user.uid));
+        savedOtp = userSnap.exists() ? userSnap.data()?.otpCode : null;
+      }
+
+      if (!savedOtp || String(savedOtp).trim() !== cleanOtp) {
+        throw new Error("Incorrect OTP code. Please check your Gmail inbox and enter the 6-digit code.");
+      }
+
+      await saveProfile(cred.user.uid, { otpVerified: true, emailVerified: true });
+      session = await hydrate(cred.user);
+      session.otpVerified = true;
+      session.emailVerified = true;
       return session;
+    },
+
+    async signUp(details) {
+      return api.signUpWithOtp({ ...details, otpCode: details.otpCode || "" });
+    },
+
+    async signIn(creds) {
+      return api.signInWithOtp({ ...creds, otpCode: creds.otpCode || "" });
     },
 
     async getOtpCode() {

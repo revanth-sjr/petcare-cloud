@@ -79,10 +79,16 @@
           <input type="password" id="loginPassword" autocomplete="current-password" placeholder="Your password" required>
         </label>
 
+        <label style="margin-top:4px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+            <span>Gmail Verification OTP</span>
+            <button type="button" class="btn btn-ghost btn-sm" id="btnSendLoginOtp" style="padding:2px 8px;font-size:0.78rem;">Get OTP on Gmail</button>
+          </div>
+          <input type="text" id="loginOtpCode" maxlength="6" pattern="[0-9]{6}" autocomplete="one-time-code" placeholder="Enter 6-digit OTP from Gmail" style="text-align:center;letter-spacing:6px;font-weight:700;font-family:monospace;" required>
+        </label>
+
         <p class="auth-error" id="loginError" hidden></p>
         <button class="btn btn-primary btn-block" type="submit" id="loginSubmit">Log in</button>
-
-
       </form>
 
       <!-- ---------- SIGN UP ---------- -->
@@ -114,30 +120,16 @@
           <button type="button" data-path="join">I'm a caretaker</button>
         </div>
 
-        <p class="auth-error" id="signupError" hidden></p>
-        <button class="btn btn-primary btn-block" type="submit" id="signupSubmit">Create account</button>
-      </form>
-
-      <!-- ---------- OTP VERIFICATION (INLINE FORM) ---------- -->
-      <form id="otpForm" class="auth-form" hidden>
-        <div style="background:var(--accent-subtle, rgba(16,185,129,0.08));border:1px solid var(--border);padding:14px;border-radius:10px;margin-bottom:12px;text-align:center;">
-          <p style="margin:0 0 6px 0;font-weight:700;font-size:0.95rem;color:var(--text);">🔐 Enter 6-Digit OTP from Gmail</p>
-          <p style="margin:0;font-size:0.82rem;color:var(--text-muted);line-height:1.4;">A 6-digit OTP code has been sent to <b id="otpEmailTarget">—</b>. Check your Gmail inbox and Spam folder.</p>
-        </div>
-
-        <label style="text-align:center;">
-          <span style="display:block;font-size:0.8rem;font-weight:700;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;">6-Digit OTP Code</span>
-          <input type="text" id="otpCodeInput" maxlength="6" pattern="[0-9]{6}" autocomplete="one-time-code" placeholder="Enter 6-digit OTP" style="text-align:center;letter-spacing:8px;font-size:1.5rem;font-weight:700;padding:10px 14px;border-radius:10px;border:2px solid var(--border);width:100%;box-sizing:border-box;font-family:monospace;" required>
+        <label style="margin-top:4px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+            <span>Gmail Verification OTP</span>
+            <button type="button" class="btn btn-ghost btn-sm" id="btnSendSignupOtp" style="padding:2px 8px;font-size:0.78rem;">Get OTP on Gmail</button>
+          </div>
+          <input type="text" id="suOtpCode" maxlength="6" pattern="[0-9]{6}" autocomplete="one-time-code" placeholder="Enter 6-digit OTP from Gmail" style="text-align:center;letter-spacing:6px;font-weight:700;font-family:monospace;" required>
         </label>
 
-        <p class="auth-error" id="otpError" hidden></p>
-        
-        <button class="btn btn-primary btn-block" type="submit" id="btnVerifyOtp">Verify OTP & Sign In</button>
-        
-        <div style="display:flex;gap:8px;margin-top:10px;">
-          <button class="btn btn-ghost btn-block btn-sm" type="button" id="btnResendOtp" style="flex:1;">Resend OTP to Gmail</button>
-          <button class="btn btn-ghost btn-block btn-sm" type="button" id="btnBackToLogin" style="flex:1;color:var(--crit);">Change Email</button>
-        </div>
+        <p class="auth-error" id="signupError" hidden></p>
+        <button class="btn btn-primary btn-block" type="submit" id="signupSubmit">Create account</button>
       </form>
 
       <p class="auth-note" id="authNote"></p>

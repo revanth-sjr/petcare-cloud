@@ -86,6 +86,18 @@ export async function create() {
       return () => listeners.delete(cb);
     },
 
+    async sendOtpForEmail(email) {
+      return "123456";
+    },
+
+    async signUpWithOtp(details) {
+      return api.signUp(details);
+    },
+
+    async signInWithOtp(creds) {
+      return api.signIn(creds);
+    },
+
     async signUp({ firstName, middleName, lastName, email, password }) {
       const key = email.trim().toLowerCase();
       if (users[key]) { const e = new Error("in use"); e.code = "auth/email-already-in-use"; throw e; }
