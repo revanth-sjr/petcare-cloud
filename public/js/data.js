@@ -13,9 +13,9 @@ import { istTimeToday, now, todayKey, toDate, dayKeyOffset, dayKeyIST } from "./
 export const TASK_TYPES = ["feeding", "walk", "medication"];
 
 export const TASK_META = {
-  feeding:    { label: "Feeding",    icon: "🍖", verb: "Log Feeding"    },
-  walk:       { label: "Walk",       icon: "🚶", verb: "Log Walk"       },
-  medication: { label: "Medication", icon: "💊", verb: "Log Medication" }
+  feeding:    { label: "Feeding",    icon: '<img src="https://img.icons8.com/ios-filled/50/dog-bowl.png" alt="Feeding" class="ui-icon">', verb: "Log Feeding"    },
+  walk:       { label: "Walk",       icon: '<img src="https://img.icons8.com/ios-filled/50/walking.png" alt="Walk" class="ui-icon">', verb: "Log Walk"       },
+  medication: { label: "Medication", icon: '<img src="https://img.icons8.com/ios-filled/50/pill.png" alt="Medication" class="ui-icon">', verb: "Log Medication" }
 };
 
 /* ---------------------------------------------------------------------

@@ -73,7 +73,7 @@ function card(m) {
     editBtn.type = "button";
     editBtn.title = "Edit this memory";
     editBtn.setAttribute("aria-label", "Edit this memory");
-    editBtn.textContent = "✎";
+    editBtn.innerHTML = '<img src="https://img.icons8.com/ios-filled/50/pencil.png" alt="Edit" class="ui-icon-sm">';
     editBtn.addEventListener("click", () => openForm(m));
 
     const delBtn = document.createElement("button");

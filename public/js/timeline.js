@@ -55,7 +55,7 @@ export function render(dash, ctx) {
       trashBtn.type = "button";
       trashBtn.title = "Move to bin";
       trashBtn.setAttribute("aria-label", `Move this ${meta.label.toLowerCase()} entry to the bin`);
-      trashBtn.textContent = "🗑";
+      trashBtn.innerHTML = '<img src="https://img.icons8.com/ios-filled/50/trash.png" alt="Bin" class="ui-icon">';
       trashBtn.addEventListener("click", () => ctx.onTrash(item));
       li.appendChild(trashBtn);
     }

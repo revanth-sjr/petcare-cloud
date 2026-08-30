@@ -262,7 +262,7 @@ function renderNextCare(dash) {
   const current = now();
   const feedingRows = dash.feedingSchedule?.rows || [];
   const feedingComplete = feedingRows.length > 0 && feedingRows.every((row) => row.status === "COMPLETED");
-  const items = [{ icon: "🍖", label: "Feeding", time: nextFeedingTime(dash, current) }];
+  const items = [{ icon: '<img src="https://img.icons8.com/ios-filled/50/dog-bowl.png" alt="Feeding" class="ui-icon">', label: "Feeding", time: nextFeedingTime(dash, current) }];
   if (feedingComplete) items[0].completed = true;
   list.innerHTML = items.map((item) => item.time
     ? `<li><span class="next-care-icon">${item.icon}</span><span class="next-care-label">${item.label}</span><span class="next-care-time"><b>${esc(fmtClock(item.time))}</b><small>${esc(fmtRelative(item.time))}</small></span></li>`
@@ -360,7 +360,7 @@ function renderStreak(dash) {
     return;
   }
   el.hidden = false;
-  el.innerHTML = `<span class="flame">🔥</span> <b>${s.days}-day</b> medication streak` +
+  el.innerHTML = `<span class="flame"><img src="https://img.icons8.com/ios-filled/50/fire-element.png" alt="Streak" class="ui-icon"></span> <b>${s.days}-day</b> medication streak` +
     (s.perfectToday ? "" : ` <i>— today's doses still open</i>`);
 }
 
@@ -388,7 +388,7 @@ function renderAlerts(dash, ctx) {
   strip.hidden = false;
   strip.className = `alert-strip${overdueRow ? "" : " is-due"}`;
   strip.innerHTML = `
-    <span>${overdueRow ? "⚠️" : (feeding ? "🍖" : walk ? "🚶" : "💊")}</span>
+    <span>${overdueRow ? '<img src="https://img.icons8.com/ios-filled/50/warning-shield.png" alt="Warning" class="ui-icon">' : (feeding ? '<img src="https://img.icons8.com/ios-filled/50/dog-bowl.png" alt="Feeding" class="ui-icon">' : walk ? '<img src="https://img.icons8.com/ios-filled/50/walking.png" alt="Walk" class="ui-icon">' : '<img src="https://img.icons8.com/ios-filled/50/pill.png" alt="Medication" class="ui-icon">')}</span>
     <span>${esc(dash.pet?.name || "Your pet")}'s ${esc(label)} scheduled for
       ${esc(fmtClock(slotToday(row.slot)))} ${overdueRow ? "has not been logged" : "is due now"}.</span>`;
 
@@ -423,7 +423,7 @@ function renderOverFeeding(dash) {
 
   banner.hidden = false;
   banner.innerHTML = `
-    <span>⚠️</span>
+    <span><img src="https://img.icons8.com/ios-filled/50/warning-shield.png" alt="Warning" class="ui-icon"></span>
     <span><b>Feeding Warning —</b> This pet has exceeded today's planned feeding schedule
       (${esc(perDay)} configured, ${esc(extra)} logged today).</span>`;
 }

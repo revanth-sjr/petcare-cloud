@@ -117,26 +117,26 @@ export function makeJoinCode(petName) {
    free-text field, so nothing is ever forced into the wrong bucket.
    ------------------------------------------------------------------ */
 export const SPECIES = [
-  { id: "dog", label: "Dog", icon: "🐶", breedLabel: "Breed", breeds: [
+  { id: "dog", label: "Dog", icon: '<img src="https://img.icons8.com/color/48/dog.png" alt="Dog" class="species-icon-img">', breedLabel: "Breed", breeds: [
       "Labrador Retriever", "Golden Retriever", "German Shepherd", "Poodle", "Beagle",
       "Bulldog", "Rottweiler", "Shih Tzu", "Pomeranian", "Mixed Breed"
     ] },
-  { id: "cat", label: "Cat", icon: "🐱", breedLabel: "Breed", breeds: [
+  { id: "cat", label: "Cat", icon: '<img src="https://img.icons8.com/color/48/cat.png" alt="Cat" class="species-icon-img">', breedLabel: "Breed", breeds: [
       "Persian", "Siamese", "Maine Coon", "Bengal", "Ragdoll", "British Shorthair", "Sphynx", "Mixed Breed"
     ] },
-  { id: "bird", label: "Bird", icon: "🐦", breedLabel: "Bird type", breeds: [
+  { id: "bird", label: "Bird", icon: '<img src="https://img.icons8.com/color/48/bird.png" alt="Bird" class="species-icon-img">', breedLabel: "Bird type", breeds: [
       "Parrot", "Cockatiel", "Lovebird", "Budgerigar", "Macaw", "Canary", "Finch"
     ] },
-  { id: "fish", label: "Fish", icon: "🐟", breedLabel: "Fish type", breeds: [
+  { id: "fish", label: "Fish", icon: '<img src="https://img.icons8.com/color/48/fish.png" alt="Fish" class="species-icon-img">', breedLabel: "Fish type", breeds: [
       "Goldfish", "Betta", "Guppy", "Molly", "Tetra", "Angelfish", "Koi"
     ] },
-  { id: "rabbit", label: "Rabbit", icon: "🐰", breedLabel: "Breed", breeds: [
+  { id: "rabbit", label: "Rabbit", icon: '<img src="https://img.icons8.com/color/48/rabbit.png" alt="Rabbit" class="species-icon-img">', breedLabel: "Breed", breeds: [
       "Holland Lop", "Netherland Dwarf", "Mini Rex", "Lionhead", "Flemish Giant"
     ] },
-  { id: "hamster", label: "Hamster", icon: "🐹", breedLabel: "Breed", breeds: [
+  { id: "hamster", label: "Hamster", icon: '<img src="https://img.icons8.com/color/48/hamster.png" alt="Hamster" class="species-icon-img">', breedLabel: "Breed", breeds: [
       "Syrian", "Roborovski", "Campbell's Dwarf", "Winter White", "Chinese"
     ] },
-  { id: "reptile", label: "Reptile", icon: "🦎", breedLabel: "Type", breeds: [
+  { id: "reptile", label: "Reptile", icon: '<img src="https://img.icons8.com/color/48/lizard.png" alt="Reptile" class="species-icon-img">', breedLabel: "Type", breeds: [
       "Turtle", "Tortoise", "Gecko", "Iguana", "Snake", "Bearded Dragon"
     ] },
   { id: "other", label: "Other", icon: "🐾", breedLabel: "Type / breed", breeds: [] }

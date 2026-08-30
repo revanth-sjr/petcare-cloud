@@ -256,10 +256,10 @@ function renderOverview(cards) {
 
   const items = [
     { icon: "🐾", label: "Pets",                value: String(cards.length) },
-    { icon: "🍖", label: "Today's Feeding",     value: feedTarget ? `${feedDone}/${feedTarget}` : "—" },
-    { icon: "💊", label: "Upcoming Medication", value: String(upcomingMeds) },
-    { icon: "⚠️", label: "Missed Tasks",        value: String(missed), tone: missed ? "bad" : "good" },
-    { icon: "✅", label: "Completed Tasks",     value: String(completed), tone: "good" }
+    { icon: '<img src="https://img.icons8.com/ios-filled/50/dog-bowl.png" alt="Feeding" class="ui-icon">', label: "Today's Feeding",     value: feedTarget ? `${feedDone}/${feedTarget}` : "—" },
+    { icon: '<img src="https://img.icons8.com/ios-filled/50/pill.png" alt="Medication" class="ui-icon">', label: "Upcoming Medication", value: String(upcomingMeds) },
+    { icon: '<img src="https://img.icons8.com/ios-filled/50/warning-shield.png" alt="Warning" class="ui-icon">', label: "Missed Tasks",        value: String(missed), tone: missed ? "bad" : "good" },
+    { icon: '<img src="https://img.icons8.com/ios-filled/50/checkmark.png" alt="Check" class="ui-icon">', label: "Completed Tasks",     value: String(completed), tone: "good" }
   ];
 
   $("#overviewGrid").innerHTML = items.map((it) => `
@@ -293,7 +293,7 @@ function renderAlerts(cards) {
       const label = r.kind === "feeding" ? "Feeding" : r.kind === "walk" ? "Walk" : r.name;
       rows.push({
         tone: "crit", petId: pet.id,
-        icon: r.kind === "feeding" ? "🍖" : r.kind === "walk" ? "🚶" : "💊",
+        icon: r.kind === "feeding" ? '<img src="https://img.icons8.com/ios-filled/50/dog-bowl.png" alt="Feeding" class="ui-icon">' : r.kind === "walk" ? '<img src="https://img.icons8.com/ios-filled/50/walking.png" alt="Walk" class="ui-icon">' : '<img src="https://img.icons8.com/ios-filled/50/pill.png" alt="Medication" class="ui-icon">',
         text: `${pet.name}: ${label} overdue — was due ${fmtClock(istTimeToday(r.slot))}`
       });
     }
@@ -301,13 +301,13 @@ function renderAlerts(cards) {
       const label = r.kind === "feeding" ? "Feeding" : r.kind === "walk" ? "Walk" : r.name;
       rows.push({
         tone: "warn", petId: pet.id,
-        icon: r.kind === "feeding" ? "🍖" : r.kind === "walk" ? "🚶" : "💊",
+        icon: r.kind === "feeding" ? '<img src="https://img.icons8.com/ios-filled/50/dog-bowl.png" alt="Feeding" class="ui-icon">' : r.kind === "walk" ? '<img src="https://img.icons8.com/ios-filled/50/walking.png" alt="Walk" class="ui-icon">' : '<img src="https://img.icons8.com/ios-filled/50/pill.png" alt="Medication" class="ui-icon">',
         text: `${pet.name}: ${label} due now`
       });
     }
     if (dash.today.overFeeding) {
       rows.push({
-        tone: "warn", petId: pet.id, icon: "⚠️",
+        tone: "warn", petId: pet.id, icon: '<img src="https://img.icons8.com/ios-filled/50/warning-shield.png" alt="Warning" class="ui-icon">',
         text: `${pet.name}: Feeding Warning — exceeded today's planned schedule`
       });
     }
@@ -427,7 +427,7 @@ function flashCard(pet, dash) {
   const nextFeedLine = !feedRows.length
     ? ""
     : allFeedDone
-      ? `<p class="pfc-next">✅ All feedings done for today</p>`
+      ? `<p class="pfc-next"><img src="https://img.icons8.com/ios-filled/50/22c55e/checkmark.png" alt="Check" class="ui-icon no-invert"> All feedings done for today</p>`
       : `<p class="pfc-next">Next feeding: ${esc(fmtClock(istTimeToday(worstFeed.slot)))}</p>`;
 
   const btn = document.createElement("button");
@@ -438,14 +438,14 @@ function flashCard(pet, dash) {
 
   btn.innerHTML = `
     <div class="pfc-photo"${photo ? ` style="background-image:url(${esc(photo)})"` : ""}>
-      ${photo ? "" : esc(p.emoji || meta.icon)}
+      ${photo ? "" : (meta.icon.includes('<') ? meta.icon : esc(p.emoji || meta.icon))}
     </div>
     <div class="pfc-body">
       <h3 class="pfc-name">${esc(p.name || pet.name)}</h3>
       ${metaLine ? `<p class="pfc-meta">${metaLine}</p>` : ""}
 
       <div class="pfc-row">
-        <span class="pfc-row-label">🍖 Feeding</span>
+        <span class="pfc-row-label"><img src="https://img.icons8.com/ios-filled/50/dog-bowl.png" alt="Feeding" class="ui-icon"> Feeding</span>
         ${worstFeed
           ? `<span class="pill ${STATUS_PILL[worstFeed.status]}">${STATUS_LABEL[worstFeed.status]}</span>`
           : `<span class="pill p-up">Not configured</span>`}
@@ -454,11 +454,11 @@ function flashCard(pet, dash) {
 
       ${hasMeds ? `
       <div class="pfc-row">
-        <span class="pfc-row-label">💊 Medication</span>
+        <span class="pfc-row-label"><img src="https://img.icons8.com/ios-filled/50/pill.png" alt="Medication" class="ui-icon"> Medication</span>
         <span class="pill ${STATUS_PILL[medRow.status]}">${STATUS_LABEL[medRow.status]}</span>
       </div>` : ""}
 
-      ${dash.today.overFeeding ? `<p class="pfc-warn">⚠️ Feeding Warning — exceeded today's schedule</p>` : ""}
+      ${dash.today.overFeeding ? `<p class="pfc-warn"><img src="https://img.icons8.com/ios-filled/50/warning-shield.png" alt="Warning" class="ui-icon"> Feeding Warning — exceeded today's schedule</p>` : ""}
     </div>`;
 
   return btn;
@@ -475,7 +475,7 @@ function unavailableCard(pet) {
     <div class="pfc-body">
       <h3 class="pfc-name">${esc(pet.name)}</h3>
       <p class="pfc-meta">Could not load today's status right now.</p>
-      <span class="pill p-over">⚠️ Unavailable</span>
+      <span class="pill p-over"><img src="https://img.icons8.com/ios-filled/50/warning-shield.png" alt="Warning" class="ui-icon"> Unavailable</span>
     </div>`;
   return btn;
 }

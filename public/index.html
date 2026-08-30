@@ -48,7 +48,7 @@
     </button>
 
     <a class="btn btn-ghost btn-sm home-link" id="btnGoHome" href="./home.html" title="Back to Home">
-      <span aria-hidden="true">🏠</span><span>Home</span>
+      <span aria-hidden="true"><img src="https://img.icons8.com/ios-filled/50/home.png" alt="Home" class="ui-icon"></span><span>Home</span>
     </a>
 
     <div class="pet-switcher" id="petSwitcher" hidden>
@@ -62,7 +62,7 @@
   </div>
 
   <div class="topbar-right">
-    <button class="btn btn-ghost btn-sm theme-toggle-btn" id="themeToggleBtn" type="button" title="Toggle theme">💻 System</button>
+    <button class="btn btn-ghost btn-sm theme-toggle-btn" id="themeToggleBtn" type="button" title="Toggle theme"><img src="https://img.icons8.com/ios-filled/50/laptop.png" alt="System" class="ui-icon"> System</button>
     <span class="mode-badge" id="modeBadge" data-mode="loading">
       <i class="dot"></i><span id="modeText">Connecting…</span>
     </span>
@@ -82,7 +82,7 @@
 <div id="alertStrip" class="alert-strip" hidden></div>
 <div id="overFeedingBanner" class="alert-strip is-warn" hidden></div>
 <div class="caretaker-banner" id="caretakerBanner" hidden>
-  <span class="caretaker-banner-icon" aria-hidden="true">🧭</span>
+  <span class="caretaker-banner-icon" aria-hidden="true"><img src="https://img.icons8.com/ios-filled/50/compass.png" alt="Compass" class="ui-icon"></span>
   <div><strong>Caretaker dashboard</strong><span>Log today's care and keep the owner updated.</span></div>
 </div>
 
@@ -107,7 +107,7 @@
       <div class="pet-id">
         <div class="pet-id-row">
           <h1 id="petName">—</h1>
-          <button class="icon-btn pet-edit-btn" id="btnEditPet" type="button" title="Edit pet" aria-label="Edit pet" hidden>✎</button>
+          <button class="icon-btn pet-edit-btn" id="btnEditPet" type="button" title="Edit pet" aria-label="Edit pet" hidden><img src="https://img.icons8.com/ios-filled/50/pencil.png" alt="Edit" class="ui-icon-sm"></button>
         </div>
         <p class="pet-sub"><span id="petBreed">—</span> · <span id="petAge">—</span> · <span id="petWeight">—</span></p>
         <p class="streak" id="streak" hidden></p>
@@ -123,21 +123,21 @@
       <h2 class="section-title">Today's care</h2>
       <div class="actions">
         <button class="action" data-log="feeding">
-          <span class="action-icon">🍖</span>
+          <span class="action-icon"><img src="https://img.icons8.com/ios-filled/50/dog-bowl.png" alt="Feeding" class="ui-icon ui-icon-lg"></span>
           <span class="action-text">
             <b>Log Feeding</b><i id="cntFeeding">0 / 3</i>
             <small class="action-last" id="ldFeeding">Last done: not yet</small>
           </span>
         </button>
         <button class="action" data-log="walk">
-          <span class="action-icon">🚶</span>
+          <span class="action-icon"><img src="https://img.icons8.com/ios-filled/50/walking.png" alt="Walk" class="ui-icon ui-icon-lg"></span>
           <span class="action-text">
             <b>Log Walk</b><i id="cntWalk">0 / 2</i>
             <small class="action-last" id="ldWalk">Last done: not yet</small>
           </span>
         </button>
         <button class="action" data-log="medication">
-          <span class="action-icon">💊</span>
+          <span class="action-icon"><img src="https://img.icons8.com/ios-filled/50/pill.png" alt="Medication" class="ui-icon ui-icon-lg"></span>
           <span class="action-text">
             <b>Log Medication</b><i id="cntMed">0 / 0</i>
             <small class="action-last" id="ldMedication">Last done: not yet</small>
@@ -150,7 +150,7 @@
     <section class="card" id="feedingScheduleCard" aria-label="Feeding schedule">
       <div class="card-head">
         <h2>Feeding schedule</h2>
-        <button class="btn btn-ghost btn-sm" id="btnOpenCalendar">📅 Calendar</button>
+        <button class="btn btn-ghost btn-sm" id="btnOpenCalendar"><img src="https://img.icons8.com/ios-filled/50/calendar.png" alt="Calendar" class="ui-icon"> Calendar</button>
       </div>
       <ul class="med-list" id="feedingScheduleList"></ul>
     </section>
@@ -192,7 +192,7 @@
         <h2>Today's timeline</h2>
         <div class="card-head-actions">
           <span class="hint" id="timelineDate">—</span>
-          <button class="btn btn-ghost btn-sm" id="btnOpenBin" type="button" title="Deleted entries can be restored here">🗑 Bin<span class="bin-count" id="binCount"></span></button>
+          <button class="btn btn-ghost btn-sm" id="btnOpenBin" type="button" title="Deleted entries can be restored here"><img src="https://img.icons8.com/ios-filled/50/trash.png" alt="Bin" class="ui-icon"> Bin<span class="bin-count" id="binCount"></span></button>
         </div>
       </div>
       <ol class="timeline" id="timeline"></ol>
@@ -240,11 +240,11 @@
       <p class="card-kicker">Special instructions</p>
       <dl class="instr" id="instructions"></dl>
       <div class="vet-line">
-        <span>🏥 <b id="vetName">—</b></span>
+        <span><img src="https://img.icons8.com/ios-filled/50/veterinarian.png" alt="Vet" class="ui-icon"> <b id="vetName">—</b></span>
         <a class="btn btn-ghost btn-sm" id="vetCall" href="#">Call</a>
       </div>
       <div class="vet-line" id="vetEmergencyLine" hidden>
-        <span>🚨 <b>Emergency vet</b></span>
+        <span><img src="https://img.icons8.com/ios-filled/50/siren.png" alt="Emergency" class="ui-icon"> <b>Emergency vet</b></span>
         <a class="btn btn-ghost btn-sm" id="vetEmergencyCall" href="#">Call</a>
       </div>
     </section>
@@ -291,7 +291,7 @@
 
 <!-- ================= AI ASSISTANT ================= -->
 <button class="ai-fab" id="aiFab" aria-expanded="false" aria-controls="aiPanel">
-  <span class="ai-fab-icon">💬</span>
+  <span class="ai-fab-icon"><img src="https://img.icons8.com/ios-filled/50/speech-bubble.png" alt="Chat" class="ui-icon"></span>
   <span class="ai-fab-label">Ask PetCare AI</span>
 </button>
 
@@ -526,8 +526,8 @@
     </div>
 
     <div class="cal-tabs cal-data-tabs" role="tablist" id="calDataTabs">
-      <button type="button" class="cal-tab is-on" id="calDataFeeding">🍖 Feeding</button>
-      <button type="button" class="cal-tab" id="calDataMedication">💊 Medication</button>
+      <button type="button" class="cal-tab is-on" id="calDataFeeding"><img src="https://img.icons8.com/ios-filled/50/dog-bowl.png" alt="Feeding" class="ui-icon"> Feeding</button>
+      <button type="button" class="cal-tab" id="calDataMedication"><img src="https://img.icons8.com/ios-filled/50/pill.png" alt="Medication" class="ui-icon"> Medication</button>
     </div>
 
     <div id="calMonthBody">
