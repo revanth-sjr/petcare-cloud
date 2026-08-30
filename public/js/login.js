@@ -45,10 +45,8 @@ function wireTabs() {
     btn.addEventListener("click", () => {
       signupPath = btn.dataset.path;
       $$(".seg button").forEach((b) => b.classList.toggle("is-on", b === btn));
-      $("#ownerFields").hidden = signupPath !== "owner";
-      $("#joinFields").hidden  = signupPath !== "join";
       $("#signupSubmit").textContent =
-        signupPath === "owner" ? "Create account" : "Create account & join";
+        signupPath === "owner" ? "Create account" : "Create caretaker account";
       hideErrors();
     });
   });
@@ -105,7 +103,11 @@ function wireSignup() {
 async function finish() {
   let hasPet = false;
   try { hasPet = (await auth.myPets()).length > 0; } catch { /* fail open to onboarding */ }
-  window.location.replace(hasPet ? "./home.html" : "./onboarding.html?mode=first");
+  if (hasPet || signupPath === "join") {
+    window.location.replace("./home.html");
+  } else {
+    window.location.replace("./onboarding.html?mode=first");
+  }
 }
 
 async function busy(sel, label, run, errorSel) {

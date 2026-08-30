@@ -102,8 +102,10 @@
           <span>Password</span>
           <input type="password" id="suPassword" autocomplete="new-password" placeholder="At least 6 characters" required>
         </label>
-
-
+        <div class="seg" role="group" aria-label="What are you signing up for">
+          <button type="button" data-path="owner" class="is-on">I'm the owner</button>
+          <button type="button" data-path="join">I'm a caretaker</button>
+        </div>
 
         <p class="auth-error" id="signupError" hidden></p>
         <button class="btn btn-primary btn-block" type="submit" id="signupSubmit">Create account</button>
