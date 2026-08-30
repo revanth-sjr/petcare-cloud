@@ -1,46 +1,43 @@
 /* =====================================================================
-   theme.js — Dark / Light / System theme toggle module.
+   theme.js — Pure Dark / Light theme toggle module.
    Pod B owns this file.
    ===================================================================== */
 
 export function initTheme() {
   const toggleBtns = document.querySelectorAll(".theme-toggle-btn");
 
-  function getTheme() {
-    return localStorage.getItem("petcare.theme") || "system";
+  function getEffectiveTheme() {
+    const saved = localStorage.getItem("petcare.theme");
+    if (saved === "dark" || saved === "light") return saved;
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
   }
 
   function applyTheme(theme) {
-    if (theme === "dark" || theme === "light") {
-      document.documentElement.setAttribute("data-theme", theme);
-    } else {
-      document.documentElement.removeAttribute("data-theme");
-    }
-    updateButtons();
+    document.documentElement.setAttribute("data-theme", theme);
+    updateButtons(theme);
   }
 
-  function updateButtons() {
-    const current = getTheme();
+  function updateButtons(currentTheme) {
     toggleBtns.forEach((btn) => {
-      btn.textContent = current === "dark" ? "🌙 Dark" : current === "light" ? "☀️ Light" : "💻 System";
-      btn.title = `Theme: ${current.toUpperCase()} (Click to toggle Light / Dark / System)`;
+      btn.textContent = currentTheme === "dark" ? "🌙 Dark" : "☀️ Light";
+      btn.title = `Current theme: ${currentTheme.toUpperCase()} (Click to toggle)`;
     });
   }
 
   toggleBtns.forEach((btn) => {
     btn.addEventListener("click", () => {
-      const current = getTheme();
-      const next = current === "system" ? "light" : current === "light" ? "dark" : "system";
+      const current = getEffectiveTheme();
+      const next = current === "dark" ? "light" : "dark";
       localStorage.setItem("petcare.theme", next);
       applyTheme(next);
     });
   });
 
-  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
-    if (getTheme() === "system") {
-      updateButtons();
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
+    if (!localStorage.getItem("petcare.theme")) {
+      applyTheme(e.matches ? "dark" : "light");
     }
   });
 
-  applyTheme(getTheme());
+  applyTheme(getEffectiveTheme());
 }
