@@ -203,10 +203,26 @@ export async function create() {
       write(KEY_PETS, pets);
     },
 
-    async joinWithCode(code) {
-      const entry = Object.entries(pets).find(([, p]) => p.joinCode === code);
-      if (!entry) throw new Error("No pet found with that code. Ask the owner to check it.");
+    async joinWithCode(code, password) {
+      if (!session) throw new Error("You must be logged in to join a pet.");
+
+      const cleanCode = (code || "").trim().toUpperCase();
+      if (!cleanCode) throw new Error("Invalid care code.");
+      if (!password)  throw new Error("Password verification failed.");
+
+      const entry = Object.entries(pets).find(([, p]) => p.joinCode === cleanCode);
+      if (!entry) throw new Error("Invalid care code.");
+
       const [petId, p] = entry;
+      if (Array.isArray(p.memberUids) && p.memberUids.includes(session.uid)) {
+        throw new Error("You already have access to this pet.");
+      }
+
+      const u = users[session.email?.toLowerCase()];
+      if (!u || u.password !== password) {
+        throw new Error("Password verification failed.");
+      }
+
       if (!p.memberUids.includes(session.uid)) p.memberUids.push(session.uid);
       write(KEY_PETS, pets);
       api.pendingJoin = { petId, name: session.name, email: session.email };

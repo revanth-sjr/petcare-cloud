@@ -12,7 +12,7 @@
    ===================================================================== */
 
 import { $, $$, esc, toast, openModal, closeAllModals, STATUS_LABEL, STATUS_PILL } from "./ui.js";
-import { initAuth, speciesMeta } from "./auth.js";
+import { initAuth, speciesMeta, normaliseCode } from "./auth.js";
 import { createStore, buildDashboard } from "./data.js";
 import { now, fmtClock, dayPeriod, istTimeToday } from "./time.js";
 import { isFirebaseConfigured } from "./config.js";
@@ -154,16 +154,14 @@ function wireStatic() {
     await auth.signOut();
     window.location.replace("./login.html");
   });
-  $("#btnEmptyAddPet").addEventListener("click", () => {
-    /* Same as index.html's own empty-state CTA: straight to the Add Pet
-       screen, no Welcome screen — this account has already been through
-       sign-up (and possibly onboarding once before, if this is a zero
-       state from archiving a last pet rather than a brand-new account). */
+  $("#btnEmptyAddPet")?.addEventListener("click", () => {
     window.location.href = "./onboarding.html?mode=add";
   });
-  $("#btnAddPetHome").addEventListener("click", () => {
+  $("#btnAddPetHome")?.addEventListener("click", () => {
     window.location.href = "./onboarding.html?mode=add";
   });
+
+  wireJoinPetModal();
 
   /* A coarse, immediate signal — the same flag data.js's createStore()
      itself branches on — rather than waiting on every pet's store just
@@ -171,6 +169,60 @@ function wireStatic() {
   const live = isFirebaseConfigured();
   $("#modeBadge").dataset.mode = live ? "live" : "demo";
   $("#modeText").textContent   = live ? "Live · Firestore" : "Demo mode";
+}
+
+function wireJoinPetModal() {
+  const openJoin = () => {
+    $("#joinPetForm")?.reset();
+    $("#jpError").hidden = true;
+    openModal("joinPetModal");
+    setTimeout(() => $("#jpCode")?.focus(), 60);
+  };
+
+  $("#btnEmptyJoinPet")?.addEventListener("click", openJoin);
+  $("#btnJoinPetHome")?.addEventListener("click", openJoin);
+
+  $("#joinPetForm")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const code = normaliseCode($("#jpCode").value);
+    const password = $("#jpPassword").value;
+
+    if (!code)     return showJpError("Enter a care code.");
+    if (!password) return showJpError("Enter your current password.");
+
+    const btn = $("#jpSubmit");
+    const original = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "Verifying…";
+    $("#jpError").hidden = true;
+
+    try {
+      await auth.joinWithCode(code, password);
+      closeAllModals();
+      toast("Joined pet care team successfully!", "ok");
+
+      pets = await auth.myPets();
+      renderRoleUi();
+      await setupLiveStores();
+      $("#emptyDash").hidden = true;
+      $("#homeMain").hidden = false;
+    } catch (err) {
+      showJpError(err.message || "Could not join pet. Check code and password.");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = original;
+    }
+  });
+}
+
+function showJpError(msg) {
+  const el = $("#jpError");
+  if (el) {
+    el.textContent = msg;
+    el.hidden = false;
+  } else {
+    toast(msg, "err");
+  }
 }
 
 /* ------------------------------------------------------------------

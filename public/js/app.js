@@ -20,7 +20,7 @@ import {
   setTimeOffsetMs, getTimeOffsetMs, fmtClock, fmtDate, now, realNow, istTimeToday
 } from "./time.js";
 import { GRACE_MINUTES, UNDO_WINDOW_SECONDS } from "./config.js";
-import { initAuth, speciesMeta, validatePetForm } from "./auth.js";
+import { initAuth, speciesMeta, validatePetForm, normaliseCode } from "./auth.js";
 import { wireSpeciesGrid, wireBreedSelect, wireFeedingScheduleEditor, wirePhotoPicker } from "./pets-ui.js";
 import * as dashboardView from "./dashboard.js";
 import * as timelineView from "./timeline.js";
@@ -390,6 +390,7 @@ function wirePetSelector() {
   document.addEventListener("click", (e) => {
     if (!$("#petSwitcher").contains(e.target)) closePetMenu();
   });
+  wireDashboardJoinModal();
 }
 
 function openPetMenu() {
@@ -471,6 +472,16 @@ function filterPetItems(term) {
     }
   }
 
+  const joinItem = document.createElement("button");
+  joinItem.type = "button";
+  joinItem.className = "pet-switcher-item pet-switcher-add";
+  joinItem.textContent = "+ Join a pet";
+  joinItem.addEventListener("click", () => {
+    closePetMenu();
+    openJoinModalOnDashboard();
+  });
+  listContainer.appendChild(joinItem);
+
   if (currentPet?.role === "owner") {
     const addItem = document.createElement("button");
     addItem.type = "button";
@@ -478,6 +489,53 @@ function filterPetItems(term) {
     addItem.textContent = "+ Add a pet";
     addItem.addEventListener("click", () => { window.location.href = "./onboarding.html?mode=add"; });
     listContainer.appendChild(addItem);
+  }
+}
+
+function openJoinModalOnDashboard() {
+  $("#joinPetForm")?.reset();
+  $("#jpError").hidden = true;
+  openModal("joinPetModal");
+  setTimeout(() => $("#jpCode")?.focus(), 60);
+}
+
+function wireDashboardJoinModal() {
+  $("#joinPetForm")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const code = normaliseCode($("#jpCode").value);
+    const password = $("#jpPassword").value;
+
+    if (!code)     return showJpDashError("Enter a care code.");
+    if (!password) return showJpDashError("Enter your current password.");
+
+    const btn = $("#jpSubmit");
+    const original = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "Verifying…";
+    $("#jpError").hidden = true;
+
+    try {
+      const petId = await auth.joinWithCode(code, password);
+      closeAllModals();
+      toast("Joined pet care team successfully!", "ok");
+      pets = await auth.myPets();
+      await openPet(petId);
+    } catch (err) {
+      showJpDashError(err.message || "Could not join pet. Check code and password.");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = original;
+    }
+  });
+}
+
+function showJpDashError(msg) {
+  const el = $("#jpError");
+  if (el) {
+    el.textContent = msg;
+    el.hidden = false;
+  } else {
+    toast(msg, "err");
   }
 }
 

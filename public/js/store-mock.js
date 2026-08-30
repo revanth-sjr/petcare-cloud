@@ -321,6 +321,16 @@ export async function create(petId = PET_ID, session = null) {
     },
 
     async removeCaretaker(id) {
+      const ct = state.caretakers.find((c) => c.id === id);
+      if (ct?.uid) {
+        try {
+          let storedPets = JSON.parse(localStorage.getItem("petcare.demo.pets") || "{}");
+          if (storedPets[petId]) {
+            storedPets[petId].memberUids = (storedPets[petId].memberUids || []).filter((u) => u !== ct.uid);
+            localStorage.setItem("petcare.demo.pets", JSON.stringify(storedPets));
+          }
+        } catch { /* storage fallback */ }
+      }
       state.caretakers = state.caretakers.filter((c) => c.id !== id);
       emit();
     },

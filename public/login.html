@@ -103,21 +103,7 @@
           <input type="password" id="suPassword" autocomplete="new-password" placeholder="At least 6 characters" required>
         </label>
 
-        <div class="seg" role="group" aria-label="What are you signing up for">
-          <button type="button" data-path="owner" class="is-on">I'm the owner</button>
-          <button type="button" data-path="join">I'm a caretaker</button>
-        </div>
 
-        <div id="ownerFields">
-        </div>
-
-        <div id="joinFields" hidden>
-          <label>
-            <span>Care code</span>
-            <input type="text" id="suJoinCode" placeholder="e.g. CARE-1234" class="mono-input" autocapitalize="characters">
-          </label>
-          <p class="auth-help">The owner finds this in the Caretakers panel on their dashboard.</p>
-        </div>
 
         <p class="auth-error" id="signupError" hidden></p>
         <button class="btn btn-primary btn-block" type="submit" id="signupSubmit">Create account</button>

@@ -17,7 +17,7 @@
    ===================================================================== */
 
 import { firebaseConfig } from "./config.js";
-import { makeJoinCode, composeName } from "./auth.js";
+import { makeJoinCode, composeName, normaliseCode } from "./auth.js";
 
 const SDK = "https://www.gstatic.com/firebasejs/10.12.0";
 
@@ -188,18 +188,48 @@ export async function create() {
        member write. This pet becomes just one more entry in myPets() —
        a caretaker can hold this on several pets, each independent.
        ---------------------------------------------------------------- */
-    async joinWithCode(code) {
-      const uid  = auth.currentUser.uid;
-      const snap = await fs.getDoc(fs.doc(db, "joinCodes", code));
-      if (!snap.exists()) throw new Error("No pet found with that code. Ask the owner to check it.");
+    async joinWithCode(code, password) {
+      const user = auth.currentUser;
+      if (!user) throw new Error("You must be logged in to join a pet.");
+
+      const cleanCode = normaliseCode(code);
+      if (!cleanCode) throw new Error("Invalid care code.");
+      if (!password)  throw new Error("Password verification failed.");
+
+      /* 1. Look up code mapping */
+      const snap = await fs.getDoc(fs.doc(db, "joinCodes", cleanCode));
+      if (!snap.exists()) throw new Error("Invalid care code.");
 
       const { petId } = snap.data();
-      await fs.updateDoc(fs.doc(db, "pets", petId), {
-        memberUids: fs.arrayUnion(uid)
+      if (!petId) throw new Error("Invalid care code.");
+
+      /* 2. Check for duplicate join on existing pet */
+      const petRef = fs.doc(db, "pets", petId);
+      const petSnap = await fs.getDoc(petRef);
+      if (!petSnap.exists()) throw new Error("Invalid care code.");
+
+      const petData = petSnap.data() || {};
+      const members = Array.isArray(petData.memberUids) ? petData.memberUids : [];
+      if (members.includes(user.uid)) {
+        throw new Error("You already have access to this pet.");
+      }
+
+      /* 3. Password re-authentication using Firebase Auth */
+      try {
+        const cred = authMod.EmailAuthProvider.credential(user.email, password);
+        await authMod.reauthenticateWithCredential(user, cred);
+      } catch (err) {
+        throw new Error("Password verification failed.");
+      }
+
+      /* 4. Atomically add UID to pet.memberUids */
+      await fs.updateDoc(petRef, {
+        memberUids: fs.arrayUnion(user.uid)
       });
 
-      await fs.setDoc(fs.doc(db, "pets", petId, "caretakers", uid), {
-        uid,
+      /* 5. Create caretaker document record */
+      await fs.setDoc(fs.doc(db, "pets", petId, "caretakers", user.uid), {
+        uid: user.uid,
         name:  session?.name || "",
         email: session?.email || "",
         role:  "caretaker",

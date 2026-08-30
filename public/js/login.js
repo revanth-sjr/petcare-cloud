@@ -89,21 +89,11 @@ function wireSignup() {
     const problem = validateSignup(details);
     if (problem) return showError("#signupError", problem);
 
-    const code = normaliseCode($("#suJoinCode").value);
-
-    if (signupPath === "join" && !code) return showError("#signupError", "Enter the care code the owner gave you.");
-
     await busy("#signupSubmit", "Creating account…", async () => {
-      /* the account may already exist from a half-finished attempt */
       let session = auth.current();
       if (!session || session.email !== details.email.trim().toLowerCase()) {
         session = await auth.signUp(details);
       }
-
-      if (signupPath === "join") {
-        await auth.joinWithCode(code);
-      }
-      /* owner path: no pet yet — finish() sends them to onboarding */
       await finish();
     }, "#signupError");
   });
