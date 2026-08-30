@@ -196,25 +196,7 @@ export async function create() {
       if (!cleanCode) throw new Error("Invalid care code.");
       if (!password)  throw new Error("Password verification failed.");
 
-      /* 1. Look up code mapping */
-      const snap = await fs.getDoc(fs.doc(db, "joinCodes", cleanCode));
-      if (!snap.exists()) throw new Error("Invalid care code.");
-
-      const { petId } = snap.data();
-      if (!petId) throw new Error("Invalid care code.");
-
-      /* 2. Check for duplicate join on existing pet */
-      const petRef = fs.doc(db, "pets", petId);
-      const petSnap = await fs.getDoc(petRef);
-      if (!petSnap.exists()) throw new Error("Invalid care code.");
-
-      const petData = petSnap.data() || {};
-      const members = Array.isArray(petData.memberUids) ? petData.memberUids : [];
-      if (members.includes(user.uid)) {
-        throw new Error("You already have access to this pet.");
-      }
-
-      /* 3. Password re-authentication using Firebase Auth */
+      /* 1. Password re-authentication using Firebase Auth */
       try {
         const cred = authMod.EmailAuthProvider.credential(user.email, password);
         await authMod.reauthenticateWithCredential(user, cred);
@@ -222,21 +204,57 @@ export async function create() {
         throw new Error("Password verification failed.");
       }
 
+      /* 2. Look up code mapping */
+      let snap;
+      try {
+        snap = await fs.getDoc(fs.doc(db, "joinCodes", cleanCode));
+      } catch (err) {
+        throw new Error("Invalid care code.");
+      }
+      if (!snap || !snap.exists()) throw new Error("Invalid care code.");
+
+      const { petId } = snap.data();
+      if (!petId) throw new Error("Invalid care code.");
+
+      const petRef = fs.doc(db, "pets", petId);
+
+      /* 3. Check for duplicate join on existing pet */
+      try {
+        const petSnap = await fs.getDoc(petRef);
+        if (petSnap.exists()) {
+          const members = Array.isArray(petSnap.data()?.memberUids) ? petSnap.data().memberUids : [];
+          if (members.includes(user.uid)) {
+            throw new Error("You already have access to this pet.");
+          }
+        }
+      } catch (err) {
+        if (err.message === "You already have access to this pet.") throw err;
+      }
+
       /* 4. Atomically add UID to pet.memberUids */
-      await fs.updateDoc(petRef, {
-        memberUids: fs.arrayUnion(user.uid)
-      });
+      try {
+        await fs.updateDoc(petRef, {
+          memberUids: fs.arrayUnion(user.uid)
+        });
+      } catch (err) {
+        console.error("updateDoc memberUids failed:", err);
+        throw new Error("Could not join pet. Check code and try again.");
+      }
 
       /* 5. Create caretaker document record */
-      await fs.setDoc(fs.doc(db, "pets", petId, "caretakers", user.uid), {
-        uid: user.uid,
-        name:  session?.name || "",
-        email: session?.email || "",
-        role:  "caretaker",
-        status: "active",
-        note:  "Joined with a care code",
-        addedAt: fs.serverTimestamp()
-      }, { merge: true });
+      try {
+        await fs.setDoc(fs.doc(db, "pets", petId, "caretakers", user.uid), {
+          uid: user.uid,
+          name:  session?.name || "",
+          email: session?.email || "",
+          role:  "caretaker",
+          status: "active",
+          note:  "Joined with a care code",
+          addedAt: fs.serverTimestamp()
+        }, { merge: true });
+      } catch (err) {
+        console.warn("caretaker doc creation warning:", err);
+      }
 
       await api.setSelectedPetId(petId);
       return petId;
