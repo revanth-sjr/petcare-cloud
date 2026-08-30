@@ -105,6 +105,19 @@ export function emailValidationError(v) {
     return "Invalid or fake Gmail username format. Please enter your real Gmail address.";
   }
 
+  // 5. Reject 3+ consecutively repeated characters in username (e.g. iii, zzz, 999)
+  if (/(.)\1{2,}/.test(username)) {
+    return "Fake or invalid Gmail username detected (repeated characters pattern). Please use your real Gmail address.";
+  }
+
+  // 6. Reject suspicious/fake keyword combinations (e.g. miakalifa, fake, test, temp, dummy, sample)
+  const suspiciousKeywords = [/miakalifa/i, /kalifa/i, /fakeemail/i, /testemail/i, /tempemail/i, /dummyemail/i, /sampleemail/i, /asdf/i, /qwer/i, /zxcv/i, /12345/i];
+  for (const kw of suspiciousKeywords) {
+    if (kw.test(username)) {
+      return "Fake or suspicious Gmail username detected. Please enter your real Gmail address.";
+    }
+  }
+
   return null;
 }
 
