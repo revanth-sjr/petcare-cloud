@@ -42,11 +42,52 @@ export async function create() {
   const ready = new Promise((r) => { resolveReady = r; });
   let first = true;
 
+  const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
+
   authMod.onAuthStateChanged(auth, async (user) => {
-    session = user ? await hydrate(user) : null;
+    if (user) {
+      const loginTimeKey = "petcare_login_time_" + user.uid;
+      const loginTimeStr = localStorage.getItem(loginTimeKey);
+      const now = Date.now();
+
+      if (loginTimeStr) {
+        const loginTime = parseInt(loginTimeStr, 10);
+        if (now - loginTime > TWENTY_FOUR_HOURS_MS) {
+          console.log("[PetCare Auth] 24-hour session expired. Automatically signing out.");
+          localStorage.removeItem(loginTimeKey);
+          await authMod.signOut(auth);
+          session = null;
+          listeners.forEach((cb) => cb(null));
+          if (first) { first = false; resolveReady(null); }
+          return;
+        }
+      } else {
+        localStorage.setItem(loginTimeKey, now.toString());
+      }
+
+      session = await hydrate(user);
+    } else {
+      session = null;
+    }
+
     listeners.forEach((cb) => cb(session));
     if (first) { first = false; resolveReady(session); }
   });
+
+  setInterval(() => {
+    const user = auth.currentUser;
+    if (user) {
+      const loginTimeKey = "petcare_login_time_" + user.uid;
+      const loginTimeStr = localStorage.getItem(loginTimeKey);
+      if (loginTimeStr && (Date.now() - parseInt(loginTimeStr, 10) > TWENTY_FOUR_HOURS_MS)) {
+        console.log("[PetCare Auth] Active 24-hour session timer triggered logout.");
+        localStorage.removeItem(loginTimeKey);
+        authMod.signOut(auth).then(() => {
+          window.location.href = "./login.html";
+        });
+      }
+    }
+  }, 60000);
 
   /** Turn a Firebase user into our session shape. Identity only — no
       petId/role here, since one person can hold different roles on
@@ -184,6 +225,7 @@ export async function create() {
         createdAt: fs.serverTimestamp()
       });
 
+      localStorage.setItem("petcare_login_time_" + cred.user.uid, Date.now().toString());
       session = await hydrate(cred.user);
       session.otpVerified = true;
       session.emailVerified = true;
@@ -225,6 +267,7 @@ export async function create() {
       }
 
       await saveProfile(cred.user.uid, { otpVerified: true, emailVerified: true });
+      localStorage.setItem("petcare_login_time_" + cred.user.uid, Date.now().toString());
       session = await hydrate(cred.user);
       session.otpVerified = true;
       session.emailVerified = true;
@@ -291,6 +334,9 @@ export async function create() {
     },
 
     async signOut() {
+      if (auth.currentUser) {
+        localStorage.removeItem("petcare_login_time_" + auth.currentUser.uid);
+      }
       await authMod.signOut(auth);
       session = null;
     },
