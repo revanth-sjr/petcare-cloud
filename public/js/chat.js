@@ -87,7 +87,17 @@ async function ask(question) {
 
   let reply;
   try {
-    reply = isAiConfigured() ? await callFunction(question) : answerLocally(question, currentPet);
+    if (isAiConfigured()) {
+      reply = await callFunction(question);
+    } else {
+      try {
+        reply = await callGeminiDirect(question);
+      } catch (geminiErr) {
+        console.info("[PetCare] Gemini Direct call fallback notice:", geminiErr.message);
+        reply = answerLocally(question, currentPet);
+      }
+    }
+
     if (reply?.answer) {
       conversationHistory.push({ role: "user", text: question });
       conversationHistory.push({ role: "model", text: reply.answer });
@@ -118,6 +128,80 @@ async function callFunction(question) {
   });
   if (!res.ok) throw new Error(`AI endpoint returned ${res.status}`);
   return await res.json();
+}
+
+async function callGeminiDirect(question) {
+  const key = firebaseConfig?.apiKey;
+  if (!key || key.startsWith("PASTE_")) throw new Error("No API key configured");
+
+  const systemPrompt = `You are PetCare AI, the assistant inside a pet-owner dashboard.
+Give general pet-care information only. NEVER state, imply, or guess a diagnosis.
+If symptoms could be serious (breathing, choking, seizures, collapse, bleeding, poison, bloat, severe pain), set urgency to "emergency".
+Use urgency "soon" for symptoms needing a vet today; "routine" for general care. Keep answer under 90 words.
+Active pet context: ${currentPet ? `Name: ${currentPet.name}, Species: ${currentPet.species}, Breed: ${currentPet.breed || "N/A"}, Age: ${currentPet.ageYears || "N/A"}` : "General pet"}`;
+
+  const formattedHistory = (conversationHistory || [])
+    .filter((h) => h && h.role && h.text)
+    .map((h) => ({
+      role: h.role === "bot" || h.role === "model" ? "model" : "user",
+      parts: [{ text: String(h.text).slice(0, 500) }]
+    }));
+
+  const contents = [
+    ...formattedHistory,
+    { role: "user", parts: [{ text: question }] }
+  ];
+
+  const body = {
+    systemInstruction: { parts: [{ text: systemPrompt }] },
+    contents,
+    generationConfig: {
+      temperature: 0.4,
+      maxOutputTokens: 400,
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: "OBJECT",
+        properties: {
+          answer:      { type: "STRING" },
+          urgency:     { type: "STRING", enum: ["routine", "soon", "emergency"] },
+          showVets:    { type: "BOOLEAN" },
+          vetFilter:   { type: "STRING", enum: ["emergency", "general", "none"] },
+          suggestions: { type: "ARRAY", items: { type: "STRING" } }
+        },
+        required: ["answer", "urgency", "showVets", "suggestions"]
+      }
+    }
+  };
+
+  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout ? AbortSignal.timeout(10_000) : undefined
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`Gemini API ${res.status}: ${errText.slice(0, 200)}`);
+  }
+
+  const data = await res.json();
+  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!text) throw new Error("No text returned from Gemini API");
+
+  const parsed = JSON.parse(text);
+  const local = answerLocally(question, currentPet);
+  const rank = { routine: 0, soon: 1, emergency: 2 };
+  const urgency = rank[local.urgency] > rank[parsed.urgency] ? local.urgency : parsed.urgency;
+
+  return {
+    answer: String(parsed.answer || "").slice(0, 1200),
+    urgency,
+    showVets: urgency !== "routine" ? true : Boolean(parsed.showVets),
+    vetFilter: urgency === "emergency" ? "emergency" : (parsed.vetFilter && parsed.vetFilter !== "none" ? parsed.vetFilter : null),
+    suggestions: Array.isArray(parsed.suggestions) ? parsed.suggestions.slice(0, 4) : [],
+    source: "gemini"
+  };
 }
 
 /** Only the fields the system prompt actually needs — never the whole
