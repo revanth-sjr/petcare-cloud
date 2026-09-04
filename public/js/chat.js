@@ -21,16 +21,22 @@ const OPENERS = [
 
 let busy = false;
 let currentPet = null;   // whichever pet is open on the dashboard right now
+let conversationHistory = []; // multi-turn conversation history for Gemini chatbot
 
 /** app.js calls this on every pet switch, so a question asked as "my pet"
     always resolves to whichever pet is currently selected — never a pet
     left over from before the switch. */
-export function setPetContext(pet) { currentPet = pet; }
+export function setPetContext(pet) {
+  if (currentPet?.id !== pet?.id) {
+    conversationHistory = [];
+  }
+  currentPet = pet;
+}
 
 export function init() {
   $("#aiDisclaimer").textContent = DISCLAIMER;
   $("#aiSource").textContent = isAiConfigured()
-    ? "Powered by Gemini · general care guidance"
+    ? "Powered by Gemini 3.7 Flash · general care guidance"
     : "Rule-based responder · general care guidance";
 
   $("#aiFab").addEventListener("click", open);
@@ -82,6 +88,13 @@ async function ask(question) {
   let reply;
   try {
     reply = isAiConfigured() ? await callFunction(question) : answerLocally(question, currentPet);
+    if (reply?.answer) {
+      conversationHistory.push({ role: "user", text: question });
+      conversationHistory.push({ role: "model", text: reply.answer });
+      if (conversationHistory.length > 10) {
+        conversationHistory = conversationHistory.slice(-10);
+      }
+    }
   } catch (err) {
     console.warn("[PetCare] AI call failed, using local responder.", err);
     reply = answerLocally(question, currentPet);
@@ -95,7 +108,12 @@ async function callFunction(question) {
   const res = await fetch(AI_ENDPOINT, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ question, petId: currentPet?.id || null, pet: petContextPayload() }),
+    body: JSON.stringify({
+      question,
+      petId: currentPet?.id || null,
+      pet: petContextPayload(),
+      history: conversationHistory
+    }),
     signal: AbortSignal.timeout ? AbortSignal.timeout(12_000) : undefined
   });
   if (!res.ok) throw new Error(`AI endpoint returned ${res.status}`);

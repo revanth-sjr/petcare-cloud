@@ -19,7 +19,7 @@ const { answerLocally, buildSystemPrompt } = require("./fallback");
 const GEMINI_API_KEY = defineSecret("GEMINI_API_KEY");
 
 /* Override with `firebase functions:config` style env if a newer model ships. */
-const MODEL = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";
+const MODEL = process.env.GEMINI_MODEL || "gemini-3.7-flash";
 const API   = "https://generativelanguage.googleapis.com/v1beta/models";
 
 exports.askPetCareAI = onRequest(
@@ -45,6 +45,7 @@ exports.askPetCareAI = onRequest(
        beyond a handful of display fields, and never merged with any
        other pet. See sanitizePet(). */
     const pet = sanitizePet(req.body?.pet);
+    const history = Array.isArray(req.body?.history) ? req.body.history.slice(-10) : [];
 
     const key = GEMINI_API_KEY.value();
 
@@ -55,7 +56,7 @@ exports.askPetCareAI = onRequest(
     }
 
     try {
-      const reply = await askGemini(question, key, pet);
+      const reply = await askGemini(question, history, key, pet);
       logger.info("gemini ok", { urgency: reply.urgency, chars: reply.answer.length });
       return res.json({ ...reply, source: "gemini" });
     } catch (err) {
@@ -86,10 +87,22 @@ function sanitizePet(p) {
 }
 
 /* ------------------------------------------------------------------ */
-async function askGemini(question, key, pet) {
+async function askGemini(question, history, key, pet) {
+  const formattedHistory = (history || [])
+    .filter((h) => h && h.role && h.text)
+    .map((h) => ({
+      role: h.role === "bot" || h.role === "model" ? "model" : "user",
+      parts: [{ text: String(h.text).slice(0, 500) }]
+    }));
+
+  const contents = [
+    ...formattedHistory,
+    { role: "user", parts: [{ text: question }] }
+  ];
+
   const body = {
     systemInstruction: { parts: [{ text: buildSystemPrompt(pet) }] },
-    contents: [{ role: "user", parts: [{ text: question }] }],
+    contents,
     generationConfig: {
       temperature: 0.4,
       maxOutputTokens: 400,
@@ -108,11 +121,24 @@ async function askGemini(question, key, pet) {
     }
   };
 
-  const r = await fetch(`${API}/${MODEL}:generateContent?key=${key}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body)
-  });
+  let r;
+  try {
+    r = await fetch(`${API}/${MODEL}:generateContent?key=${key}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    if (!r.ok && MODEL.includes("3.7")) {
+      // Fallback model if gemini-3.7-flash is unavailable on key
+      r = await fetch(`${API}/gemini-2.5-flash:generateContent?key=${key}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+    }
+  } catch (err) {
+    throw err;
+  }
 
   if (!r.ok) throw new Error(`Gemini ${r.status}: ${(await r.text()).slice(0, 300)}`);
 
