@@ -124,7 +124,7 @@ async function callFunction(question) {
       pet: petContextPayload(),
       history: conversationHistory
     }),
-    signal: AbortSignal.timeout ? AbortSignal.timeout(12_000) : undefined
+    signal: AbortSignal.timeout ? AbortSignal.timeout(30_000) : undefined
   });
   if (!res.ok) throw new Error(`AI endpoint returned ${res.status}`);
   return await res.json();
@@ -183,7 +183,7 @@ Active pet context: ${currentPet ? `Name: ${currentPet.name}, Species: ${current
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
-        signal: AbortSignal.timeout ? AbortSignal.timeout(10_000) : undefined
+        signal: AbortSignal.timeout ? AbortSignal.timeout(30_000) : undefined
       });
       if (res.ok) break;
       const errText = await res.text();
