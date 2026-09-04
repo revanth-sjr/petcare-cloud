@@ -24,7 +24,7 @@ export const PET_ID = "buddy";
 
 /* Cloud Function URL. Get it from the output of `firebase deploy --only functions`.
    Leave it empty to run the rule-based responder client-side (Spark-plan mode). */
-export const AI_ENDPOINT = "";
+export const AI_ENDPOINT = "https://asia-south1-petcare-cloud-cts.cloudfunctions.net/askPetCareAI";
 
 /* How long after a scheduled dose before it counts as OVERDUE. */
 export const GRACE_MINUTES = 60;
