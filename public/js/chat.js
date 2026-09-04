@@ -157,7 +157,7 @@ Active pet context: ${currentPet ? `Name: ${currentPet.name}, Species: ${current
     contents,
     generationConfig: {
       temperature: 0.4,
-      maxOutputTokens: 400,
+      maxOutputTokens: 1200,
       responseMimeType: "application/json",
       responseSchema: {
         type: "OBJECT",

@@ -107,7 +107,7 @@ async function askGemini(question, history, key, pet) {
     contents,
     generationConfig: {
       temperature: 0.4,
-      maxOutputTokens: 400,
+      maxOutputTokens: 1200,
       responseMimeType: "application/json",
       responseSchema: {
         type: "OBJECT",
