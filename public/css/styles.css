@@ -1167,6 +1167,20 @@ button{font-family:inherit;font-size:inherit;color:inherit}
   margin:2px 0 0;padding:8px 10px;border-radius:8px;
   background:var(--warn-bg);color:var(--warn);font-size:12px;font-weight:600;line-height:1.4;
 }
+.pfc-vet-box{
+  margin-top:4px;padding:8px 10px;border-radius:8px;
+  background:var(--accent-bg);border:1px solid var(--line);
+  font-size:12px;color:var(--ink);display:flex;flex-direction:column;gap:3px;
+  text-align:left;
+}
+.pfc-vet-box.dim{background:var(--surface-2);color:var(--ink-3);font-size:11.5px;display:flex;flex-direction:row;align-items:center;gap:6px}
+.pfc-vet-title{font-weight:600;display:flex;align-items:center;gap:6px;color:var(--accent-ink)}
+.pfc-vet-num{color:var(--ink-2);font-family:var(--f-mono);font-size:11.5px}
+.pfc-vet-em{color:var(--crit);font-weight:700;font-size:11.5px}
+.vet-details{display:flex;flex-direction:column;gap:2px}
+.vet-icon-title{display:flex;align-items:center;gap:6px;font-size:13.5px;font-weight:600}
+.vet-sub-phone{font-family:var(--f-mono);font-size:12px;color:var(--ink-2)}
+.vet-line.is-emergency{border-color:var(--crit);background:var(--crit-bg);padding:10px 12px;border-radius:var(--r-sm);margin-top:8px}
 .pet-flash-card--unavailable{opacity:.72}
 .pet-flash-card--unavailable .pfc-photo{background-color:var(--surface-2)}
 

@@ -236,16 +236,25 @@
       <ul class="lastdone" id="lastDone"></ul>
     </section>
 
-    <section class="card instr-card" aria-label="Special instructions">
-      <p class="card-kicker">Special instructions</p>
+    <section class="card instr-card" aria-label="Special instructions & Veterinarian">
+      <p class="card-kicker">Special instructions &amp; Doctor Contact</p>
       <dl class="instr" id="instructions"></dl>
-      <div class="vet-line">
-        <span><img src="https://img.icons8.com/ios-filled/50/veterinarian.png" alt="Vet" class="ui-icon"> <b id="vetName">—</b></span>
-        <a class="btn btn-ghost btn-sm" id="vetCall" href="#">Call</a>
-      </div>
-      <div class="vet-line" id="vetEmergencyLine" hidden>
-        <span><img src="https://img.icons8.com/ios-filled/50/siren.png" alt="Emergency" class="ui-icon"> <b>Emergency vet</b></span>
-        <a class="btn btn-ghost btn-sm" id="vetEmergencyCall" href="#">Call</a>
+      <div class="vet-block" id="vetBlock">
+        <p class="card-kicker" style="margin-top:14px;margin-bottom:6px;">Veterinary Doctor</p>
+        <div class="vet-line">
+          <div class="vet-details">
+            <span class="vet-icon-title"><img src="https://img.icons8.com/ios-filled/50/veterinarian.png" alt="Vet" class="ui-icon"> <b id="vetName">—</b></span>
+            <span class="vet-sub-phone" id="vetPhoneSub"></span>
+          </div>
+          <a class="btn btn-ghost btn-sm" id="vetCall" href="#" hidden>Call Doctor</a>
+        </div>
+        <div class="vet-line is-emergency" id="vetEmergencyLine" hidden>
+          <div class="vet-details">
+            <span class="vet-icon-title"><img src="https://img.icons8.com/ios-filled/50/siren.png" alt="Emergency" class="ui-icon"> <b id="vetEmergencyName">Emergency Doctor</b></span>
+            <span class="vet-sub-phone" id="vetEmergencyPhoneSub"></span>
+          </div>
+          <a class="btn btn-crit btn-sm" id="vetEmergencyCall" href="#" hidden>🚨 Emergency Call</a>
+        </div>
       </div>
     </section>
 

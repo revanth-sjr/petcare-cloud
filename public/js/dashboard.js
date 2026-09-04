@@ -320,25 +320,37 @@ function renderInstructions(dash) {
     .join("") || `<div><dd class="empty">No special instructions.</dd></div>`;
 
   const vet = dash.pet?.vet || {};
-  $("#vetName").textContent = vet.name || "—";
+  const vetNameEl = $("#vetName");
+  const vetPhoneSub = $("#vetPhoneSub");
   const call = $("#vetCall");
-  if (vet.phone) {
-    call.href = `tel:${vet.phone.replace(/\s/g, "")}`;
-    call.textContent = vet.phone;
-    call.hidden = false;
+
+  if (vet.name || vet.phone) {
+    if (vetNameEl) vetNameEl.textContent = vet.name || "Veterinary Doctor / Clinic";
+    if (vet.phone) {
+      if (vetPhoneSub) vetPhoneSub.textContent = vet.phone;
+      if (call) {
+        call.href = `tel:${vet.phone.replace(/\s/g, "")}`;
+        call.textContent = `Call ${vet.phone}`;
+        call.hidden = false;
+      }
+    } else {
+      if (vetPhoneSub) vetPhoneSub.textContent = "No phone number added";
+      if (call) call.hidden = true;
+    }
   } else {
-    call.hidden = true;
+    if (vetNameEl) vetNameEl.textContent = "No vet doctor listed";
+    if (vetPhoneSub) vetPhoneSub.textContent = "Add vet details in Edit Pet";
+    if (call) call.hidden = true;
   }
 
-  /* Emergency vet number is optional — a pet saved before this field
-     existed simply has none, and the whole line stays hidden rather than
-     showing an empty "Call" button. */
   const emLine = $("#vetEmergencyLine");
+  const emPhoneSub = $("#vetEmergencyPhoneSub");
   const emCall = $("#vetEmergencyCall");
   if (emLine && emCall) {
     if (vet.emergencyPhone) {
+      if (emPhoneSub) emPhoneSub.textContent = vet.emergencyPhone;
       emCall.href = `tel:${vet.emergencyPhone.replace(/\s/g, "")}`;
-      emCall.textContent = vet.emergencyPhone;
+      emCall.textContent = `🚨 Emergency Call`;
       emLine.hidden = false;
     } else {
       emLine.hidden = true;

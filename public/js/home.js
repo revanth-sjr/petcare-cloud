@@ -434,6 +434,16 @@ function flashCard(pet, dash) {
       ? `<p class="pfc-next"><img src="https://img.icons8.com/ios-filled/50/22c55e/checkmark.png" alt="Check" class="ui-icon no-invert"> All feedings done for today</p>`
       : `<p class="pfc-next">Next feeding: ${esc(fmtClock(istTimeToday(worstFeed.slot)))}</p>`;
 
+  const vet = dash.pet?.vet || pet.vet || {};
+  const hasVet = Boolean(vet.name || vet.phone || vet.emergencyPhone);
+  const vetLine = hasVet
+    ? `<div class="pfc-vet-box">
+        <span class="pfc-vet-title"><img src="https://img.icons8.com/ios-filled/50/veterinarian.png" alt="Vet Doctor" class="ui-icon"> <b>Vet Doctor:</b> ${esc(vet.name || "Assigned Doctor")}</span>
+        ${vet.phone ? `<span class="pfc-vet-num">📞 ${esc(vet.phone)}</span>` : ""}
+        ${vet.emergencyPhone ? `<span class="pfc-vet-em">🚨 <b>Emergency:</b> ${esc(vet.emergencyPhone)}</span>` : ""}
+       </div>`
+    : `<div class="pfc-vet-box dim"><img src="https://img.icons8.com/ios-filled/50/veterinarian.png" alt="Vet" class="ui-icon"> <span>No vet doctor assigned</span></div>`;
+
   const btn = document.createElement("button");
   btn.type = "button";
   btn.className = "pet-flash-card";
@@ -461,6 +471,8 @@ function flashCard(pet, dash) {
         <span class="pfc-row-label"><img src="https://img.icons8.com/ios-filled/50/pill.png" alt="Medication" class="ui-icon"> Medication</span>
         <span class="pill ${STATUS_PILL[medRow.status]}">${STATUS_LABEL[medRow.status]}</span>
       </div>` : ""}
+
+      ${vetLine}
 
       ${dash.today.overFeeding ? `<p class="pfc-warn"><img src="https://img.icons8.com/ios-filled/50/warning-shield.png" alt="Warning" class="ui-icon"> Feeding Warning — exceeded today's schedule</p>` : ""}
     </div>`;
