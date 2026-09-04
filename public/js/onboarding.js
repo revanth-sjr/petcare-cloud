@@ -89,6 +89,9 @@ function resetForm() {
   breed.populate(null);
   feeding.set(null);
   photo.set("");
+  if ($("#fVetName")) $("#fVetName").value = "";
+  if ($("#fVetPhone")) $("#fVetPhone").value = "";
+  if ($("#fVetEmergencyPhone")) $("#fVetEmergencyPhone").value = "";
   hideFormError();
 }
 
@@ -107,7 +110,12 @@ function wireForm() {
       photoURL: photo.get(),
       feedingSchedule: { times: feeding.get(), notes: "" },
       walkTarget: $("#fWalkTarget").value,
-      specialInstructions: { allergy: "", medication: "", notes: $("#fNotes").value.trim() }
+      specialInstructions: { allergy: "", medication: "", notes: $("#fNotes").value.trim() },
+      vet: {
+        name: ($("#fVetName")?.value || "").trim(),
+        phone: ($("#fVetPhone")?.value || "").trim(),
+        emergencyPhone: ($("#fVetEmergencyPhone")?.value || "").trim()
+      }
     };
 
     const problem = validatePetForm(payload);

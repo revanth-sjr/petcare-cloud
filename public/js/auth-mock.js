@@ -165,7 +165,7 @@ export async function create() {
         }));
     },
 
-    async createPet({ name, species, breed, ageYears, gender, weightKg, photoURL, feedingSchedule, walkTarget, specialInstructions }) {
+    async createPet({ name, species, breed, ageYears, gender, weightKg, photoURL, feedingSchedule, walkTarget, specialInstructions, vet }) {
       const petId = `pet-${Math.random().toString(36).slice(2, 8)}`;
       const times = Array.isArray(feedingSchedule?.times) && feedingSchedule.times.length
         ? [...feedingSchedule.times].sort() : ["08:00", "13:00", "19:00"];
@@ -188,7 +188,11 @@ export async function create() {
         dailyTargets: { feeding: times.length, walk: walkTarget == null ? 2 : Math.max(0, Number(walkTarget) || 0) },
         feedingSchedule: { times, notes: (feedingSchedule?.notes || "").trim() },
         specialInstructions: specialInstructions || { allergy: "", medication: "", notes: "" },
-        vet: { name: "", phone: "", emergencyPhone: "" }
+        vet: {
+          name: (vet?.name || "").trim(),
+          phone: (vet?.phone || "").trim(),
+          emergencyPhone: (vet?.emergencyPhone || "").trim()
+        }
       };
       write(KEY_PETS, pets);
 

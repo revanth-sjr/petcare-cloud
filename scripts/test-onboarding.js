@@ -30,7 +30,7 @@ function check(label, cond) {
 
 async function main() {
   const server = spawn("npx", ["--yes", "serve", "public", "-l", String(PORT)], {
-    cwd: ROOT, stdio: "ignore"
+    cwd: ROOT, stdio: "ignore", shell: true
   });
   await waitForServer();
 

@@ -364,7 +364,7 @@ export async function create() {
     },
 
     /** Owner path: create a pet, claim ownership, publish a join code. */
-    async createPet({ name, species, breed, ageYears, gender, weightKg, photoURL, feedingSchedule, walkTarget, specialInstructions }) {
+    async createPet({ name, species, breed, ageYears, gender, weightKg, photoURL, feedingSchedule, walkTarget, specialInstructions, vet }) {
       const uid   = auth.currentUser.uid;
       const petId = fs.doc(fs.collection(db, "pets")).id;
       const code  = makeJoinCode(name);
@@ -388,7 +388,11 @@ export async function create() {
         dailyTargets: { feeding: times.length, walk: walkTarget == null ? 2 : Math.max(0, Number(walkTarget) || 0) },
         feedingSchedule: { times, notes: (feedingSchedule?.notes || "").trim() },
         specialInstructions: specialInstructions || { allergy: "", medication: "", notes: "" },
-        vet: { name: "", phone: "", emergencyPhone: "" },
+        vet: {
+          name: (vet?.name || "").trim(),
+          phone: (vet?.phone || "").trim(),
+          emergencyPhone: (vet?.emergencyPhone || "").trim()
+        },
         createdAt: fs.serverTimestamp()
       });
 

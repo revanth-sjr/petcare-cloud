@@ -125,6 +125,24 @@
         <textarea id="fNotes" rows="2" placeholder="Allergies, medication routine, anything a caretaker should know"></textarea>
       </label>
 
+      <div class="onb-field">
+        <span>Veterinarian contact <i>optional</i></span>
+        <div class="field-row">
+          <label class="onb-field">
+            <span>Vet / clinic name</span>
+            <input type="text" id="fVetName" placeholder="e.g. Dr. Nair, Whiskers Clinic">
+          </label>
+          <label class="onb-field">
+            <span>Vet phone number</span>
+            <input type="tel" id="fVetPhone" placeholder="e.g. 98765 43210">
+          </label>
+        </div>
+        <label class="onb-field">
+          <span>Emergency vet phone <i>optional</i></span>
+          <input type="tel" id="fVetEmergencyPhone" placeholder="e.g. 98765 00000">
+        </label>
+      </div>
+
       <p class="auth-error" id="petFormError" hidden></p>
       <button class="btn btn-primary btn-block btn-lg" type="submit" id="petFormSubmit">Save pet</button>
       <button type="button" class="btn btn-ghost btn-block" id="petFormCancel" hidden>Cancel</button>
