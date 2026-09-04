@@ -173,16 +173,28 @@ Active pet context: ${currentPet ? `Name: ${currentPet.name}, Species: ${current
     }
   };
 
-  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-    signal: AbortSignal.timeout ? AbortSignal.timeout(10_000) : undefined
-  });
+  const candidateModels = ["gemini-3.6-flash", "gemini-flash-latest", "gemini-3.7-flash"];
+  let res;
+  let lastErr = "";
 
-  if (!res.ok) {
-    const errText = await res.text();
-    throw new Error(`Gemini API ${res.status}: ${errText.slice(0, 200)}`);
+  for (const m of candidateModels) {
+    try {
+      res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${key}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout ? AbortSignal.timeout(10_000) : undefined
+      });
+      if (res.ok) break;
+      const errText = await res.text();
+      lastErr = `Gemini ${m} ${res.status}: ${errText.slice(0, 150)}`;
+    } catch (err) {
+      lastErr = err.message;
+    }
+  }
+
+  if (!res || !res.ok) {
+    throw new Error(`Gemini API failed across candidate models: ${lastErr}`);
   }
 
   const data = await res.json();

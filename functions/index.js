@@ -19,8 +19,10 @@ const { answerLocally, buildSystemPrompt } = require("./fallback");
 const GEMINI_API_KEY = defineSecret("GEMINI_API_KEY");
 
 /* Override with `firebase functions:config` style env if a newer model ships. */
-const MODEL = process.env.GEMINI_MODEL || "gemini-3.7-flash";
-const API   = "https://generativelanguage.googleapis.com/v1beta/models";
+const API = "https://generativelanguage.googleapis.com/v1beta/models";
+const CANDIDATE_MODELS = process.env.GEMINI_MODEL 
+  ? [process.env.GEMINI_MODEL, "gemini-3.6-flash", "gemini-flash-latest"]
+  : ["gemini-3.6-flash", "gemini-flash-latest", "gemini-3.7-flash"];
 
 exports.askPetCareAI = onRequest(
   {
@@ -57,7 +59,7 @@ exports.askPetCareAI = onRequest(
 
     try {
       const reply = await askGemini(question, history, key, pet);
-      logger.info("gemini ok", { urgency: reply.urgency, chars: reply.answer.length });
+      logger.info("gemini ok", { urgency: reply.urgency, chars: reply.answer.length, model: reply.modelUsed });
       return res.json({ ...reply, source: "gemini" });
     } catch (err) {
       logger.error("gemini failed, falling back", err);
@@ -122,25 +124,28 @@ async function askGemini(question, history, key, pet) {
   };
 
   let r;
-  try {
-    r = await fetch(`${API}/${MODEL}:generateContent?key=${key}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
-    });
-    if (!r.ok && MODEL.includes("3.7")) {
-      // Fallback model if gemini-3.7-flash is unavailable on key
-      r = await fetch(`${API}/gemini-2.5-flash:generateContent?key=${key}`, {
+  let modelUsed = "";
+  let lastErr = "";
+
+  for (const m of CANDIDATE_MODELS) {
+    try {
+      r = await fetch(`${API}/${m}:generateContent?key=${key}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body)
       });
+      if (r.ok) {
+        modelUsed = m;
+        break;
+      }
+      const errTxt = await r.text();
+      lastErr = `Gemini ${m} (${r.status}): ${errTxt.slice(0, 150)}`;
+    } catch (err) {
+      lastErr = err.message;
     }
-  } catch (err) {
-    throw err;
   }
 
-  if (!r.ok) throw new Error(`Gemini ${r.status}: ${(await r.text()).slice(0, 300)}`);
+  if (!r || !r.ok) throw new Error(`Gemini API failed across candidate models: ${lastErr}`);
 
   const data = await r.json();
   const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
@@ -160,6 +165,7 @@ async function askGemini(question, history, key, pet) {
     showVets:    urgency !== "routine" ? true : Boolean(parsed.showVets),
     vetFilter:   urgency === "emergency" ? "emergency"
                  : (parsed.vetFilter && parsed.vetFilter !== "none" ? parsed.vetFilter : null),
-    suggestions: Array.isArray(parsed.suggestions) ? parsed.suggestions.slice(0, 4) : []
+    suggestions: Array.isArray(parsed.suggestions) ? parsed.suggestions.slice(0, 4) : [],
+    modelUsed
   };
 }
