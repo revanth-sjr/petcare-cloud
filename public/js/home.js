@@ -126,19 +126,19 @@ function paintUser() {
 function renderRoleUi() {
   const owned = pets.some((p) => p.role === "owner");
   const isCaretakerOnly = pets.length > 0 && pets.every((p) => p.role === "caretaker");
+  const showOwnerActions = owned || (!isCaretakerOnly && pets.length === 0);
 
   const role = $("#userRole");
-  role.textContent = isCaretakerOnly ? "caretaker" : "owner";
+  role.textContent = showOwnerActions ? "owner" : "caretaker";
   role.className = `role-chip ${role.textContent}`;
 
-  /* On zero pets or active pets, both Join and Add buttons should be available */
-  if ($("#btnAddPetHome")) $("#btnAddPetHome").hidden = false;
-  if ($("#btnEmptyAddPet")) $("#btnEmptyAddPet").hidden = false;
+  if ($("#btnAddPetHome")) $("#btnAddPetHome").hidden = !showOwnerActions;
+  if ($("#btnEmptyAddPet")) $("#btnEmptyAddPet").hidden = !showOwnerActions;
 
-  if ($("#btnJoinPetHome")) $("#btnJoinPetHome").hidden = false;
-  if ($("#btnEmptyJoinPet")) $("#btnEmptyJoinPet").hidden = false;
+  if ($("#btnJoinPetHome")) $("#btnJoinPetHome").hidden = showOwnerActions;
+  if ($("#btnEmptyJoinPet")) $("#btnEmptyJoinPet").hidden = showOwnerActions;
 
-  if (isCaretakerOnly) {
+  if (!showOwnerActions) {
     $("#welcomeSub").textContent = "Caretaker dashboard: keep every pet's care on track today.";
   }
 }
