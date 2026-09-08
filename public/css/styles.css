@@ -413,7 +413,8 @@ button{font-family:inherit;font-size:inherit;color:inherit}
   transition:transform .14s ease, box-shadow .14s ease;
 }
 .ai-fab:hover{transform:translateY(-2px);box-shadow:0 16px 32px -10px rgba(221,107,69,.7)}
-.ai-fab-icon{font-size:17px}
+.ai-fab-icon{display:inline-flex;align-items:center;font-size:17px}
+.ai-fab-icon img{width:18px;height:18px;filter:brightness(0) invert(1)}
 .ai-fab.is-hidden{opacity:0;pointer-events:none;transform:scale(.9)}
 
 .ai-panel{
