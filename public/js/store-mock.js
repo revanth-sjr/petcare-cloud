@@ -34,8 +34,8 @@ export async function create(petId = PET_ID, session = null) {
     }
     /* Someone who just redeemed a care code introduces themselves to the
        roster, the same way auth-firebase.js writes their caretaker doc. */
-    if (session?.role === "caretaker" &&
-        !s.caretakers.some((c) => c.email && c.email === session.email)) {
+    if (session && s.pet && s.pet.ownerUid !== session.uid &&
+        !s.caretakers.some((c) => (c.uid && c.uid === session.uid) || (c.email && c.email === session.email))) {
       s.caretakers.push({
         id: `ct-${session.uid}`,
         uid: session.uid,

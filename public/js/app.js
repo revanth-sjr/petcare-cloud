@@ -561,7 +561,8 @@ function wireEditArchive() {
   });
 
   $("#btnEditPet").addEventListener("click", openEditPet);
-  $("#btnEmptyAddPet").addEventListener("click", () => { window.location.href = "./onboarding.html?mode=add"; });
+  $("#btnEmptyAddPet")?.addEventListener("click", () => { window.location.href = "./onboarding.html?mode=add"; });
+  $("#btnEmptyJoinPet")?.addEventListener("click", () => { openJoinModalOnDashboard(); });
 
   $("#editPetForm").addEventListener("submit", async (e) => {
     e.preventDefault();

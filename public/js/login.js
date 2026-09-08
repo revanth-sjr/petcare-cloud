@@ -171,13 +171,7 @@ async function finish() {
     return;
   }
 
-  let hasPet = false;
-  try { hasPet = (await auth.myPets()).length > 0; } catch { /* fail open to onboarding */ }
-  if (hasPet || signupPath === "join") {
-    window.location.replace("./home.html");
-  } else {
-    window.location.replace("./onboarding.html?mode=first");
-  }
+  window.location.replace("./home.html");
 }
 
 async function busy(sel, label, run, errorSel) {

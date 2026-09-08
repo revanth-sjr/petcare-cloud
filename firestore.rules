@@ -52,7 +52,7 @@ service cloud.firestore {
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberUids'])
           && request.resource.data.memberUids.hasAll(resource.data.memberUids)
           && request.resource.data.memberUids.hasOnly(
-               resource.data.memberUids.concat([request.auth.uid]));
+               resource.data.memberUids + [request.auth.uid]);
       }
 
       /* Any member may update the denormalised current weight; everything
