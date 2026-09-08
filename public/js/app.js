@@ -474,28 +474,22 @@ function filterPetItems(term) {
     }
   }
 
-  const isOwner = session?.role === "owner" || currentPet?.role === "owner";
+  const joinItem = document.createElement("button");
+  joinItem.type = "button";
+  joinItem.className = "pet-switcher-item pet-switcher-add";
+  joinItem.textContent = "+ Join a pet";
+  joinItem.addEventListener("click", () => {
+    closePetMenu();
+    openJoinModalOnDashboard();
+  });
+  listContainer.appendChild(joinItem);
 
-  if (!isOwner) {
-    const joinItem = document.createElement("button");
-    joinItem.type = "button";
-    joinItem.className = "pet-switcher-item pet-switcher-add";
-    joinItem.textContent = "+ Join a pet";
-    joinItem.addEventListener("click", () => {
-      closePetMenu();
-      openJoinModalOnDashboard();
-    });
-    listContainer.appendChild(joinItem);
-  }
-
-  if (isOwner) {
-    const addItem = document.createElement("button");
-    addItem.type = "button";
-    addItem.className = "pet-switcher-item pet-switcher-add";
-    addItem.textContent = "+ Add a pet";
-    addItem.addEventListener("click", () => { window.location.href = "./onboarding.html?mode=add"; });
-    listContainer.appendChild(addItem);
-  }
+  const addItem = document.createElement("button");
+  addItem.type = "button";
+  addItem.className = "pet-switcher-item pet-switcher-add";
+  addItem.textContent = "+ Add a pet";
+  addItem.addEventListener("click", () => { window.location.href = "./onboarding.html?mode=add"; });
+  listContainer.appendChild(addItem);
 }
 
 function openJoinModalOnDashboard() {
