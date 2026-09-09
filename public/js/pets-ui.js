@@ -385,7 +385,15 @@ export function openPhotoCropModal(imageSource, onSave, onCancel) {
     naturalW = img.naturalWidth || 480;
     naturalH = img.naturalHeight || 480;
     resetTransform();
+    requestAnimationFrame(updateTransform);
   };
+
+  if (img.complete && img.naturalWidth) {
+    naturalW = img.naturalWidth;
+    naturalH = img.naturalHeight;
+    resetTransform();
+    requestAnimationFrame(updateTransform);
+  }
 
   function getEffectiveDimensions() {
     const isRotated90 = (rotation / 90) % 2 !== 0;

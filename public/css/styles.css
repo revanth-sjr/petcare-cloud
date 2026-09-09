@@ -218,6 +218,7 @@ button{font-family:inherit;font-size:inherit;color:inherit}
 .pet-avatar{
   width:60px;height:60px;border-radius:18px;display:grid;place-items:center;
   font-size:32px;background:var(--accent-bg);border:1px solid var(--line);
+  background-size:cover;background-position:center;background-repeat:no-repeat;
 }
 .pet-id h1{font-family:var(--f-display);font-size:27px;font-weight:700;margin:0;letter-spacing:-.02em;line-height:1.1}
 .pet-sub{margin:2px 0 0;color:var(--ink-2);font-size:13.5px}
