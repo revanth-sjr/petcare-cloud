@@ -120,6 +120,25 @@ export function wireBreedSelect(selectEl, customWrapEl, customInputEl, labelEl) 
 export function wirePhotoPicker({ input, preview, clearBtn, onChange, maxSourceBytes = 20 * 1024 * 1024 }) {
   let value = "";
 
+  if (preview) {
+    preview.style.cursor = "pointer";
+    preview.title = "Click to edit framing or change photo";
+    preview.addEventListener("click", () => {
+      if (value) {
+        openPhotoCropModal(
+          value,
+          (croppedDataUrl) => {
+            value = croppedDataUrl;
+            applyPreview();
+            onChange?.(value, null);
+          }
+        );
+      } else {
+        input.click();
+      }
+    });
+  }
+
   input.addEventListener("change", async () => {
     const file = input.files?.[0];
     if (!file) return;
@@ -128,17 +147,21 @@ export function wirePhotoPicker({ input, preview, clearBtn, onChange, maxSourceB
       onChange?.(null, "That photo is too large — pick a smaller file.");
       return;
     }
-    try {
-      value = await fileToCompressedDataUrl(file);
-      applyPreview();
-      onChange?.(value, null);
-    } catch {
-      input.value = "";
-      onChange?.(null, "Could not read that photo — try a different file.");
-    }
+    openPhotoCropModal(
+      file,
+      (croppedDataUrl) => {
+        value = croppedDataUrl;
+        applyPreview();
+        onChange?.(value, null);
+      },
+      () => {
+        input.value = "";
+      }
+    );
   });
 
-  clearBtn?.addEventListener("click", () => {
+  clearBtn?.addEventListener("click", (e) => {
+    e.stopPropagation();
     value = "";
     input.value = "";
     applyPreview();
@@ -267,3 +290,259 @@ function fileToCompressedDataUrl(file, { maxDim = 480, quality = 0.82 } = {}) {
     img.src = objectUrl;
   });
 }
+
+/**
+ * Opens an Instagram-style interactive photo crop and grid adjustment modal.
+ * Features 3x3 grid overlay, drag/pan, zoom slider (1x-3x), rotate, focus presets,
+ * and renders a high-quality 480x480 square JPEG data URL.
+ */
+export function openPhotoCropModal(imageSource, onSave, onCancel) {
+  document.querySelectorAll(".crop-modal-backdrop").forEach((el) => el.remove());
+
+  const backdrop = document.createElement("div");
+  backdrop.className = "crop-modal-backdrop";
+  backdrop.innerHTML = `
+    <div class="crop-modal-card" role="dialog" aria-label="Adjust Photo Framing">
+      <div class="crop-modal-header">
+        <div class="crop-modal-title">
+          <h3>Customize Pet Photo</h3>
+          <p>Drag & zoom to center your pet's face inside the grid</p>
+        </div>
+        <button type="button" class="crop-close-btn" id="cropHeaderClose" aria-label="Close modal">&times;</button>
+      </div>
+
+      <div class="crop-viewport-wrap">
+        <div class="crop-viewport" id="cropViewport">
+          <img class="crop-img" id="cropImg" draggable="false" alt="Pet preview to crop" />
+          <div class="crop-grid-overlay" id="cropGrid">
+            <div class="crop-grid-cell"></div><div class="crop-grid-cell"></div><div class="crop-grid-cell"></div>
+            <div class="crop-grid-cell"></div><div class="crop-grid-cell"></div><div class="crop-grid-cell"></div>
+            <div class="crop-grid-cell"></div><div class="crop-grid-cell"></div><div class="crop-grid-cell"></div>
+          </div>
+          <div class="crop-avatar-mask" id="cropMask"></div>
+        </div>
+      </div>
+
+      <div class="crop-controls">
+        <div class="crop-slider-row">
+          <span class="crop-slider-icon">🔍</span>
+          <input type="range" class="crop-zoom-slider" id="cropZoom" min="1" max="3" step="0.02" value="1" aria-label="Zoom level">
+          <span class="crop-zoom-label" id="cropZoomVal">100%</span>
+        </div>
+
+        <div class="crop-presets-row">
+          <button type="button" class="crop-preset-btn" id="btnFocusHead" title="Center Head / Face">
+            <span>👤 Head</span>
+          </button>
+          <button type="button" class="crop-preset-btn" id="btnFocusCenter" title="Center Photo">
+            <span>🎯 Center</span>
+          </button>
+          <button type="button" class="crop-preset-btn" id="btnRotate" title="Rotate 90°">
+            <span>🔄 Rotate</span>
+          </button>
+          <button type="button" class="crop-preset-btn" id="btnToggleGrid" title="Toggle Grid Overlay">
+            <span>📐 Grid</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="crop-modal-footer">
+        <button type="button" class="btn btn-ghost" id="cropCancelBtn">Cancel</button>
+        <button type="button" class="btn btn-primary" id="cropApplyBtn">✨ Apply Framing</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(backdrop);
+  requestAnimationFrame(() => backdrop.classList.add("is-visible"));
+
+  const img = backdrop.querySelector("#cropImg");
+  const viewport = backdrop.querySelector("#cropViewport");
+  const zoomSlider = backdrop.querySelector("#cropZoom");
+  const zoomLabel = backdrop.querySelector("#cropZoomVal");
+  const gridOverlay = backdrop.querySelector("#cropGrid");
+  const maskOverlay = backdrop.querySelector("#cropMask");
+
+  let scale = 1.0;
+  let offsetX = 0;
+  let offsetY = 0;
+  let rotation = 0;
+  let isDragging = false;
+  let startX = 0;
+  let startY = 0;
+  let baseScale = 1.0;
+  let naturalW = 1;
+  let naturalH = 1;
+
+  if (typeof imageSource === "string") {
+    img.src = imageSource;
+  } else if (imageSource instanceof File) {
+    const objectUrl = URL.createObjectURL(imageSource);
+    img.src = objectUrl;
+  }
+
+  img.onload = () => {
+    naturalW = img.naturalWidth || 480;
+    naturalH = img.naturalHeight || 480;
+    resetTransform();
+  };
+
+  function getEffectiveDimensions() {
+    const isRotated90 = (rotation / 90) % 2 !== 0;
+    const w = isRotated90 ? naturalH : naturalW;
+    const h = isRotated90 ? naturalW : naturalH;
+    return { w, h };
+  }
+
+  function updateTransform() {
+    const vWidth = viewport.clientWidth || 300;
+    const vHeight = viewport.clientHeight || 300;
+    const { w: effW, h: effH } = getEffectiveDimensions();
+
+    baseScale = Math.max(vWidth / effW, vHeight / effH);
+    const curW = effW * baseScale * scale;
+    const curH = effH * baseScale * scale;
+
+    const maxOffsetX = Math.max(0, (curW - vWidth) / 2);
+    const maxOffsetY = Math.max(0, (curH - vHeight) / 2);
+
+    offsetX = Math.max(-maxOffsetX, Math.min(maxOffsetX, offsetX));
+    offsetY = Math.max(-maxOffsetY, Math.min(maxOffsetY, offsetY));
+
+    img.style.transform = `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px)) rotate(${rotation}deg) scale(${baseScale * scale})`;
+    zoomLabel.textContent = `${Math.round(scale * 100)}%`;
+    zoomSlider.value = scale;
+  }
+
+  function resetTransform() {
+    scale = 1.0;
+    offsetX = 0;
+    offsetY = 0;
+    rotation = 0;
+    updateTransform();
+  }
+
+  function onPointerDown(e) {
+    isDragging = true;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    startX = clientX - offsetX;
+    startY = clientY - offsetY;
+    viewport.classList.add("is-grabbing");
+  }
+
+  function onPointerMove(e) {
+    if (!isDragging) return;
+    if (e.cancelable) e.preventDefault();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    offsetX = clientX - startX;
+    offsetY = clientY - startY;
+    updateTransform();
+  }
+
+  function onPointerEnd() {
+    isDragging = false;
+    viewport.classList.remove("is-grabbing");
+  }
+
+  viewport.addEventListener("mousedown", onPointerDown);
+  window.addEventListener("mousemove", onPointerMove);
+  window.addEventListener("mouseup", onPointerEnd);
+
+  viewport.addEventListener("touchstart", onPointerDown, { passive: false });
+  window.addEventListener("touchmove", onPointerMove, { passive: false });
+  window.addEventListener("touchend", onPointerEnd);
+
+  viewport.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    const delta = e.deltaY < 0 ? 0.08 : -0.08;
+    scale = Math.max(1.0, Math.min(3.0, scale + delta));
+    updateTransform();
+  }, { passive: false });
+
+  zoomSlider.addEventListener("input", (e) => {
+    scale = parseFloat(e.target.value);
+    updateTransform();
+  });
+
+  backdrop.querySelector("#btnFocusCenter").addEventListener("click", () => {
+    offsetX = 0;
+    offsetY = 0;
+    scale = 1.0;
+    updateTransform();
+  });
+
+  backdrop.querySelector("#btnFocusHead").addEventListener("click", () => {
+    scale = 1.35;
+    const vHeight = viewport.clientHeight || 300;
+    const { h: effH } = getEffectiveDimensions();
+    const curH = effH * baseScale * scale;
+    const maxOffsetY = Math.max(0, (curH - vHeight) / 2);
+    offsetY = maxOffsetY * 0.7;
+    offsetX = 0;
+    updateTransform();
+  });
+
+  backdrop.querySelector("#btnRotate").addEventListener("click", () => {
+    rotation = (rotation + 90) % 360;
+    updateTransform();
+  });
+
+  let gridMode = 0;
+  backdrop.querySelector("#btnToggleGrid").addEventListener("click", () => {
+    gridMode = (gridMode + 1) % 3;
+    gridOverlay.style.display = gridMode === 0 ? "grid" : "none";
+    maskOverlay.style.display = gridMode === 1 ? "block" : "none";
+  });
+
+  function cleanupListeners() {
+    window.removeEventListener("mousemove", onPointerMove);
+    window.removeEventListener("mouseup", onPointerEnd);
+    window.removeEventListener("touchmove", onPointerMove);
+    window.removeEventListener("touchend", onPointerEnd);
+  }
+
+  function close(cancel = false) {
+    cleanupListeners();
+    backdrop.classList.remove("is-visible");
+    setTimeout(() => backdrop.remove(), 200);
+    if (cancel) onCancel?.();
+  }
+
+  backdrop.querySelector("#cropHeaderClose").addEventListener("click", () => close(true));
+  backdrop.querySelector("#cropCancelBtn").addEventListener("click", () => close(true));
+  backdrop.addEventListener("click", (e) => {
+    if (e.target === backdrop) close(true);
+  });
+
+  backdrop.querySelector("#cropApplyBtn").addEventListener("click", () => {
+    const canvasSize = 480;
+    const vSize = viewport.clientWidth || 300;
+    const factor = canvasSize / vSize;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = canvasSize;
+    canvas.height = canvasSize;
+    const ctx = canvas.getContext("2d");
+
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvasSize, canvasSize);
+
+    ctx.save();
+    ctx.translate(canvasSize / 2 + offsetX * factor, canvasSize / 2 + offsetY * factor);
+    ctx.rotate((rotation * Math.PI) / 180);
+
+    const drawW = naturalW * baseScale * scale * factor;
+    const drawH = naturalH * baseScale * scale * factor;
+
+    ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
+    ctx.restore();
+
+    cleanupListeners();
+    const croppedDataUrl = canvas.toDataURL("image/jpeg", 0.88);
+    close(false);
+    onSave(croppedDataUrl);
+  });
+}
+
