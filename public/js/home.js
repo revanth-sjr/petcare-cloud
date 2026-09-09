@@ -175,8 +175,8 @@ function wireStatic() {
      itself branches on — rather than waiting on every pet's store just
      to paint a badge. */
   const live = isFirebaseConfigured();
-  $("#modeBadge").dataset.mode = live ? "live" : "demo";
-  $("#modeText").textContent   = live ? "Live · Firestore" : "Demo mode";
+  if ($("#modeBadge")) $("#modeBadge").dataset.mode = live ? "live" : "demo";
+  if ($("#modeText")) $("#modeText").textContent   = live ? "Live · Firestore" : "Demo mode";
 }
 
 function wireJoinPetModal() {

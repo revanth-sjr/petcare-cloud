@@ -248,9 +248,8 @@ function paintUser() {
   $("#caretakerBanner").hidden = r !== "caretaker";
   $("#exportCard").hidden = r === "caretaker";
   $("#careTeamCard").hidden = r === "caretaker";
-  /* Both owner and caretaker can edit pet details — only deleting a pet
-     is owner-only, gated separately inside the edit modal itself. */
-  $("#btnEditPet").hidden = !r;
+  /* Only the owner of the pet can edit pet details — hidden for caretakers */
+  $("#btnEditPet").hidden = r !== "owner";
 }
 
 /* ------------------------------------------------------------------
@@ -655,10 +654,8 @@ function wireEditArchive() {
 
 function openEditPet() {
   const pet = state.pet;
-  /* Owners and caretakers can both edit pet details — only deleting the
-     pet (Remove this pet, wired separately below) stays owner-only, and
-     that button is hidden/disabled per role right here. */
-  if (!pet || !currentPet) return;
+  /* Only the owner of the pet can edit pet details */
+  if (!pet || !currentPet || currentPet.role !== "owner") return;
 
   $("#editPetError").hidden = true;
   $("#epName").value = pet.name || "";
