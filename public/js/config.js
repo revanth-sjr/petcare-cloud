@@ -35,7 +35,7 @@ export const GRACE_MINUTES = 60;
    firestore.rules, so they can never drift apart. Keep this between 5 and
    10 seconds — long enough to catch a mistouch, short enough that it never
    reads as "did that actually save?" */
-export const UNDO_WINDOW_SECONDS = 8;
+export const UNDO_WINDOW_SECONDS = 3;
 
 /* Everything is bucketed by this timezone. Do not read the browser's zone —
    a judge's laptop may be on a different one than the demo assumes. */

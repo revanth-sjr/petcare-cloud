@@ -28,7 +28,7 @@ export function toast(message, kind = "") {
   }, 2600);
 }
 
-export function showNotification(message, kind = "", { seconds = 8 } = {}) {
+export function showNotification(message, kind = "", { seconds = 3 } = {}) {
   const wrap = $("#toasts");
   if (!wrap) return;
 
@@ -64,13 +64,13 @@ export function showNotification(message, kind = "", { seconds = 8 } = {}) {
 }
 
 /** Same visual family as toast() above, but with one action button and a
-    countdown — "Feeding recorded • Undo (8s)". Reusable for any accidental,
+    countdown — "Feeding recorded • Undo (3s)". Reusable for any accidental,
     reversible one-tap action, not just feeding: pass the message, the
     button label, what to run if it's pressed, and how long the window
     stays open. Returns a `cancel()` the caller can invoke to dismiss the
     toast early without treating it as "the user pressed the button" (e.g.
     if the underlying record is removed for some other reason first). */
-export function showActionToast(message, actionLabel, onAction, { seconds = 8 } = {}) {
+export function showActionToast(message, actionLabel, onAction, { seconds = 3 } = {}) {
   const wrap = $("#toasts");
   if (!wrap) { onAction?.(); return { cancel() {} }; }
 
