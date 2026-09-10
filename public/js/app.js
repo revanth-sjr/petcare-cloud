@@ -235,14 +235,92 @@ function notifyCareAlerts(dashboard) {
       status === "overdue" ? "err" : "warn"
     );
   }
+
+  // Update topbar notification bell badge and dropdown
+  const bellBtn = $("#notifBellBtn");
+  const badge = $("#notifBadge");
+  const dropdown = $("#notifDropdown");
+  const dropCount = $("#notifDropdownCount");
+  const dropList = $("#notifDropdownList");
+
+  const notifRows = [];
+  if (dashboard.alerts?.overdue) {
+    for (const r of dashboard.alerts.overdue) {
+      const label = r.kind === "feeding" ? "Feeding" : r.kind === "walk" ? "Walk" : r.name;
+      notifRows.push({
+        tone: "crit",
+        icon: r.kind === "feeding" ? '<img src="https://img.icons8.com/ios-filled/50/dog-bowl.png" alt="Feeding" class="ui-icon">' : r.kind === "walk" ? '<img src="https://img.icons8.com/ios-filled/50/walking.png" alt="Walk" class="ui-icon">' : '<img src="https://img.icons8.com/ios-filled/50/pill.png" alt="Medication" class="ui-icon">',
+        text: `${dashboard.pet?.name || currentPet?.name || "Pet"}: ${label} overdue — was due ${fmtClock(istTimeToday(r.slot))}`
+      });
+    }
+  }
+  if (dashboard.alerts?.dueNow) {
+    for (const r of dashboard.alerts.dueNow) {
+      const label = r.kind === "feeding" ? "Feeding" : r.kind === "walk" ? "Walk" : r.name;
+      notifRows.push({
+        tone: "warn",
+        icon: r.kind === "feeding" ? '<img src="https://img.icons8.com/ios-filled/50/dog-bowl.png" alt="Feeding" class="ui-icon">' : r.kind === "walk" ? '<img src="https://img.icons8.com/ios-filled/50/walking.png" alt="Walk" class="ui-icon">' : '<img src="https://img.icons8.com/ios-filled/50/pill.png" alt="Medication" class="ui-icon">',
+        text: `${dashboard.pet?.name || currentPet?.name || "Pet"}: ${label} due now`
+      });
+    }
+  }
+  if (dashboard.today?.overFeeding) {
+    notifRows.push({
+      tone: "warn",
+      icon: '<img src="https://img.icons8.com/ios-filled/50/warning-shield.png" alt="Warning" class="ui-icon">',
+      text: `${dashboard.pet?.name || currentPet?.name || "Pet"}: Feeding Warning — exceeded today's planned schedule`
+    });
+  }
+
+  const total = notifRows.length;
+  if (badge) {
+    badge.textContent = String(total);
+    badge.hidden = total === 0;
+  }
+  if (dropCount) dropCount.textContent = String(total);
+
+  if (dropList) {
+    dropList.innerHTML = "";
+    if (!total) {
+      dropList.innerHTML = `<li class="notif-dropdown-empty">No items needing attention right now</li>`;
+    } else {
+      for (const row of notifRows) {
+        const li = document.createElement("li");
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = `notif-dropdown-item is-${row.tone}`;
+        btn.innerHTML = `<span aria-hidden="true">${row.icon}</span><span>${esc(row.text)}</span>`;
+        btn.addEventListener("click", () => {
+          if (dropdown) dropdown.hidden = true;
+          const strip = $("#alertStrip");
+          if (strip && !strip.hidden) strip.scrollIntoView({ behavior: "smooth" });
+        });
+        li.appendChild(btn);
+        dropList.appendChild(li);
+      }
+    }
+  }
+
+  if (bellBtn && !bellBtn._wired) {
+    bellBtn._wired = true;
+    bellBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (dropdown) dropdown.hidden = !dropdown.hidden;
+    });
+    document.addEventListener("click", (e) => {
+      if (dropdown && !$("#notifBellWrap")?.contains(e.target)) {
+        dropdown.hidden = true;
+      }
+    });
+  }
 }
 
 function paintUser() {
   $("#userName").textContent    = session.name;
   $("#userInitial").textContent = (session.name || "?").charAt(0).toUpperCase();
   const role = $("#userRole");
-  const r = currentPet?.role || "";
-  role.textContent = r || "—";
+  const r = currentPet?.role || "owner";
+  role.textContent = r.toUpperCase();
   role.className = `role-chip ${r === "owner" ? "owner" : "caretaker"}`;
   document.body.classList.toggle("caretaker-dashboard", r === "caretaker");
   $("#caretakerBanner").hidden = r !== "caretaker";

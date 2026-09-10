@@ -129,8 +129,9 @@ function renderRoleUi() {
   const showOwnerActions = owned || (!isCaretakerOnly && pets.length === 0);
 
   const role = $("#userRole");
-  role.textContent = showOwnerActions ? "owner" : "caretaker";
-  role.className = `role-chip ${role.textContent}`;
+  const rName = showOwnerActions ? "owner" : "caretaker";
+  role.textContent = rName.toUpperCase();
+  role.className = `role-chip ${rName}`;
 
   if ($("#btnAddPetHome")) $("#btnAddPetHome").hidden = !showOwnerActions;
   if ($("#btnEmptyAddPet")) $("#btnEmptyAddPet").hidden = !showOwnerActions;
@@ -310,6 +311,54 @@ function renderAlerts(cards) {
         text: `${pet.name}: Feeding Warning — exceeded today's planned schedule`
       });
     }
+  }
+
+  // Update topbar notification bell & dropdown badge
+  const bellBtn = $("#notifBellBtn");
+  const badge = $("#notifBadge");
+  const dropdown = $("#notifDropdown");
+  const dropCount = $("#notifDropdownCount");
+  const dropList = $("#notifDropdownList");
+
+  const total = rows.length;
+  if (badge) {
+    badge.textContent = String(total);
+    badge.hidden = total === 0;
+  }
+  if (dropCount) dropCount.textContent = String(total);
+
+  if (dropList) {
+    dropList.innerHTML = "";
+    if (!total) {
+      dropList.innerHTML = `<li class="notif-dropdown-empty">No items needing attention right now</li>`;
+    } else {
+      for (const row of rows) {
+        const li = document.createElement("li");
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = `notif-dropdown-item is-${row.tone}`;
+        btn.innerHTML = `<span class="home-alert-icon" aria-hidden="true">${row.icon}</span><span>${esc(row.text)}</span>`;
+        btn.addEventListener("click", () => {
+          if (dropdown) dropdown.hidden = true;
+          openPetDetails(row.petId);
+        });
+        li.appendChild(btn);
+        dropList.appendChild(li);
+      }
+    }
+  }
+
+  if (bellBtn && !bellBtn._wired) {
+    bellBtn._wired = true;
+    bellBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (dropdown) dropdown.hidden = !dropdown.hidden;
+    });
+    document.addEventListener("click", (e) => {
+      if (dropdown && !$("#notifBellWrap")?.contains(e.target)) {
+        dropdown.hidden = true;
+      }
+    });
   }
 
   if (!rows.length) {
