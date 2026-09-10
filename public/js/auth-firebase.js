@@ -102,6 +102,7 @@ export async function create() {
       otpVerified: Boolean(profile.otpVerified),
       name:  profile.name || user.displayName || (user.email || "").split("@")[0],
       firstName: profile.firstName || "", middleName: profile.middleName || "", lastName: profile.lastName || "",
+      phone: profile.phone || "",
       lastSelectedPetId: profile.lastSelectedPetId || null
     };
   }
@@ -333,13 +334,14 @@ export async function create() {
       throw new Error("Invalid OTP code. Please check your Gmail inbox and enter the correct 6-digit code.");
     },
 
-    async updateUserProfile({ firstName, middleName, lastName }) {
+    async updateUserProfile({ firstName, middleName, lastName, phone }) {
       const user = auth.currentUser;
       if (!user) throw new Error("No user signed in.");
 
       const fName = String(firstName || "").trim();
       const lName = String(lastName || "").trim();
       const mName = String(middleName || "").trim();
+      const phoneNum = String(phone || "").trim();
       if (!fName) throw new Error("First name is required.");
       if (!lName) throw new Error("Last name is required.");
 
@@ -356,6 +358,7 @@ export async function create() {
         firstName: fName,
         middleName: mName,
         lastName: lName,
+        phone: phoneNum,
         updatedAt: fs.serverTimestamp()
       });
 

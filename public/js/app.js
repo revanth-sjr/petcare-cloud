@@ -872,6 +872,7 @@ async function openProfileModal() {
   $("#pfFirstName").value = firstName;
   $("#pfLastName").value = lastName;
   $("#pfMiddleName").value = middleName;
+  if ($("#pfPhone")) $("#pfPhone").value = currentSession.phone || "";
 
   $("#pfError").hidden = true;
   $("#pfError").textContent = "";
@@ -928,9 +929,10 @@ function wireProfileModal() {
       const firstName = $("#pfFirstName").value.trim();
       const lastName = $("#pfLastName").value.trim();
       const middleName = $("#pfMiddleName").value.trim();
+      const phone = $("#pfPhone") ? $("#pfPhone").value.trim() : "";
 
       try {
-        const updatedSession = await auth.updateUserProfile({ firstName, middleName, lastName });
+        const updatedSession = await auth.updateUserProfile({ firstName, middleName, lastName, phone });
         if (updatedSession) {
           session = updatedSession;
         }

@@ -71,6 +71,7 @@ export async function create() {
   const sessionFor = (u) => ({
     uid: u.uid, email: u.email, emailVerified: true, name: u.name,
     firstName: u.firstName || "", middleName: u.middleName || "", lastName: u.lastName || "",
+    phone: u.phone || "",
     lastSelectedPetId: u.lastSelectedPetId || null
   });
 
@@ -144,11 +145,12 @@ export async function create() {
       return true;
     },
 
-    async updateUserProfile({ firstName, middleName, lastName }) {
+    async updateUserProfile({ firstName, middleName, lastName, phone }) {
       if (!session) throw new Error("No user signed in.");
       const fName = String(firstName || "").trim();
       const lName = String(lastName || "").trim();
       const mName = String(middleName || "").trim();
+      const phoneNum = String(phone || "").trim();
       if (!fName) throw new Error("First name is required.");
       if (!lName) throw new Error("Last name is required.");
 
@@ -158,6 +160,7 @@ export async function create() {
         u.firstName = fName;
         u.middleName = mName;
         u.lastName = lName;
+        u.phone = phoneNum;
         u.name = composeName({ firstName: fName, middleName: mName, lastName: lName });
         write(KEY_USERS, users);
         session = sessionFor(u);
