@@ -1191,8 +1191,26 @@ button{font-family:inherit;font-size:inherit;color:inherit}
 .home-alert-icon{font-size:16px;flex:none}
 
 /* ---------------- pet gallery: flash cards ---------------- */
-.pet-gallery-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.pet-gallery-head{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px}
 .pet-gallery-head .section-title{margin:0}
+.pet-gallery-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pet-search-bar{position:relative;min-width:220px;flex:1 1 220px}
+.home-pet-search-input{
+  width:100%;border:1px solid var(--line-2);border-radius:20px;
+  padding:6px 14px;font-family:inherit;font-size:13px;
+  background:var(--surface-2);color:var(--ink);
+  transition:border-color .15s ease, background .15s ease, box-shadow .15s ease;
+}
+.home-pet-search-input:focus{
+  outline:none;border-color:var(--accent);background:var(--surface);
+  box-shadow:0 0 0 2px var(--accent-bg);
+}
+.pet-search-no-results{
+  grid-column:1/-1;text-align:center;padding:36px 16px;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  color:var(--ink-2);font-size:14px;box-shadow:var(--shadow);
+}
+.pet-search-no-results p{margin:0 0 8px}
 .pet-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(258px,1fr));gap:18px}
 .pet-card-wrap{display:flex;flex-direction:column;gap:8px}
 .pet-card-wrap .pet-flash-card{flex:1}

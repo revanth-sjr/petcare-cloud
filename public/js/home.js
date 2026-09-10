@@ -172,6 +172,11 @@ function wireStatic() {
 
   wireJoinPetModal();
 
+  $("#homePetSearchInput")?.addEventListener("input", (e) => {
+    petGalleryQuery = e.target.value;
+    updateHomeView();
+  });
+
   /* A coarse, immediate signal — the same flag data.js's createStore()
      itself branches on — rather than waiting on every pet's store just
      to paint a badge. */
@@ -406,10 +411,37 @@ function renderAlerts(cards) {
    ------------------------------------------------------------------ */
 const RANK = { OVERDUE: 0, DUE_NOW: 1, UPCOMING: 2, COMPLETED: 3 };
 
+let petGalleryQuery = "";
+
 function renderGallery(cards) {
   const grid = $("#petGallery");
   grid.innerHTML = "";
-  for (const { pet, dash } of cards) {
+
+  const query = (petGalleryQuery || "").trim().toLowerCase();
+  const filtered = cards.filter(({ pet }) => {
+    if (!query) return true;
+    const name = (pet?.name || "").toLowerCase();
+    const breed = (pet?.breed || "").toLowerCase();
+    const species = (pet?.species || "").toLowerCase();
+    return name.includes(query) || breed.includes(query) || species.includes(query);
+  });
+
+  if (!filtered.length && cards.length > 0) {
+    grid.innerHTML = `
+      <div class="pet-search-no-results">
+        <p>No pets found matching "<b>${esc(petGalleryQuery)}</b>"</p>
+        <button class="btn btn-ghost btn-sm" type="button" id="btnClearPetSearch">Clear search</button>
+      </div>`;
+    $("#btnClearPetSearch")?.addEventListener("click", () => {
+      petGalleryQuery = "";
+      const input = $("#homePetSearchInput");
+      if (input) input.value = "";
+      renderGallery(cards);
+    });
+    return;
+  }
+
+  for (const { pet, dash } of filtered) {
     const card = dash ? flashCard(pet, dash) : unavailableCard(pet);
     if (pet.role === "owner") {
       const wrap = document.createElement("div");
