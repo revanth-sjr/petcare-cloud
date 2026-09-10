@@ -362,37 +362,40 @@ function renderAlerts(cards) {
   }
 
   if (!rows.length) {
-    wrap.hidden = true;
-    list.innerHTML = "";
+    if (wrap) wrap.hidden = true;
+    if (list) list.innerHTML = "";
     return;
   }
 
-  wrap.hidden = false;
+  if (wrap) wrap.hidden = false;
   if (count) count.textContent = String(rows.length);
 
   if (toggleBtn && !toggleBtn._wired) {
     toggleBtn._wired = true;
-    list.hidden = true;
+    if (list) list.hidden = true;
     toggleBtn.textContent = `Show details (${rows.length})`;
     toggleBtn.addEventListener("click", () => {
+      if (!list) return;
       const isCollapsed = list.hidden;
       list.hidden = !isCollapsed;
       toggleBtn.textContent = !isCollapsed ? `Show details (${rows.length})` : "Collapse";
     });
-  } else if (toggleBtn) {
+  } else if (toggleBtn && list) {
     toggleBtn.textContent = list.hidden ? `Show details (${rows.length})` : "Collapse";
   }
 
-  list.innerHTML = "";
-  for (const row of rows) {
-    const li = document.createElement("li");
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = `home-alert-item is-${row.tone}`;
-    btn.innerHTML = `<span class="home-alert-icon" aria-hidden="true">${row.icon}</span><span>${esc(row.text)}</span>`;
-    btn.addEventListener("click", () => openPetDetails(row.petId));
-    li.appendChild(btn);
-    list.appendChild(li);
+  if (list) {
+    list.innerHTML = "";
+    for (const row of rows) {
+      const li = document.createElement("li");
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = `home-alert-item is-${row.tone}`;
+      btn.innerHTML = `<span class="home-alert-icon" aria-hidden="true">${row.icon}</span><span>${esc(row.text)}</span>`;
+      btn.addEventListener("click", () => openPetDetails(row.petId));
+      li.appendChild(btn);
+      list.appendChild(li);
+    }
   }
 }
 
