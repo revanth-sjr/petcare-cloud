@@ -500,7 +500,8 @@ function renderPetMenu(filterText = "") {
   const menu = $("#petSwitcherMenu");
   menu.innerHTML = `
     <div class="pet-search-wrap">
-      <input type="text" id="petSearchInput" placeholder="🔍 Search pet..." class="pet-search-input" value="${esc(filterText)}">
+      <img src="https://img.icons8.com/ios-filled/50/search.png" alt="" class="ui-icon search-bar-icon" aria-hidden="true">
+      <input type="text" id="petSearchInput" placeholder="Search pet..." class="pet-search-input" value="${esc(filterText)}">
     </div>
     <div class="pet-switcher-list" id="petSwitcherList"></div>
   `;

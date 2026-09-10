@@ -325,7 +325,7 @@ export function openPhotoCropModal(imageSource, onSave, onCancel) {
 
       <div class="crop-controls">
         <div class="crop-slider-row">
-          <span class="crop-slider-icon">🔍</span>
+          <span class="crop-slider-icon"><img src="https://img.icons8.com/ios-filled/50/search.png" alt="Zoom" class="ui-icon-sm"></span>
           <input type="range" class="crop-zoom-slider" id="cropZoom" min="1" max="3" step="0.02" value="1" aria-label="Zoom level">
           <span class="crop-zoom-label" id="cropZoomVal">100%</span>
         </div>
