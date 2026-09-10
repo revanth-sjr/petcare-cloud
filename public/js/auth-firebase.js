@@ -333,6 +333,37 @@ export async function create() {
       throw new Error("Invalid OTP code. Please check your Gmail inbox and enter the correct 6-digit code.");
     },
 
+    async updateUserProfile({ firstName, middleName, lastName }) {
+      const user = auth.currentUser;
+      if (!user) throw new Error("No user signed in.");
+
+      const fName = String(firstName || "").trim();
+      const lName = String(lastName || "").trim();
+      const mName = String(middleName || "").trim();
+      if (!fName) throw new Error("First name is required.");
+      if (!lName) throw new Error("Last name is required.");
+
+      const name = composeName({ firstName: fName, middleName: mName, lastName: lName });
+
+      try {
+        await authMod.updateProfile(user, { displayName: name });
+      } catch (err) {
+        console.warn("[PetCare Auth] Firebase auth updateProfile warn:", err);
+      }
+
+      await saveProfile(user.uid, {
+        name,
+        firstName: fName,
+        middleName: mName,
+        lastName: lName,
+        updatedAt: fs.serverTimestamp()
+      });
+
+      session = await hydrate(user);
+      listeners.forEach((cb) => cb(session));
+      return session;
+    },
+
     async signOut() {
       if (auth.currentUser) {
         localStorage.removeItem("petcare_login_time_" + auth.currentUser.uid);

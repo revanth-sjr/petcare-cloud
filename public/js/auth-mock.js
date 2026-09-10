@@ -144,6 +144,29 @@ export async function create() {
       return true;
     },
 
+    async updateUserProfile({ firstName, middleName, lastName }) {
+      if (!session) throw new Error("No user signed in.");
+      const fName = String(firstName || "").trim();
+      const lName = String(lastName || "").trim();
+      const mName = String(middleName || "").trim();
+      if (!fName) throw new Error("First name is required.");
+      if (!lName) throw new Error("Last name is required.");
+
+      const key = session.email.toLowerCase();
+      const u = users[key];
+      if (u) {
+        u.firstName = fName;
+        u.middleName = mName;
+        u.lastName = lName;
+        u.name = composeName({ firstName: fName, middleName: mName, lastName: lName });
+        write(KEY_USERS, users);
+        session = sessionFor(u);
+        write(KEY_SESSION, session);
+        emit();
+      }
+      return session;
+    },
+
     async signOut() {
       session = null;
       remove(KEY_SESSION);

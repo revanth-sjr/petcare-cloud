@@ -171,6 +171,7 @@ function wireStatic() {
   });
 
   wireJoinPetModal();
+  wireProfileModal();
 
   $("#homePetSearchInput")?.addEventListener("input", (e) => {
     petGalleryQuery = e.target.value;
@@ -585,4 +586,111 @@ function unavailableCard(pet) {
 async function openPetDetails(petId) {
   try { await auth.setSelectedPetId(petId); } catch { /* index.html falls back to pets[0] anyway */ }
   window.location.href = "./index.html";
+}
+
+/* ---------------- User Profile Modal ---------------- */
+async function openProfileModal() {
+  const modal = $("#profileModal");
+  if (!modal) return;
+
+  const currentSession = auth ? auth.current() : session;
+  if (!currentSession) return;
+
+  const nameParts = (currentSession.name || "").trim().split(/\s+/);
+  const firstName = currentSession.firstName || nameParts[0] || "";
+  const lastName = currentSession.lastName || (nameParts.length > 1 ? nameParts.slice(1).join(" ") : "");
+  const middleName = currentSession.middleName || "";
+
+  $("#pfAvatar").textContent = (currentSession.name || "?").charAt(0).toUpperCase();
+  $("#pfDisplayName").textContent = currentSession.name || "User";
+  $("#pfEmailText").textContent = currentSession.email || "";
+  $("#pfEmailInput").value = currentSession.email || "";
+
+  $("#pfFirstName").value = firstName;
+  $("#pfLastName").value = lastName;
+  $("#pfMiddleName").value = middleName;
+
+  $("#pfError").hidden = true;
+  $("#pfError").textContent = "";
+
+  openModal("profileModal");
+
+  // Render pets list
+  const petsListEl = $("#pfPetsList");
+  if (petsListEl) {
+    petsListEl.innerHTML = `<div class="profile-pet-item-skeleton">Loading connected pets...</div>`;
+    try {
+      const myPets = await auth.myPets();
+      if (!myPets || myPets.length === 0) {
+        petsListEl.innerHTML = `<div class="profile-pet-item" style="color:var(--ink-2);">No connected pets yet</div>`;
+      } else {
+        petsListEl.innerHTML = myPets.map(p => `
+          <div class="profile-pet-item">
+            <div class="profile-pet-item-left">
+              <span class="profile-pet-emoji">${p.emoji || "🐾"}</span>
+              <span>${esc(p.name)}</span>
+            </div>
+            <span class="role-chip ${p.role === "owner" ? "owner" : "caretaker"}">${p.role.toUpperCase()}</span>
+          </div>
+        `).join("");
+      }
+    } catch (err) {
+      console.warn("Error fetching pets for profile:", err);
+      petsListEl.innerHTML = `<div class="profile-pet-item" style="color:var(--ink-2);">Unable to load pets list</div>`;
+    }
+  }
+}
+
+function wireProfileModal() {
+  const userChip = $(".user-chip");
+  if (userChip && !userChip._profileWired) {
+    userChip._profileWired = true;
+    userChip.addEventListener("click", (e) => {
+      if (e.target.closest("#btnSignOut")) return;
+      openProfileModal();
+    });
+  }
+
+  const profileForm = $("#profileForm");
+  if (profileForm && !profileForm._profileWired) {
+    profileForm._profileWired = true;
+    profileForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const errEl = $("#pfError");
+      const saveBtn = $("#btnProfileSave");
+      errEl.hidden = true;
+      saveBtn.disabled = true;
+      saveBtn.textContent = "Saving...";
+
+      const firstName = $("#pfFirstName").value.trim();
+      const lastName = $("#pfLastName").value.trim();
+      const middleName = $("#pfMiddleName").value.trim();
+
+      try {
+        const updatedSession = await auth.updateUserProfile({ firstName, middleName, lastName });
+        if (updatedSession) {
+          session = updatedSession;
+        }
+        paintUser();
+        renderWelcome();
+        toast("Profile updated successfully!", "ok");
+        closeAllModals();
+      } catch (err) {
+        errEl.textContent = err.message || "Failed to update profile.";
+        errEl.hidden = false;
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Save Changes";
+      }
+    });
+  }
+
+  const signOutBtn = $("#btnProfileSignOut");
+  if (signOutBtn && !signOutBtn._profileWired) {
+    signOutBtn._profileWired = true;
+    signOutBtn.addEventListener("click", async () => {
+      await auth.signOut();
+      window.location.replace("./login.html");
+    });
+  }
 }
