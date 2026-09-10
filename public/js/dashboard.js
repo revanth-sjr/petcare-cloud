@@ -383,32 +383,9 @@ function renderStreak(dash) {
    ------------------------------------------------------------------ */
 function renderAlerts(dash, ctx) {
   const strip = $("#alertStrip");
-  const { overdue, dueNow } = dash.alerts;
-
-  if (!overdue.length && !dueNow.length) {
-    strip.hidden = true;
-    strip.innerHTML = "";
-    return;
-  }
-
-  const overdueRow = overdue.length > 0;
-  const row = overdueRow ? overdue[0] : dueNow[0];
-  const feeding = row.kind === "feeding";
-  const walk = row.kind === "walk";
-  const label = feeding ? "feeding" : walk ? "walk" : row.name;
-
-  strip.hidden = false;
-  strip.className = `alert-strip${overdueRow ? "" : " is-due"}`;
-  strip.innerHTML = `
-    <span>${overdueRow ? '<img src="https://img.icons8.com/ios-filled/50/warning-shield.png" alt="Warning" class="ui-icon">' : (feeding ? '<img src="https://img.icons8.com/ios-filled/50/dog-bowl.png" alt="Feeding" class="ui-icon">' : walk ? '<img src="https://img.icons8.com/ios-filled/50/walking.png" alt="Walk" class="ui-icon">' : '<img src="https://img.icons8.com/ios-filled/50/pill.png" alt="Medication" class="ui-icon">')}</span>
-    <span>${esc(dash.pet?.name || "Your pet")}'s ${esc(label)} scheduled for
-      ${esc(fmtClock(slotToday(row.slot)))} ${overdueRow ? "has not been logged" : "is due now"}.</span>`;
-
-  const btn = document.createElement("button");
-  btn.className = `btn btn-sm ${overdueRow ? "btn-crit" : "btn-warn"}`;
-  btn.textContent = "Mark as given";
-  btn.addEventListener("click", () => (feeding ? ctx.onGiveFeeding(row) : ctx.onGive(row)));
-  strip.appendChild(btn);
+  if (!strip) return;
+  strip.hidden = true;
+  strip.innerHTML = "";
 }
 
 /* ------------------------------------------------------------------

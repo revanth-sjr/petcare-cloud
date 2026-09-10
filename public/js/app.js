@@ -292,8 +292,6 @@ function notifyCareAlerts(dashboard) {
         btn.innerHTML = `<span aria-hidden="true">${row.icon}</span><span>${esc(row.text)}</span>`;
         btn.addEventListener("click", () => {
           if (dropdown) dropdown.hidden = true;
-          const strip = $("#alertStrip");
-          if (strip && !strip.hidden) strip.scrollIntoView({ behavior: "smooth" });
         });
         li.appendChild(btn);
         dropList.appendChild(li);
@@ -779,7 +777,8 @@ function showEmptyState() {
   $("#boot").hidden = true;
   $("#layout").hidden = true;
   $("#petSwitcher").hidden = true;
-  $("#alertStrip").hidden = true;
+  const strip = $("#alertStrip");
+  if (strip) strip.hidden = true;
   $("#emptyDash").hidden = false;
 }
 
