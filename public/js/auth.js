@@ -154,7 +154,7 @@ export const SPECIES = [
   { id: "rabbit", label: "Rabbit", icon: '<img src="https://img.icons8.com/color/48/rabbit.png" alt="Rabbit" class="species-icon-img">', breedLabel: "Breed", breeds: [
       "Holland Lop", "Netherland Dwarf", "Mini Rex", "Lionhead", "Flemish Giant"
     ] },
-  { id: "hamster", label: "Hamster", icon: '<img src="https://img.icons8.com/color/48/hamster.png" alt="Hamster" class="species-icon-img">', breedLabel: "Breed", breeds: [
+  { id: "hamster", label: "Hamster", icon: '<img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" alt="Hamster" class="species-icon-img">', breedLabel: "Breed", breeds: [
       "Syrian", "Roborovski", "Campbell's Dwarf", "Winter White", "Chinese"
     ] },
   { id: "reptile", label: "Reptile", icon: '<img src="https://img.icons8.com/color/48/lizard.png" alt="Reptile" class="species-icon-img">', breedLabel: "Type", breeds: [

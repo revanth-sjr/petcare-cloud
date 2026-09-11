@@ -72,7 +72,7 @@
       <form id="loginForm" class="auth-form" novalidate>
         <label>
           <span>Email</span>
-          <input type="email" id="loginEmail" autocomplete="email" placeholder="Enter your email address">
+          <input type="email" id="loginEmail" autocomplete="email" placeholder="Enter your email">
         </label>
         <label>
           <span>Password</span>
@@ -82,7 +82,7 @@
         <button class="btn btn-primary btn-block" type="button" id="btnSendLoginOtp" style="margin-top:6px;">Verify Email & Send OTP</button>
 
         <div id="loginOtpGroup" hidden style="margin-top:12px;background:var(--accent-subtle, rgba(16,185,129,0.06));border:1px solid var(--border);padding:14px;border-radius:10px;">
-          <p id="loginOtpStatus" style="margin:0 0 10px 0;font-size:0.85rem;color:var(--text);font-weight:600;text-align:center;">🔐 A 6-digit OTP code has been sent to your Gmail inbox. Enter the code below:</p>
+          <p id="loginOtpStatus" style="margin:0 0 10px 0;font-size:0.85rem;color:var(--text);font-weight:600;text-align:center;"><img src="https://img.icons8.com/ios-filled/50/lock.png" alt="Lock" class="ui-icon-sm" style="vertical-align:middle;margin-right:4px;"> A 6-digit OTP code has been sent to your Gmail inbox. Enter the code below:</p>
           <label style="margin:0;">
             <input type="text" id="loginOtpCode" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" autocomplete="one-time-code" placeholder="Enter 6-digit OTP" style="text-align:center;letter-spacing:4px;font-size:1.05rem;font-weight:600;padding:10px 12px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg-card);width:100%;box-sizing:border-box;" required>
           </label>
@@ -110,7 +110,11 @@
         </label>
         <label>
           <span>Email</span>
-          <input type="email" id="suEmail" autocomplete="email" placeholder="you@example.com">
+          <input type="email" id="suEmail" autocomplete="email" placeholder="Enter your email">
+        </label>
+        <label>
+          <span>Phone Number <i>optional</i></span>
+          <input type="tel" id="suPhone" autocomplete="tel" placeholder="Phone number">
         </label>
         <label>
           <span>Password</span>
@@ -124,7 +128,7 @@
         <button class="btn btn-primary btn-block" type="button" id="btnSendSignupOtp" style="margin-top:6px;">Verify Email & Send OTP</button>
 
         <div id="suOtpGroup" hidden style="margin-top:12px;background:var(--accent-subtle, rgba(16,185,129,0.06));border:1px solid var(--border);padding:14px;border-radius:10px;">
-          <p id="suOtpStatus" style="margin:0 0 10px 0;font-size:0.85rem;color:var(--text);font-weight:600;text-align:center;">🔐 A 6-digit OTP code has been sent to your Gmail inbox. Enter the code below:</p>
+          <p id="suOtpStatus" style="margin:0 0 10px 0;font-size:0.85rem;color:var(--text);font-weight:600;text-align:center;"><img src="https://img.icons8.com/ios-filled/50/lock.png" alt="Lock" class="ui-icon-sm" style="vertical-align:middle;margin-right:4px;"> A 6-digit OTP code has been sent to your Gmail inbox. Enter the code below:</p>
           <label style="margin:0;">
             <input type="text" id="suOtpCode" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" autocomplete="one-time-code" placeholder="Enter 6-digit OTP" style="text-align:center;letter-spacing:4px;font-size:1.05rem;font-weight:600;padding:10px 12px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg-card);width:100%;box-sizing:border-box;" required>
           </label>

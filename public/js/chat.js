@@ -85,30 +85,44 @@ async function ask(question) {
   suggestions([]);
   const typing = showTyping();
 
-  let reply;
-  try {
-    if (isAiConfigured()) {
-      reply = await callFunction(question);
-    } else {
-      try {
-        reply = await callGeminiDirect(question);
-      } catch (geminiErr) {
-        console.info("[PetCare] Gemini Direct call fallback notice:", geminiErr.message);
-        reply = answerLocally(question, currentPet);
-      }
-    }
+  let reply = null;
 
-    if (reply?.answer) {
-      conversationHistory.push({ role: "user", text: question });
-      conversationHistory.push({ role: "model", text: reply.answer });
-      if (conversationHistory.length > 10) {
-        conversationHistory = conversationHistory.slice(-10);
+  // 1. Try Cloud Function endpoint first if configured
+  if (isAiConfigured()) {
+    try {
+      const res = await callFunction(question);
+      if (res && res.source === "gemini") {
+        reply = res;
+      } else {
+        console.info("[PetCare] Cloud function returned fallback response, attempting direct Gemini API...");
       }
+    } catch (fnErr) {
+      console.warn("[PetCare] Cloud Function AI call failed, attempting direct Gemini API...", fnErr);
     }
-  } catch (err) {
-    console.warn("[PetCare] AI call failed, using local responder.", err);
+  }
+
+  // 2. Try direct Gemini API if Cloud Function was not used, failed, or returned fallback
+  if (!reply || reply.source !== "gemini") {
+    try {
+      reply = await callGeminiDirect(question);
+    } catch (geminiErr) {
+      console.info("[PetCare] Gemini Direct call notice:", geminiErr.message);
+    }
+  }
+
+  // 3. Local rule-based responder only as final resort
+  if (!reply) {
     reply = answerLocally(question, currentPet);
   }
+
+  if (reply?.answer) {
+    conversationHistory.push({ role: "user", text: question });
+    conversationHistory.push({ role: "model", text: reply.answer });
+    if (conversationHistory.length > 10) {
+      conversationHistory = conversationHistory.slice(-10);
+    }
+  }
+
   typing.remove();
   renderReply(reply);
   busy = false;
@@ -173,7 +187,7 @@ Active pet context: ${currentPet ? `Name: ${currentPet.name}, Species: ${current
     }
   };
 
-  const candidateModels = ["gemini-3.6-flash", "gemini-flash-latest", "gemini-3.7-flash"];
+  const candidateModels = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro", "gemini-3.6-flash", "gemini-flash-latest", "gemini-3.7-flash"];
   let res;
   let lastErr = "";
 

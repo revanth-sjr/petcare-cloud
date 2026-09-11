@@ -99,7 +99,7 @@ export async function create() {
       return api.signIn(creds);
     },
 
-    async signUp({ firstName, middleName, lastName, email, password }) {
+    async signUp({ firstName, middleName, lastName, email, phone, password }) {
       const key = email.trim().toLowerCase();
       if (users[key]) { const e = new Error("in use"); e.code = "auth/email-already-in-use"; throw e; }
       users[key] = {
@@ -109,6 +109,7 @@ export async function create() {
         middleName: (middleName || "").trim(),
         lastName: (lastName || "").trim(),
         email: key,
+        phone: (phone || "").trim(),
         password,
         lastSelectedPetId: null
       };

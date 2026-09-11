@@ -112,6 +112,7 @@ function wireSignup() {
       middleName: $("#suMiddleName").value,
       lastName:   $("#suLastName").value,
       email:      $("#suEmail").value,
+      phone:      $("#suPhone")?.value || "",
       password:   $("#suPassword").value
     };
     const problem = validateSignup(details);
@@ -142,6 +143,7 @@ function wireSignup() {
       middleName: $("#suMiddleName").value,
       lastName:   $("#suLastName").value,
       email:      $("#suEmail").value,
+      phone:      $("#suPhone")?.value || "",
       password:   $("#suPassword").value,
       otpCode:    $("#suOtpCode").value.trim()
     };

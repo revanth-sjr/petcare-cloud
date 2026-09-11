@@ -187,7 +187,7 @@ export async function create() {
       return otp;
     },
 
-    async signUpWithOtp({ firstName, middleName, lastName, email, password, otpCode }) {
+    async signUpWithOtp({ firstName, middleName, lastName, email, phone, password, otpCode }) {
       const cleanEmail = String(email || "").trim().toLowerCase();
       const cleanOtp = String(otpCode || "").trim();
 
@@ -221,6 +221,7 @@ export async function create() {
         middleName: (middleName || "").trim(),
         lastName: (lastName || "").trim(),
         email: cleanEmail,
+        phone: (phone || "").trim(),
         otpVerified: true,
         emailVerified: true,
         createdAt: fs.serverTimestamp()
