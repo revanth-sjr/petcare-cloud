@@ -2050,10 +2050,12 @@ body::after {
 .onb-card {
   position: relative !important;
   overflow: hidden !important;
+  transform-style: preserve-3d !important;
+  will-change: transform !important;
   background-color: rgba(255, 255, 255, 0.52) !important;
   background-image: radial-gradient(
-    380px circle at var(--glass-mx, 50%) var(--glass-my, 50%),
-    rgba(255, 255, 255, 0.35),
+    420px circle at var(--glass-mx, 50%) var(--glass-my, 50%),
+    rgba(255, 255, 255, 0.45),
     transparent 70%
   ) !important;
   backdrop-filter: blur(32px) saturate(210%) contrast(105%) !important;
@@ -2064,7 +2066,7 @@ body::after {
     inset 0 2px 1.5px 0 rgba(255, 255, 255, 0.95),
     inset 0 -1px 1px 0 rgba(0, 0, 0, 0.04),
     0 18px 40px -12px rgba(15, 23, 42, 0.14) !important;
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease !important;
+  transition: box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease !important;
 }
 
 /* ---------------- High-Gloss Specular Sheen Reflection Sweep ---------------- */
@@ -2089,12 +2091,12 @@ body::after {
     105deg,
     transparent 0%,
     rgba(255, 255, 255, 0.05) 25%,
-    rgba(255, 255, 255, 0.65) 50%,
+    rgba(255, 255, 255, 0.7) 50%,
     rgba(255, 255, 255, 0.05) 75%,
     transparent 100%
   ) !important;
   transform: rotate(25deg) translateX(-190%) !important;
-  transition: transform 0.75s cubic-bezier(0.19, 1, 0.22, 1) !important;
+  transition: transform 0.95s cubic-bezier(0.16, 1, 0.3, 1) !important;
   pointer-events: none !important;
   z-index: 5 !important;
 }
@@ -2110,7 +2112,7 @@ body::after {
 .btn-secondary:hover::after,
 .pet-switcher-btn:hover::after,
 .topbar:hover::after {
-  transform: rotate(25deg) translateX(400%) !important;
+  transform: rotate(25deg) translateX(420%) !important;
 }
 
 .card:hover, 

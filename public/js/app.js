@@ -794,16 +794,81 @@ function hideEmptyState() {
   $("#layout").hidden = false;
 }
 
+/* ------------------------------------------------------------------
+   Ultra-Smooth 3D Liquid Tilt & Cursor Reflection Spotlight Engine
+   ------------------------------------------------------------------ */
+function initLiquidReflectionEngine() {
+  let activeEl = null;
+  let targetX = 50, targetY = 50;
+  let currentX = 50, currentY = 50;
+  let targetRx = 0, targetRy = 0;
+  let currentRx = 0, currentRy = 0;
+  let animating = false;
+
+  function update() {
+    currentX += (targetX - currentX) * 0.12;
+    currentY += (targetY - currentY) * 0.12;
+    currentRx += (targetRx - currentRx) * 0.12;
+    currentRy += (targetRy - currentRy) * 0.12;
+
+    if (activeEl) {
+      activeEl.style.setProperty("--glass-mx", `${currentX}%`);
+      activeEl.style.setProperty("--glass-my", `${currentY}%`);
+      activeEl.style.transform = `perspective(1000px) rotateX(${currentRx.toFixed(2)}deg) rotateY(${currentRy.toFixed(2)}deg) translateZ(4px)`;
+    }
+
+    if (activeEl || Math.abs(currentRx) > 0.05 || Math.abs(currentRy) > 0.05) {
+      requestAnimationFrame(update);
+    } else {
+      animating = false;
+    }
+  }
+
+  document.addEventListener("mousemove", (e) => {
+    const el = e.target.closest(".card, .pet-flash-card, .overview-card, .memory-card, .action, .btn-primary, .btn-ghost, .btn-secondary, .pet-switcher-btn, .topbar");
+    
+    if (el !== activeEl) {
+      if (activeEl) {
+        activeEl.style.transform = "";
+        activeEl.style.removeProperty("--glass-mx");
+        activeEl.style.removeProperty("--glass-my");
+      }
+      activeEl = el;
+      currentX = 50; currentY = 50;
+      currentRx = 0; currentRy = 0;
+    }
+
+    if (!activeEl) return;
+
+    const rect = activeEl.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / rect.width;
+    const py = (e.clientY - rect.top) / rect.height;
+
+    targetX = Math.min(100, Math.max(0, px * 100));
+    targetY = Math.min(100, Math.max(0, py * 100));
+
+    // Smooth 3D tilt (-5deg to +5deg)
+    targetRx = (0.5 - py) * 7;
+    targetRy = (px - 0.5) * 7;
+
+    if (!animating) {
+      animating = true;
+      requestAnimationFrame(update);
+    }
+  });
+
+  document.addEventListener("mouseout", (e) => {
+    if (activeEl && (!e.relatedTarget || !activeEl.contains(e.relatedTarget))) {
+      activeEl.style.transform = "";
+      targetRx = 0; targetRy = 0;
+      activeEl = null;
+    }
+  });
+}
+
 /* ------------------------------------------------------------------ */
 function wireStaticUi() {
-  /* Dynamic Liquid Glass Specular Reflection Spotlight following mouse cursor */
-  document.addEventListener("mousemove", (e) => {
-    const glassEl = e.target.closest(".card, .pet-flash-card, .overview-card, .memory-card, .modal-box, .action, .btn-primary, .btn-ghost, .btn-secondary, .pet-switcher-btn, .topbar");
-    if (!glassEl) return;
-    const rect = glassEl.getBoundingClientRect();
-    glassEl.style.setProperty("--glass-mx", `${e.clientX - rect.left}px`);
-    glassEl.style.setProperty("--glass-my", `${e.clientY - rect.top}px`);
-  });
+  initLiquidReflectionEngine();
 
   $$(".action").forEach((btn) => {
     btn.addEventListener("click", () => {
