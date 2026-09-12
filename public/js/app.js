@@ -796,6 +796,15 @@ function hideEmptyState() {
 
 /* ------------------------------------------------------------------ */
 function wireStaticUi() {
+  /* Dynamic Liquid Glass Specular Reflection Spotlight following mouse cursor */
+  document.addEventListener("mousemove", (e) => {
+    const glassEl = e.target.closest(".card, .pet-flash-card, .overview-card, .memory-card, .modal-box, .action, .btn-primary, .btn-ghost, .btn-secondary, .pet-switcher-btn, .topbar");
+    if (!glassEl) return;
+    const rect = glassEl.getBoundingClientRect();
+    glassEl.style.setProperty("--glass-mx", `${e.clientX - rect.left}px`);
+    glassEl.style.setProperty("--glass-my", `${e.clientY - rect.top}px`);
+  });
+
   $$(".action").forEach((btn) => {
     btn.addEventListener("click", () => {
       const type = btn.dataset.log;
