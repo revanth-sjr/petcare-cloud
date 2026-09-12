@@ -8,7 +8,7 @@
    ===================================================================== */
 
 import { $, esc } from "./ui.js";
-import { AI_ENDPOINT, isAiConfigured } from "./config.js";
+import { AI_ENDPOINT, isAiConfigured, firebaseConfig } from "./config.js";
 import { answerLocally, DISCLAIMER } from "./ai-fallback.js";
 import { showVets } from "./vets.js";
 
@@ -187,7 +187,7 @@ Active pet context: ${currentPet ? `Name: ${currentPet.name}, Species: ${current
     }
   };
 
-  const candidateModels = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro", "gemini-3.6-flash", "gemini-flash-latest", "gemini-3.7-flash"];
+  const candidateModels = ["gemini-1.5-flash", "gemini-2.0-flash-exp", "gemini-1.5-pro"];
   let res;
   let lastErr = "";
 
