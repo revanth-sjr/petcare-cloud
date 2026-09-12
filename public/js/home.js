@@ -155,7 +155,64 @@ function showEmptyState() {
   $("#emptyDash").hidden = false;
 }
 
+function initLiquidReflectionEngine() {
+  let activeEl = null;
+  let targetRx = 0, targetRy = 0;
+  let currentRx = 0, currentRy = 0;
+  let animating = false;
+
+  function update() {
+    currentRx += (targetRx - currentRx) * 0.12;
+    currentRy += (targetRy - currentRy) * 0.12;
+
+    if (activeEl) {
+      activeEl.style.transform = `perspective(1000px) rotateX(${currentRx.toFixed(2)}deg) rotateY(${currentRy.toFixed(2)}deg) translateZ(3px)`;
+    }
+
+    if (activeEl || Math.abs(currentRx) > 0.05 || Math.abs(currentRy) > 0.05) {
+      requestAnimationFrame(update);
+    } else {
+      animating = false;
+    }
+  }
+
+  document.addEventListener("mousemove", (e) => {
+    const el = e.target.closest(".card, .pet-flash-card, .overview-card, .memory-card, .action, .btn-primary, .btn-ghost, .btn-secondary, .pet-switcher-btn, .topbar");
+    
+    if (el !== activeEl) {
+      if (activeEl) {
+        activeEl.style.transform = "";
+      }
+      activeEl = el;
+      currentRx = 0; currentRy = 0;
+    }
+
+    if (!activeEl) return;
+
+    const rect = activeEl.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / rect.width;
+    const py = (e.clientY - rect.top) / rect.height;
+
+    targetRx = (0.5 - py) * 6;
+    targetRy = (px - 0.5) * 6;
+
+    if (!animating) {
+      animating = true;
+      requestAnimationFrame(update);
+    }
+  });
+
+  document.addEventListener("mouseout", (e) => {
+    if (activeEl && (!e.relatedTarget || !activeEl.contains(e.relatedTarget))) {
+      activeEl.style.transform = "";
+      targetRx = 0; targetRy = 0;
+      activeEl = null;
+    }
+  });
+}
+
 function wireStatic() {
+  initLiquidReflectionEngine();
   $$('[data-close-modal]').forEach((button) => {
     button.addEventListener("click", closeAllModals);
   });
