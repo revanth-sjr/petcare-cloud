@@ -1944,18 +1944,18 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* =====================================================================
-   AUTHENTIC IPHONE LIQUID GLASS & iOS 18 CONTROL CENTER UI SYSTEM
+   AUTHENTIC IPHONE PRO TITANIUM & DEEP COBALT LIQUID GLASS UI SYSTEM
    ===================================================================== */
 
 /* ---------------- Ambient Dynamic iPhone Wallpaper Blobs ---------------- */
 body {
   position: relative;
-  background-color: #EBF2F7 !important;
+  background-color: #E2E8F0 !important;
   background-image: 
-    radial-gradient(at 10% 10%, rgba(56, 189, 248, 0.28) 0px, transparent 50%),
-    radial-gradient(at 90% 15%, rgba(236, 72, 153, 0.22) 0px, transparent 55%),
-    radial-gradient(at 50% 85%, rgba(139, 92, 246, 0.25) 0px, transparent 60%),
-    radial-gradient(at 85% 80%, rgba(16, 185, 129, 0.20) 0px, transparent 50%) !important;
+    radial-gradient(at 10% 10%, rgba(37, 99, 235, 0.22) 0px, transparent 50%),
+    radial-gradient(at 90% 15%, rgba(14, 165, 233, 0.25) 0px, transparent 55%),
+    radial-gradient(at 50% 85%, rgba(16, 185, 129, 0.20) 0px, transparent 60%),
+    radial-gradient(at 85% 80%, rgba(71, 85, 105, 0.22) 0px, transparent 50%) !important;
   background-attachment: fixed !important;
   min-height: 100vh;
   overflow-x: hidden;
@@ -1966,7 +1966,7 @@ body::after {
   content: "";
   position: fixed;
   border-radius: 50%;
-  filter: blur(80px);
+  filter: blur(90px);
   z-index: -1;
   pointer-events: none;
   opacity: 0.85;
@@ -1974,19 +1974,19 @@ body::after {
 }
 
 body::before {
-  width: 520px;
-  height: 520px;
-  top: -120px;
-  left: -120px;
-  background: radial-gradient(circle, rgba(20, 184, 166, 0.6) 0%, rgba(99, 102, 241, 0.45) 60%, transparent 100%);
+  width: 550px;
+  height: 550px;
+  top: -140px;
+  left: -140px;
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.55) 0%, rgba(37, 99, 235, 0.45) 60%, transparent 100%);
 }
 
 body::after {
-  width: 600px;
-  height: 600px;
-  bottom: -150px;
-  right: -150px;
-  background: radial-gradient(circle, rgba(244, 63, 94, 0.5) 0%, rgba(245, 158, 11, 0.45) 60%, transparent 100%);
+  width: 620px;
+  height: 620px;
+  bottom: -160px;
+  right: -160px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.45) 0%, rgba(30, 58, 138, 0.45) 60%, transparent 100%);
   animation-delay: -11s;
 }
 
@@ -1999,18 +1999,18 @@ body::after {
 [data-theme="dark"] body,
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) body {
-    background-color: #070C18 !important;
+    background-color: #070B14 !important;
     background-image: 
-      radial-gradient(at 10% 10%, rgba(56, 189, 248, 0.25) 0px, transparent 50%),
-      radial-gradient(at 90% 15%, rgba(192, 132, 252, 0.22) 0px, transparent 55%),
-      radial-gradient(at 50% 85%, rgba(20, 184, 166, 0.20) 0px, transparent 60%),
-      radial-gradient(at 85% 80%, rgba(249, 115, 22, 0.18) 0px, transparent 50%) !important;
+      radial-gradient(at 10% 10%, rgba(29, 78, 216, 0.28) 0px, transparent 50%),
+      radial-gradient(at 90% 15%, rgba(14, 165, 233, 0.22) 0px, transparent 55%),
+      radial-gradient(at 50% 85%, rgba(16, 185, 129, 0.18) 0px, transparent 60%),
+      radial-gradient(at 85% 80%, rgba(30, 41, 59, 0.45) 0px, transparent 50%) !important;
   }
   :root:not([data-theme="light"]) body::before {
-    background: radial-gradient(circle, rgba(45, 212, 191, 0.45) 0%, rgba(99, 102, 241, 0.35) 60%, transparent 100%);
+    background: radial-gradient(circle, rgba(37, 99, 235, 0.45) 0%, rgba(14, 165, 233, 0.35) 60%, transparent 100%);
   }
   :root:not([data-theme="light"]) body::after {
-    background: radial-gradient(circle, rgba(244, 63, 94, 0.4) 0%, rgba(139, 92, 246, 0.35) 60%, transparent 100%);
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.35) 0%, rgba(30, 58, 138, 0.4) 60%, transparent 100%);
   }
 }
 
@@ -2119,13 +2119,13 @@ body::after {
 
 /* ---------------- iOS Glossy Buttons ---------------- */
 .btn-primary {
-  background: linear-gradient(135deg, #0d9488 0%, #10b981 100%) !important;
+  background: linear-gradient(135deg, #1d4ed8 0%, #0284c7 100%) !important;
   color: #ffffff !important;
   border: 1px solid rgba(255, 255, 255, 0.35) !important;
   border-radius: 16px !important;
   box-shadow: 
     inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.45),
-    0 8px 22px -4px rgba(13, 148, 136, 0.45) !important;
+    0 8px 22px -4px rgba(29, 78, 216, 0.45) !important;
   font-weight: 600 !important;
   letter-spacing: -0.01em !important;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
@@ -2133,10 +2133,10 @@ body::after {
 
 .btn-primary:hover {
   transform: translateY(-1.5px) scale(1.02) !important;
-  background: linear-gradient(135deg, #0f766e 0%, #059669 100%) !important;
+  background: linear-gradient(135deg, #1e40af 0%, #0369a1 100%) !important;
   box-shadow: 
     inset 0 2px 1.5px 0 rgba(255, 255, 255, 0.6),
-    0 12px 28px -4px rgba(13, 148, 136, 0.55) !important;
+    0 12px 28px -4px rgba(29, 78, 216, 0.55) !important;
 }
 
 .btn-primary:active {
@@ -2216,9 +2216,9 @@ select {
 
 input:focus, textarea:focus, select:focus {
   background: rgba(255, 255, 255, 0.75) !important;
-  border-color: var(--accent) !important;
+  border-color: #2563eb !important;
   box-shadow: 
-    0 0 0 4px rgba(20, 184, 166, 0.25),
+    0 0 0 4px rgba(37, 99, 235, 0.25),
     inset 0 1px 1px rgba(255, 255, 255, 1) !important;
 }
 
@@ -2236,12 +2236,12 @@ input:focus, textarea:focus, select:focus {
 
 /* ---------------- iOS Floating AI Chat Widget Glass ---------------- */
 .ai-fab {
-  background: linear-gradient(135deg, rgba(20, 184, 166, 0.9) 0%, rgba(99, 102, 241, 0.9) 100%) !important;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.9) 0%, rgba(14, 165, 233, 0.9) 100%) !important;
   backdrop-filter: blur(20px) !important;
   border: 1.5px solid rgba(255, 255, 255, 0.6) !important;
   box-shadow: 
     inset 0 1.5px 1px rgba(255, 255, 255, 0.8),
-    0 14px 32px -4px rgba(99, 102, 241, 0.45) !important;
+    0 14px 32px -4px rgba(37, 99, 235, 0.45) !important;
   border-radius: 9999px !important;
 }
 
@@ -2249,7 +2249,7 @@ input:focus, textarea:focus, select:focus {
   transform: scale(1.08) rotate(4deg) !important;
   box-shadow: 
     inset 0 2px 1.5px rgba(255, 255, 255, 1),
-    0 18px 40px -4px rgba(99, 102, 241, 0.6) !important;
+    0 18px 40px -4px rgba(37, 99, 235, 0.6) !important;
 }
 
 /* Custom Sleek Scrollbar */
