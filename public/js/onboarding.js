@@ -46,7 +46,13 @@ async function boot() {
   $("#boot").hidden = true;
 
   breed = wireBreedSelect($("#fBreed"), $("#fBreedOtherWrap"), $("#fBreedOther"), $("#fBreedLabel"));
-  species = wireSpeciesGrid($("#speciesGrid"), (id) => breed.populate(id));
+  species = wireSpeciesGrid($("#speciesGrid"), (id) => {
+    breed.populate(id);
+    const walkInput = $("#fWalkTarget");
+    if (walkInput) {
+      walkInput.value = id === "dog" ? "2" : "0";
+    }
+  });
   feeding = wireFeedingScheduleEditor($("#feedingTimesEditor"));
   photo = wirePhotoPicker({
     input: $("#fPhoto"),

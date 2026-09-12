@@ -45,9 +45,9 @@ function renderPet(dash) {
 
   const { counts, targets } = dash.today;
   const done  = Math.min(counts.feeding, targets.feeding)
-              + Math.min(counts.walk, targets.walk)
+              + (targets.walk > 0 ? Math.min(counts.walk, targets.walk) : 0)
               + counts.medication;
-  const total = targets.feeding + targets.walk + targets.medication;
+  const total = targets.feeding + (targets.walk > 0 ? targets.walk : 0) + counts.medication;
   const pct   = total ? Math.round((done / total) * 100) : 0;
 
   const ring = $("#dayRing");
@@ -64,15 +64,18 @@ function renderCounters(dash) {
     ["#cntMed",     "#ldMedication", counts.medication, targets.medication, "medication"]
   ];
   for (const [sel, ldSel, done, total, type] of pairs) {
-    $(sel).textContent = `${done} / ${total}`;
     const btn = document.querySelector(`.action[data-log="${type}"]`);
-    if (btn) btn.classList.toggle("is-full", total > 0 && done >= total);
+    if (type === "walk" && total === 0) {
+      if (btn) btn.style.display = "none";
+      continue;
+    }
+    if (btn) {
+      btn.style.display = "flex";
+      btn.classList.toggle("is-full", total > 0 && done >= total);
+    }
+    $(sel).textContent = `${done} / ${total}`;
 
-    /* Per-action "Last done" line, directly under the button — updates on
-       every render(), so it moves the moment an action completes (the
-       store's subscribe callback repaints immediately) and also just from
-       time passing (the 30s repaint loop in app.js keeps "3 minutes ago"
-       honest without the pet owner ever refreshing the page). */
+    /* Per-action "Last done" line, directly under the button */
     const ldEl = $(ldSel);
     if (ldEl) {
       const at = dash.lastDone[type];
@@ -247,6 +250,7 @@ function renderLastDone(dash) {
   const ul = $("#lastDone");
   ul.innerHTML = "";
   for (const [type, meta] of Object.entries(TASK_META)) {
+    if (type === "walk" && (dash.today?.targets?.walk ?? 0) === 0) continue;
     const at = dash.lastDone[type];
     const li = document.createElement("li");
     li.innerHTML = `

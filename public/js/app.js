@@ -653,10 +653,13 @@ function wireEditArchive() {
       weightKg: $("#epWeight").value === "" ? null : Number($("#epWeight").value),
       photoURL: epPhoto.get(),
       feedingSchedule: { ...(pet.feedingSchedule || {}), times: epFeeding.get() },
-      /* dailyTargets.feeding stays a mirror of the schedule's own length —
-         the ring/KPI/streak math all reads dailyTargets, not the schedule
-         itself, so this is the one place that has to stay in sync. */
-      dailyTargets: { ...(pet.dailyTargets || {}), feeding: epFeeding.get().length },
+      /* dailyTargets.feeding stays a mirror of the schedule's own length;
+         walk target is customizable (set to 0 for indoor/non-walking pets) */
+      dailyTargets: {
+        ...(pet.dailyTargets || {}),
+        feeding: epFeeding.get().length,
+        walk: $("#epWalkTarget") ? Math.max(0, Number($("#epWalkTarget").value) || 0) : (pet.dailyTargets?.walk ?? (epSpecies.get() === "dog" ? 2 : 0))
+      },
       /* merge, don't replace — an existing allergy/medication note set
          outside this form (seed data, or set up before this UI existed)
          must survive an edit that only touches the free-text notes. Both
@@ -741,6 +744,10 @@ function openEditPet() {
   $("#epAge").value = pet.ageYears ?? "";
   $("#epGender").value = pet.gender || "";
   $("#epWeight").value = pet.weightKg ?? "";
+  if ($("#epWalkTarget")) {
+    const defaultWalk = pet.species === "dog" ? 2 : 0;
+    $("#epWalkTarget").value = pet.dailyTargets?.walk ?? defaultWalk;
+  }
   epPhoto.set(pet.photoURL || "");
   epFeeding.set(pet.feedingSchedule?.times);
   $("#epAllergy").value = pet.specialInstructions?.allergy || "";

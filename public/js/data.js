@@ -291,7 +291,9 @@ export function buildDashboard(state, at = now()) {
     };
   }).sort((a, b) => a.slot.localeCompare(b.slot));
 
-  const walkSlots = ["07:00", "18:00"].slice(0, Math.max(0, pet?.dailyTargets?.walk ?? 2));
+  const defaultWalkTarget = pet?.species === "dog" ? 2 : 0;
+  const walkTarget = Math.max(0, pet?.dailyTargets?.walk ?? defaultWalkTarget);
+  const walkSlots = ["07:00", "18:00"].slice(0, walkTarget);
   const walkCount = logsToday.filter((l) => l.type === "walk").length;
   const walkRows = walkSlots.map((slot, i) => {
     if (i < walkCount) return { kind: "walk", slot, status: "COMPLETED" };
@@ -307,7 +309,7 @@ export function buildDashboard(state, at = now()) {
 
   const targets = {
     feeding:    pet?.dailyTargets?.feeding ?? 3,
-    walk:       pet?.dailyTargets?.walk ?? 2,
+    walk:       walkTarget,
     medication: medRows.length
   };
 
@@ -386,8 +388,8 @@ export function buildDashboard(state, at = now()) {
        recomputed from scratch on every render, so editing a schedule can
        never leave a stale/duplicate reminder behind. */
     alerts: {
-      overdue: [...medRows, ...feedingRows, ...walkRows].filter((r) => r.status === "OVERDUE"),
-      dueNow:  [...medRows, ...feedingRows, ...walkRows].filter((r) => r.status === "DUE_NOW")
+      overdue: [...medRows, ...feedingRows, ...(walkTarget > 0 ? walkRows : [])].filter((r) => r.status === "OVERDUE"),
+      dueNow:  [...medRows, ...feedingRows, ...(walkTarget > 0 ? walkRows : [])].filter((r) => r.status === "DUE_NOW")
     }
   };
 }
