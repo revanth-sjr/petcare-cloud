@@ -118,6 +118,57 @@ button{font-family:inherit;font-size:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
 input::placeholder, textarea::placeholder{color:var(--ink-3);opacity:.85}
 
+/* --- Large, easy-to-click up & down arrows for number inputs --- */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: inner-spin-button !important;
+  opacity: 1;
+  height: 32px;
+  width: 24px;
+  cursor: pointer;
+  margin-left: 4px;
+  border-radius: 4px;
+}
+input[type="number"] {
+  padding-right: 6px;
+  font-size: 15px;
+}
+
+/* --- Large, easy-to-see custom dropdown arrows for select elements --- */
+select, .onb-field select, .stack-form select {
+  border: 1px solid var(--line-2);
+  border-radius: 11px;
+  padding: 10px 36px 10px 13px;
+  font-family: inherit;
+  font-size: 14.5px;
+  background-color: var(--surface);
+  color: var(--ink);
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%234B5C57' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 18px 18px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+[data-theme="dark"] select,
+[data-theme="dark"] .onb-field select,
+[data-theme="dark"] .stack-form select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) select,
+  :root:not([data-theme="light"]) .onb-field select,
+  :root:not([data-theme="light"]) .stack-form select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  }
+}
+
 /* ---------------- top bar ---------------- */
 .topbar{
   position:sticky;top:0;z-index:40;
@@ -858,15 +909,25 @@ input::placeholder, textarea::placeholder{color:var(--ink-3);opacity:.85}
 .pet-switcher-btn{
   display:flex;align-items:center;gap:8px;
   background:var(--surface-2);border:1px solid var(--line);border-radius:24px;
-  padding:4px 12px 4px 4px;cursor:pointer;max-width:220px;
+  padding:5px 14px 5px 5px;cursor:pointer;max-width:240px;
+  transition:background .15s ease, border-color .15s ease;
 }
 .pet-switcher-btn:hover{background:var(--surface);border-color:var(--line-2)}
 .pet-switcher-avatar{
-  width:28px;height:28px;border-radius:50%;display:grid;place-items:center;flex:none;
-  background:var(--accent-bg);font-size:15px;background-size:cover;background-position:center;
+  width:32px;height:32px;border-radius:50%;display:grid;place-items:center;flex:none;
+  background:var(--accent-bg);font-size:16px;background-size:cover;background-position:center;
 }
-.pet-switcher-name{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pet-switcher-caret{font-size:10px;color:var(--ink-3)}
+.pet-switcher-name{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pet-switcher-caret{
+  font-size:15px;
+  font-weight:700;
+  color:var(--ink-2);
+  line-height:1;
+  display:inline-block;
+  margin-left:2px;
+  transition:transform .15s ease, color .15s ease;
+}
+.pet-switcher-btn:hover .pet-switcher-caret{color:var(--ink);transform:translateY(1px)}
 .pet-switcher-menu{
   position:absolute;top:calc(100% + 8px);left:0;z-index:45;min-width:240px;max-width:300px;
   background:var(--surface);border:1px solid var(--line);border-radius:14px;
