@@ -1781,4 +1781,166 @@ select, .onb-field select, .stack-form select {
   background: rgba(239, 68, 68, 0.1);
 }
 
+/* =====================================================================
+   ENTERPRISE-GRADE UI MICRO-INTERACTIONS & SMOOTH ANIMATIONS
+   ===================================================================== */
+:root {
+  --ease-out-cubic: cubic-bezier(0.33, 1, 0.68, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ---------------- Card Hover & Elevation ---------------- */
+.card, .pet-flash-card, .overview-card, .memory-card, .modal-box, .vet-item {
+  transition: transform 0.28s var(--ease-smooth), box-shadow 0.28s var(--ease-smooth), border-color 0.25s var(--ease-smooth);
+}
+.card:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: var(--line-2);
+}
+
+/* ---------------- Brand Mark & Logo Wiggle ---------------- */
+.brand-mark, .auth-brand .brand-mark {
+  display: inline-block;
+  transition: transform 0.35s var(--ease-spring);
+}
+.brand:hover .brand-mark, .auth-brand:hover .brand-mark {
+  transform: scale(1.18) rotate(-8deg);
+}
+
+/* ---------------- Action Cards (Log Care) ---------------- */
+.action {
+  transition: transform 0.25s var(--ease-smooth), box-shadow 0.25s var(--ease-smooth), border-color 0.25s var(--ease-smooth), background-color 0.2s ease;
+}
+.action:hover {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 12px 28px -8px rgba(22, 33, 30, 0.18);
+  border-color: var(--accent);
+}
+.action:hover .action-icon {
+  transform: scale(1.15) rotate(-4deg);
+}
+.action-icon {
+  transition: transform 0.3s var(--ease-spring);
+}
+.action:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+/* ---------------- Buttons & Touch Feedback ---------------- */
+.btn {
+  transition: transform 0.18s var(--ease-smooth), box-shadow 0.2s var(--ease-smooth), background-color 0.18s ease, border-color 0.18s ease, opacity 0.18s ease;
+}
+.btn:hover {
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 12px rgba(22, 33, 30, 0.08);
+}
+.btn:active {
+  transform: translateY(1px) scale(0.97);
+  box-shadow: none;
+}
+
+.btn-primary {
+  box-shadow: 0 2px 8px rgba(20, 112, 107, 0.25);
+}
+.btn-primary:hover {
+  box-shadow: 0 8px 20px -4px rgba(20, 112, 107, 0.45);
+  background: var(--accent-ink);
+}
+
+.icon-btn {
+  transition: transform 0.2s var(--ease-spring), background-color 0.15s ease, color 0.15s ease;
+}
+.icon-btn:hover {
+  transform: scale(1.12);
+}
+.icon-btn:active {
+  transform: scale(0.9);
+}
+
+/* ---------------- Pet Switcher & User Chip ---------------- */
+.user-chip, .pet-switcher-btn {
+  transition: transform 0.2s var(--ease-smooth), background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.user-chip:hover, .pet-switcher-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+.user-avatar, .pet-switcher-avatar, .pet-avatar {
+  transition: transform 0.28s var(--ease-spring), box-shadow 0.28s ease;
+}
+.pet-card:hover .pet-avatar, .user-chip:hover .user-avatar, .pet-switcher-btn:hover .pet-switcher-avatar {
+  transform: scale(1.06);
+}
+
+/* ---------------- Timeline Items & Hover Highlights ---------------- */
+.tl-item {
+  transition: background-color 0.2s ease, transform 0.2s var(--ease-smooth);
+  border-radius: 8px;
+  padding-left: 6px;
+  padding-right: 6px;
+}
+.tl-item:hover {
+  background-color: var(--surface-2);
+}
+.tl-dot {
+  transition: transform 0.25s var(--ease-spring), box-shadow 0.2s ease;
+}
+.tl-item:hover .tl-dot {
+  transform: scale(1.22);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
+/* ---------------- Medication Items ---------------- */
+.med-item {
+  transition: transform 0.2s var(--ease-smooth), border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+.med-item:hover {
+  transform: translateX(3px);
+  border-color: var(--line-2);
+  box-shadow: var(--shadow);
+}
+
+/* ---------------- Species Grid Chips ---------------- */
+.species-chip {
+  transition: transform 0.22s var(--ease-spring), border-color 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
+}
+.species-chip:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 8px 18px -6px rgba(20, 112, 107, 0.25);
+}
+.species-chip:active {
+  transform: translateY(0) scale(0.97);
+}
+
+/* ---------------- Input & Select Focus Glow ---------------- */
+input:focus, select:focus, textarea:focus {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 0 0 3.5px var(--accent-bg), 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* ---------------- Modal Backdrop & Smooth Entrance ---------------- */
+.modal-box {
+  animation: modalScaleUp 0.26s var(--ease-smooth);
+}
+@keyframes modalScaleUp {
+  from { opacity: 0; transform: translateY(14px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ---------------- Streak Flame Pulse ---------------- */
+.streak {
+  transition: transform 0.2s var(--ease-spring);
+}
+.streak:hover {
+  transform: scale(1.04);
+}
+.streak .flame img {
+  animation: flamePulse 2.2s ease-in-out infinite;
+}
+@keyframes flamePulse {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 1px rgba(234, 179, 8, 0.4)); }
+  50% { transform: scale(1.15) rotate(3deg); filter: drop-shadow(0 0 6px rgba(234, 179, 8, 0.7)); }
+}
+
 
