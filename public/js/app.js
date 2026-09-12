@@ -795,26 +795,20 @@ function hideEmptyState() {
 }
 
 /* ------------------------------------------------------------------
-   Ultra-Smooth 3D Liquid Tilt & Cursor Reflection Spotlight Engine
+   Ultra-Smooth 3D Liquid Tilt Engine (Clean, Non-Shiny)
    ------------------------------------------------------------------ */
 function initLiquidReflectionEngine() {
   let activeEl = null;
-  let targetX = 50, targetY = 50;
-  let currentX = 50, currentY = 50;
   let targetRx = 0, targetRy = 0;
   let currentRx = 0, currentRy = 0;
   let animating = false;
 
   function update() {
-    currentX += (targetX - currentX) * 0.12;
-    currentY += (targetY - currentY) * 0.12;
     currentRx += (targetRx - currentRx) * 0.12;
     currentRy += (targetRy - currentRy) * 0.12;
 
     if (activeEl) {
-      activeEl.style.setProperty("--glass-mx", `${currentX}%`);
-      activeEl.style.setProperty("--glass-my", `${currentY}%`);
-      activeEl.style.transform = `perspective(1000px) rotateX(${currentRx.toFixed(2)}deg) rotateY(${currentRy.toFixed(2)}deg) translateZ(4px)`;
+      activeEl.style.transform = `perspective(1000px) rotateX(${currentRx.toFixed(2)}deg) rotateY(${currentRy.toFixed(2)}deg) translateZ(3px)`;
     }
 
     if (activeEl || Math.abs(currentRx) > 0.05 || Math.abs(currentRy) > 0.05) {
@@ -830,11 +824,8 @@ function initLiquidReflectionEngine() {
     if (el !== activeEl) {
       if (activeEl) {
         activeEl.style.transform = "";
-        activeEl.style.removeProperty("--glass-mx");
-        activeEl.style.removeProperty("--glass-my");
       }
       activeEl = el;
-      currentX = 50; currentY = 50;
       currentRx = 0; currentRy = 0;
     }
 
@@ -844,12 +835,9 @@ function initLiquidReflectionEngine() {
     const px = (e.clientX - rect.left) / rect.width;
     const py = (e.clientY - rect.top) / rect.height;
 
-    targetX = Math.min(100, Math.max(0, px * 100));
-    targetY = Math.min(100, Math.max(0, py * 100));
-
-    // Smooth 3D tilt (-5deg to +5deg)
-    targetRx = (0.5 - py) * 7;
-    targetRy = (px - 0.5) * 7;
+    // Subtle 3D tilt (-4deg to +4deg)
+    targetRx = (0.5 - py) * 6;
+    targetRy = (px - 0.5) * 6;
 
     if (!animating) {
       animating = true;
