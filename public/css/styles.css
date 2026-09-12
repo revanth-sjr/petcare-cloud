@@ -1944,137 +1944,332 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* =====================================================================
-   IPHONE LIQUID GLASS & ELEGANT TRANSITION SYSTEM
+   AUTHENTIC IPHONE LIQUID GLASS & iOS 18 CONTROL CENTER UI SYSTEM
    ===================================================================== */
 
-/* ---------------- Ambient Mesh Background ---------------- */
+/* ---------------- Ambient Dynamic iPhone Wallpaper Blobs ---------------- */
 body {
-  background-color: var(--bg);
+  position: relative;
+  background-color: #EBF2F7 !important;
   background-image: 
-    radial-gradient(at 0% 0%, rgba(20, 112, 107, 0.07) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(221, 107, 69, 0.05) 0px, transparent 50%),
-    radial-gradient(at 50% 100%, rgba(44, 108, 147, 0.06) 0px, transparent 50%);
-  background-attachment: fixed;
+    radial-gradient(at 10% 10%, rgba(56, 189, 248, 0.28) 0px, transparent 50%),
+    radial-gradient(at 90% 15%, rgba(236, 72, 153, 0.22) 0px, transparent 55%),
+    radial-gradient(at 50% 85%, rgba(139, 92, 246, 0.25) 0px, transparent 60%),
+    radial-gradient(at 85% 80%, rgba(16, 185, 129, 0.20) 0px, transparent 50%) !important;
+  background-attachment: fixed !important;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.85;
+  animation: liquidMeshFloat 22s infinite ease-in-out alternate;
+}
+
+body::before {
+  width: 520px;
+  height: 520px;
+  top: -120px;
+  left: -120px;
+  background: radial-gradient(circle, rgba(20, 184, 166, 0.6) 0%, rgba(99, 102, 241, 0.45) 60%, transparent 100%);
+}
+
+body::after {
+  width: 600px;
+  height: 600px;
+  bottom: -150px;
+  right: -150px;
+  background: radial-gradient(circle, rgba(244, 63, 94, 0.5) 0%, rgba(245, 158, 11, 0.45) 60%, transparent 100%);
+  animation-delay: -11s;
+}
+
+@keyframes liquidMeshFloat {
+  0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  50% { transform: translate(60px, 80px) scale(1.15) rotate(180deg); }
+  100% { transform: translate(-40px, 40px) scale(0.9) rotate(360deg); }
 }
 
 [data-theme="dark"] body,
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) body {
+    background-color: #070C18 !important;
     background-image: 
-      radial-gradient(at 0% 0%, rgba(45, 212, 191, 0.1) 0px, transparent 55%),
-      radial-gradient(at 100% 0%, rgba(249, 115, 22, 0.07) 0px, transparent 55%),
-      radial-gradient(at 50% 100%, rgba(56, 189, 248, 0.08) 0px, transparent 55%);
+      radial-gradient(at 10% 10%, rgba(56, 189, 248, 0.25) 0px, transparent 50%),
+      radial-gradient(at 90% 15%, rgba(192, 132, 252, 0.22) 0px, transparent 55%),
+      radial-gradient(at 50% 85%, rgba(20, 184, 166, 0.20) 0px, transparent 60%),
+      radial-gradient(at 85% 80%, rgba(249, 115, 22, 0.18) 0px, transparent 50%) !important;
+  }
+  :root:not([data-theme="light"]) body::before {
+    background: radial-gradient(circle, rgba(45, 212, 191, 0.45) 0%, rgba(99, 102, 241, 0.35) 60%, transparent 100%);
+  }
+  :root:not([data-theme="light"]) body::after {
+    background: radial-gradient(circle, rgba(244, 63, 94, 0.4) 0%, rgba(139, 92, 246, 0.35) 60%, transparent 100%);
   }
 }
 
-/* ---------------- Floating Liquid Glass Topbar ---------------- */
+/* ---------------- Floating iPhone Liquid Topbar ---------------- */
 .topbar {
-  border-radius: 20px;
-  margin-top: 12px;
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(24px) saturate(2);
-  -webkit-backdrop-filter: blur(24px) saturate(2);
-  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 26px !important;
+  margin: 14px 24px 0 24px !important;
+  padding: 10px 20px !important;
+  background: rgba(255, 255, 255, 0.48) !important;
+  backdrop-filter: blur(32px) saturate(220%) contrast(105%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(220%) contrast(105%) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.75) !important;
   box-shadow: 
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.9),
-    0 12px 32px -10px rgba(22, 33, 30, 0.08);
-}
-[data-theme="dark"] .topbar {
-  background: rgba(21, 31, 52, 0.78);
-  border-color: rgba(255, 255, 255, 0.14);
-  box-shadow: 
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.18),
-    0 16px 40px -12px rgba(0, 0, 0, 0.6);
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.04),
+    0 16px 36px -10px rgba(15, 23, 42, 0.15) !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
-/* ---------------- Liquid Glass Cards ---------------- */
-.card, .pet-flash-card, .overview-card, .memory-card, .modal-box {
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(20px) saturate(1.8);
-  -webkit-backdrop-filter: blur(20px) saturate(1.8);
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  border-radius: 20px;
+[data-theme="dark"] .topbar {
+  background: rgba(15, 23, 42, 0.52) !important;
+  border-color: rgba(255, 255, 255, 0.22) !important;
   box-shadow: 
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.75),
-    0 10px 30px -12px rgba(22, 33, 30, 0.08);
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.3),
+    0 20px 48px -12px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* ---------------- Core iPhone Liquid Glass Containers ---------------- */
+.card, 
+.pet-flash-card, 
+.overview-card, 
+.memory-card, 
+.modal-box,
+.drawer-content,
+.caretaker-banner,
+.onb-card {
+  background: rgba(255, 255, 255, 0.52) !important;
+  backdrop-filter: blur(32px) saturate(210%) contrast(105%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(210%) contrast(105%) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.7) !important;
+  border-radius: 26px !important;
+  box-shadow: 
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.04),
+    0 18px 40px -12px rgba(15, 23, 42, 0.12) !important;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease !important;
+}
+
+.card:hover, 
+.pet-flash-card:hover, 
+.overview-card:hover {
+  border-color: rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 
+    inset 0 2px 1.5px 0 rgba(255, 255, 255, 1),
+    0 24px 50px -12px rgba(20, 184, 166, 0.2) !important;
 }
 
 [data-theme="dark"] .card,
 [data-theme="dark"] .pet-flash-card,
 [data-theme="dark"] .overview-card,
 [data-theme="dark"] .memory-card,
-[data-theme="dark"] .modal-box {
-  background: rgba(21, 31, 52, 0.72);
-  border-color: rgba(255, 255, 255, 0.12);
+[data-theme="dark"] .modal-box,
+[data-theme="dark"] .drawer-content,
+[data-theme="dark"] .caretaker-banner,
+[data-theme="dark"] .onb-card {
+  background: rgba(15, 23, 42, 0.55) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
   box-shadow: 
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.15),
-    0 16px 40px -12px rgba(0, 0, 0, 0.5);
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.24),
+    0 22px 48px -14px rgba(0, 0, 0, 0.65) !important;
 }
 
-/* ---------------- Liquid Glossy Buttons ---------------- */
-.btn-primary {
-  background: linear-gradient(135deg, var(--accent) 0%, #10b981 100%);
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.25);
+/* ---------------- iOS Control Center Action Items ---------------- */
+.action, .user-chip, .pet-switcher-btn, .pill {
+  background: rgba(255, 255, 255, 0.58) !important;
+  backdrop-filter: blur(24px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(190%) !important;
+  border: 1.2px solid rgba(255, 255, 255, 0.75) !important;
+  border-radius: 20px !important;
   box-shadow: 
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.4),
-    0 6px 18px -4px rgba(16, 185, 129, 0.4);
-}
-.btn-primary:hover {
-  background: linear-gradient(135deg, #0e5b57 0%, #059669 100%);
-  box-shadow: 
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.5),
-    0 10px 24px -4px rgba(16, 185, 129, 0.5);
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.85),
+    0 6px 20px -4px rgba(15, 23, 42, 0.08) !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
-.btn-ghost {
-  background: rgba(255, 255, 255, 0.55);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.65);
+.action:hover, .pet-switcher-btn:hover {
+  transform: translateY(-2px) scale(1.01) !important;
+  background: rgba(255, 255, 255, 0.72) !important;
+  border-color: rgba(255, 255, 255, 0.95) !important;
   box-shadow: 
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.6),
-    0 4px 12px rgba(0, 0, 0, 0.03);
-}
-[data-theme="dark"] .btn-ghost {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.15);
-  box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.1);
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 1),
+    0 12px 28px -6px rgba(20, 184, 166, 0.25) !important;
 }
 
-/* ---------------- Liquid Action Cards ---------------- */
-.action {
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  border-radius: 18px;
-  box-shadow: 
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.65),
-    0 8px 24px -6px rgba(0, 0, 0, 0.06);
-}
-[data-theme="dark"] .action {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.12);
-  box-shadow: 
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.12),
-    0 10px 28px -8px rgba(0, 0, 0, 0.4);
-}
-
-/* ---------------- Liquid User & Pet Switcher Chips ---------------- */
-.user-chip, .pet-switcher-btn {
-  background: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  box-shadow: 
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.6),
-    0 4px 16px rgba(0, 0, 0, 0.05);
-}
+[data-theme="dark"] .action,
 [data-theme="dark"] .user-chip,
-[data-theme="dark"] .pet-switcher-btn {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.14);
+[data-theme="dark"] .pet-switcher-btn,
+[data-theme="dark"] .pill {
+  background: rgba(255, 255, 255, 0.09) !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+  box-shadow: 
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.18),
+    0 8px 24px -6px rgba(0, 0, 0, 0.45) !important;
 }
+
+/* ---------------- iOS Glossy Buttons ---------------- */
+.btn-primary {
+  background: linear-gradient(135deg, #0d9488 0%, #10b981 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  border-radius: 16px !important;
+  box-shadow: 
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.45),
+    0 8px 22px -4px rgba(13, 148, 136, 0.45) !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1.5px) scale(1.02) !important;
+  background: linear-gradient(135deg, #0f766e 0%, #059669 100%) !important;
+  box-shadow: 
+    inset 0 2px 1.5px 0 rgba(255, 255, 255, 0.6),
+    0 12px 28px -4px rgba(13, 148, 136, 0.55) !important;
+}
+
+.btn-primary:active {
+  transform: scale(0.96) !important;
+}
+
+.btn-ghost, .btn-secondary {
+  background: rgba(255, 255, 255, 0.45) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1.2px solid rgba(255, 255, 255, 0.75) !important;
+  border-radius: 16px !important;
+  box-shadow: 
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.8),
+    0 4px 14px rgba(0, 0, 0, 0.04) !important;
+  font-weight: 600 !important;
+}
+
+.btn-ghost:hover, .btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.65) !important;
+  transform: translateY(-1px) !important;
+}
+
+[data-theme="dark"] .btn-ghost,
+[data-theme="dark"] .btn-secondary {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.15) !important;
+}
+
+/* ---------------- iOS Segmented Control (Role Switch) ---------------- */
+.role-switch {
+  background: rgba(255, 255, 255, 0.4) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  border-radius: 18px !important;
+  padding: 4px !important;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.7) !important;
+}
+
+.role-switch button.is-on {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(12px) !important;
+  border-radius: 14px !important;
+  box-shadow: 
+    inset 0 1px 1px rgba(255, 255, 255, 1),
+    0 4px 14px rgba(15, 23, 42, 0.1) !important;
+}
+
+[data-theme="dark"] .role-switch {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+}
+[data-theme="dark"] .role-switch button.is-on {
+  background: rgba(255, 255, 255, 0.2) !important;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25) !important;
+}
+
+/* ---------------- Translucent Input Fields & Select Dropdowns ---------------- */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="datetime-local"],
+textarea,
+select {
+  background: rgba(255, 255, 255, 0.5) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1.2px solid rgba(255, 255, 255, 0.75) !important;
+  border-radius: 14px !important;
+  box-shadow: 
+    inset 0 1px 2px rgba(0, 0, 0, 0.05),
+    inset 0 1px 1px rgba(255, 255, 255, 0.8) !important;
+}
+
+input:focus, textarea:focus, select:focus {
+  background: rgba(255, 255, 255, 0.75) !important;
+  border-color: var(--accent) !important;
+  box-shadow: 
+    0 0 0 4px rgba(20, 184, 166, 0.25),
+    inset 0 1px 1px rgba(255, 255, 255, 1) !important;
+}
+
+[data-theme="dark"] input[type="text"],
+[data-theme="dark"] input[type="email"],
+[data-theme="dark"] input[type="password"],
+[data-theme="dark"] input[type="number"],
+[data-theme="dark"] input[type="datetime-local"],
+[data-theme="dark"] textarea,
+[data-theme="dark"] select {
+  background: rgba(15, 23, 42, 0.5) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  color: #f8fafc !important;
+}
+
+/* ---------------- iOS Floating AI Chat Widget Glass ---------------- */
+.ai-fab {
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.9) 0%, rgba(99, 102, 241, 0.9) 100%) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.8),
+    0 14px 32px -4px rgba(99, 102, 241, 0.45) !important;
+  border-radius: 9999px !important;
+}
+
+.ai-fab:hover {
+  transform: scale(1.08) rotate(4deg) !important;
+  box-shadow: 
+    inset 0 2px 1.5px rgba(255, 255, 255, 1),
+    0 18px 40px -4px rgba(99, 102, 241, 0.6) !important;
+}
+
+/* Custom Sleek Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+}
+
 
 
