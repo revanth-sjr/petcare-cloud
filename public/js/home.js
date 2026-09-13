@@ -177,6 +177,13 @@ function initLiquidReflectionEngine() {
   }
 
   document.addEventListener("mousemove", (e) => {
+    if (e.target.closest(".notif-dropdown")) {
+      if (activeEl) {
+        activeEl.style.transform = "";
+        activeEl = null;
+      }
+      return;
+    }
     const el = e.target.closest(".card, .pet-flash-card, .overview-card, .memory-card, .action, .btn-primary, .btn-ghost, .btn-secondary, .pet-switcher-btn, .topbar");
     
     if (el !== activeEl) {
