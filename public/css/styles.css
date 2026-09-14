@@ -600,15 +600,15 @@ select, .onb-field select, .stack-form select {
   .card-head{flex-wrap:wrap;row-gap:8px}
   .card-head-actions{flex-wrap:wrap;row-gap:6px}
 
-  /* topbar becomes two rows on mobile with clean alignment */
-  .topbar{flex-wrap:wrap;row-gap:9px;padding:10px 14px}
-  .topbar-left{width:100%;justify-content:space-between;gap:6px;min-width:0}
-  .topbar-right{width:100%;justify-content:space-between;gap:6px;min-width:0}
-  .pet-switcher{max-width:140px;min-width:0}
-  .pet-switcher-btn{max-width:140px;padding:4px 8px;gap:6px}
-  .pet-switcher-name{max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  /* topbar sleek single-row glassmorphic bar on mobile */
+  .topbar{flex-wrap:nowrap;justify-content:space-between;padding:8px 12px;margin:8px 12px 0 12px;border-radius:20px}
+  .topbar-left{width:auto;justify-content:flex-start;gap:6px;min-width:0;flex:1 1 auto}
+  .topbar-right{width:auto;justify-content:flex-end;gap:6px;min-width:0;flex:0 0 auto}
+  .pet-switcher{max-width:120px;min-width:0}
+  .pet-switcher-btn{max-width:120px;padding:4px 8px;gap:4px}
+  .pet-switcher-name{max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .brand{padding:2px 4px}
-  .brand-name{font-size:17px}
+  .brand-name{font-size:16px}
   .home-link{padding:4px 8px;font-size:12px}
 
   /* notification dropdown centered on mobile screen without clipping */
@@ -2059,9 +2059,9 @@ body::after {
 
 /* ---------------- Floating iPhone Liquid Topbar ---------------- */
 .topbar {
-  border-radius: 26px !important;
-  margin: 14px 24px 0 24px !important;
-  padding: 10px 20px !important;
+  border-radius: 26px;
+  margin: 14px 24px 0 24px;
+  padding: 10px 20px;
   background: rgba(255, 255, 255, 0.48) !important;
   backdrop-filter: blur(32px) saturate(220%) contrast(105%) !important;
   -webkit-backdrop-filter: blur(32px) saturate(220%) contrast(105%) !important;
@@ -2702,6 +2702,390 @@ input[disabled] {
   flex: none;
   display: inline-block;
   vertical-align: middle;
+}
+
+/* =====================================================================
+   COMPREHENSIVE MOBILE VIEWPORT ALIGNMENT & RESPONSIVE PERFECTION
+   ===================================================================== */
+@media (max-width: 640px) {
+  html, body {
+    overflow-x: hidden !important;
+    width: 100% !important;
+  }
+
+  /* --- Topbar Single-Row Floating Navbar --- */
+  .topbar {
+    margin: 8px 10px 0 10px !important;
+    padding: 8px 12px !important;
+    border-radius: 20px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+  }
+
+  .topbar-left {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    width: auto !important;
+    justify-content: flex-start !important;
+    gap: 6px !important;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+  }
+
+  .topbar-right {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    width: auto !important;
+    justify-content: flex-end !important;
+    gap: 6px !important;
+    min-width: 0 !important;
+    flex: 0 0 auto !important;
+  }
+
+  .brand {
+    padding: 2px 4px !important;
+    gap: 6px !important;
+  }
+
+  .brand-name {
+    font-size: 16px !important;
+  }
+
+  .brand-mark {
+    font-size: 18px !important;
+  }
+
+  /* Compact Home link & Theme button on mobile */
+  .home-link {
+    padding: 5px 8px !important;
+    font-size: 12px !important;
+    border-radius: 12px !important;
+  }
+  .home-link span:last-child {
+    display: none !important;
+  }
+
+  .theme-toggle-btn {
+    padding: 6px 9px !important;
+    font-size: 0 !important;
+    border-radius: 12px !important;
+    gap: 0 !important;
+  }
+
+  .theme-toggle-btn .ui-icon {
+    font-size: 15px !important;
+    margin: 0 !important;
+  }
+
+  .user-chip {
+    padding: 3px 6px 3px 3px !important;
+    gap: 4px !important;
+    border-radius: 20px !important;
+  }
+
+  .user-avatar {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 12px !important;
+  }
+
+  .user-meta {
+    display: none !important;
+  }
+
+  .pet-switcher {
+    max-width: 125px !important;
+    min-width: 0 !important;
+  }
+
+  .pet-switcher-btn {
+    max-width: 125px !important;
+    padding: 3px 8px 3px 4px !important;
+    gap: 5px !important;
+    border-radius: 16px !important;
+  }
+
+  .pet-switcher-avatar {
+    width: 26px !important;
+    height: 26px !important;
+    font-size: 14px !important;
+  }
+
+  .pet-switcher-name {
+    font-size: 12.5px !important;
+    max-width: 60px !important;
+  }
+
+  /* --- Page Main Shell & Padding --- */
+  .home-shell, .layout {
+    padding: 14px 10px 84px !important;
+    gap: 16px !important;
+  }
+
+  .welcome h1 {
+    font-size: 22px !important;
+    margin-bottom: 2px !important;
+  }
+
+  .welcome-sub {
+    font-size: 13px !important;
+  }
+
+  /* --- Overview Grid (5 Cards: 2x2 + 1 Full Width) --- */
+  .overview-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .overview-card {
+    padding: 12px 12px !important;
+    gap: 10px !important;
+    border-radius: 18px !important;
+  }
+
+  .overview-card:last-child {
+    grid-column: 1 / -1 !important;
+  }
+
+  .overview-icon {
+    font-size: 20px !important;
+  }
+
+  .overview-body b {
+    font-size: 18px !important;
+  }
+
+  .overview-body span {
+    font-size: 9.5px !important;
+    letter-spacing: 0.04em !important;
+  }
+
+  /* --- Pet Gallery Head & Actions --- */
+  .pet-gallery-head {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .pet-gallery-actions {
+    width: 100% !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  .pet-search-bar {
+    width: 100% !important;
+    flex: none !important;
+    min-width: 0 !important;
+  }
+
+  .home-pet-search-input {
+    width: 100% !important;
+    padding: 8px 14px 8px 36px !important;
+    border-radius: 16px !important;
+    font-size: 13px !important;
+  }
+
+  .pet-gallery-actions .btn {
+    flex: 1 1 auto !important;
+    font-size: 12.5px !important;
+    padding: 8px 12px !important;
+    border-radius: 14px !important;
+  }
+
+  .pet-gallery {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  .pet-flash-card {
+    border-radius: 20px !important;
+  }
+
+  .pfc-photo {
+    height: 150px !important;
+  }
+
+  .pfc-body {
+    padding: 14px 16px !important;
+    gap: 8px !important;
+  }
+
+  .pfc-name {
+    font-size: 17px !important;
+  }
+
+  /* --- Pet Card on index.html --- */
+  .pet-card {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    padding: 18px 16px !important;
+    gap: 12px !important;
+    border-radius: 22px !important;
+  }
+
+  .pet-avatar {
+    width: 64px !important;
+    height: 64px !important;
+    font-size: 34px !important;
+    border-radius: 18px !important;
+  }
+
+  .pet-id-row {
+    justify-content: center !important;
+  }
+
+  .pet-id h1 {
+    font-size: 24px !important;
+  }
+
+  .pet-progress {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 12px !important;
+    margin-top: 4px !important;
+  }
+
+  .ring-label {
+    margin: 0 !important;
+  }
+
+  /* --- Care Actions Buttons --- */
+  .actions {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .action {
+    padding: 12px 14px !important;
+    border-radius: 16px !important;
+  }
+
+  .action-icon {
+    font-size: 22px !important;
+  }
+
+  .action-text b {
+    font-size: 13.5px !important;
+  }
+
+  /* --- Medication Item & Timeline --- */
+  .med-item {
+    grid-template-columns: 46px 1fr !important;
+    gap: 10px !important;
+    padding: 10px 12px !important;
+    border-radius: 14px !important;
+  }
+
+  .med-right {
+    grid-column: 1 / -1 !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    padding-top: 6px !important;
+    border-top: 1px dashed var(--line) !important;
+  }
+
+  .tl-item {
+    grid-template-columns: 48px 22px 1fr auto !important;
+    gap: 8px !important;
+    padding: 8px 0 !important;
+  }
+
+  .tl-item::before {
+    left: 59px !important;
+  }
+
+  .tl-time {
+    font-size: 11px !important;
+  }
+
+  .tl-dot {
+    width: 22px !important;
+    height: 22px !important;
+    font-size: 11px !important;
+  }
+
+  /* --- General Cards --- */
+  .card {
+    padding: 14px 16px !important;
+    border-radius: 20px !important;
+  }
+
+  .card-head {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  .card-head h2 {
+    font-size: 16px !important;
+  }
+
+  /* --- Modals & Drawers --- */
+  .modal {
+    padding: 10px !important;
+  }
+
+  .modal-box {
+    width: 100% !important;
+    max-height: 90vh !important;
+    padding: 16px !important;
+    border-radius: 20px !important;
+  }
+
+  .modal-head h3 {
+    font-size: 17px !important;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse !important;
+    gap: 8px !important;
+  }
+
+  .modal-actions .btn {
+    width: 100% !important;
+  }
+
+  .modal-actions-right {
+    flex-direction: column-reverse !important;
+    width: 100% !important;
+  }
+
+  .modal-actions-right .btn {
+    width: 100% !important;
+  }
+
+  /* --- Floating AI Chat Widget --- */
+  .ai-fab {
+    right: 12px !important;
+    bottom: 12px !important;
+    padding: 11px 16px !important;
+    font-size: 13px !important;
+  }
+
+  .ai-fab-label {
+    display: none !important;
+  }
+
+  .ai-panel {
+    position: fixed !important;
+    left: 8px !important;
+    right: 8px !important;
+    bottom: 8px !important;
+    width: calc(100vw - 16px) !important;
+    max-height: 82vh !important;
+    border-radius: 20px !important;
+  }
 }
 
 
