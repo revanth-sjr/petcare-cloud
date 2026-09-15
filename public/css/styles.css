@@ -41,64 +41,64 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg:#090F1E;
-    --surface:#151F34;
-    --surface-2:#212D45;
+    --bg:#080C16;
+    --surface:#121929;
+    --surface-2:#1E293B;
     --ink:#F8FAFC;
-    --ink-2:#94A3B8;
-    --ink-3:#64748B;
-    --line:#26334D;
-    --line-2:#334366;
+    --ink-2:#CBD5E1;
+    --ink-3:#94A3B8;
+    --line:rgba(255,255,255,0.12);
+    --line-2:rgba(255,255,255,0.22);
 
     --accent:#2DD4BF;
     --accent-ink:#5EEAD4;
     --accent-bg:#0F3836;
     --coral:#F97316;
 
-    --ok:#4ADE80;     --ok-bg:#103B23;
-    --warn:#FACC15;   --warn-bg:#42290B;
-    --crit:#F87171;   --crit-bg:#481717;
+    --ok:#34D399;     --ok-bg:rgba(16, 185, 129, 0.22);
+    --warn:#FBBF24;   --warn-bg:rgba(245, 158, 11, 0.22);
+    --crit:#F87171;   --crit-bg:rgba(239, 68, 68, 0.22);
 
-    --feed:#FB923C;   --feed-bg:#4A1D0B;
-    --walk:#38BDF8;   --walk-bg:#0C3652;
-    --med:#C084FC;    --med-bg:#3B165C;
+    --feed:#FB923C;   --feed-bg:rgba(249, 115, 22, 0.22);
+    --walk:#38BDF8;   --walk-bg:rgba(14, 165, 233, 0.22);
+    --med:#C084FC;    --med-bg:rgba(168, 85, 247, 0.22);
 
-    --auth-pitch-bg:#060C1A;
-    --topbar-bg:rgba(21, 31, 52, 0.92);
+    --auth-pitch-bg:#070B14;
+    --topbar-bg:rgba(18, 26, 43, 0.88);
 
-    --shadow:0 4px 20px rgba(0,0,0,.5);
-    --shadow-lg:0 20px 50px rgba(0,0,0,.7);
+    --shadow:0 8px 30px rgba(0,0,0,.6);
+    --shadow-lg:0 20px 50px rgba(0,0,0,.8);
   }
 }
 
 [data-theme="dark"] {
-  --bg:#090F1E;
-  --surface:#151F34;
-  --surface-2:#212D45;
+  --bg:#080C16;
+  --surface:#121929;
+  --surface-2:#1E293B;
   --ink:#F8FAFC;
-  --ink-2:#94A3B8;
-  --ink-3:#64748B;
-  --line:#26334D;
-  --line-2:#334366;
+  --ink-2:#CBD5E1;
+  --ink-3:#94A3B8;
+  --line:rgba(255,255,255,0.12);
+  --line-2:rgba(255,255,255,0.22);
 
   --accent:#2DD4BF;
   --accent-ink:#5EEAD4;
   --accent-bg:#0F3836;
   --coral:#F97316;
 
-  --ok:#4ADE80;     --ok-bg:#103B23;
-  --warn:#FACC15;   --warn-bg:#42290B;
-  --crit:#F87171;   --crit-bg:#481717;
+  --ok:#34D399;     --ok-bg:rgba(16, 185, 129, 0.22);
+  --warn:#FBBF24;   --warn-bg:rgba(245, 158, 11, 0.22);
+  --crit:#F87171;   --crit-bg:rgba(239, 68, 68, 0.22);
 
-  --feed:#FB923C;   --feed-bg:#4A1D0B;
-  --walk:#38BDF8;   --walk-bg:#0C3652;
-  --med:#C084FC;    --med-bg:#3B165C;
+  --feed:#FB923C;   --feed-bg:rgba(249, 115, 22, 0.22);
+  --walk:#38BDF8;   --walk-bg:rgba(14, 165, 233, 0.22);
+  --med:#C084FC;    --med-bg:rgba(168, 85, 247, 0.22);
 
-  --auth-pitch-bg:#060C1A;
-  --topbar-bg:rgba(21, 31, 52, 0.92);
+  --auth-pitch-bg:#070B14;
+  --topbar-bg:rgba(18, 26, 43, 0.88);
 
-  --shadow:0 4px 20px rgba(0,0,0,.5);
-  --shadow-lg:0 20px 50px rgba(0,0,0,.7);
+  --shadow:0 8px 30px rgba(0,0,0,.6);
+  --shadow-lg:0 20px 50px rgba(0,0,0,.8);
 }
 
 *{box-sizing:border-box}
@@ -2040,20 +2040,35 @@ body::after {
 }
 
 [data-theme="dark"] body,
+[data-theme="dark"] {
+  background-color: #080C16 !important;
+  background-image: 
+    radial-gradient(at 10% 10%, rgba(30, 58, 138, 0.35) 0px, transparent 50%),
+    radial-gradient(at 90% 15%, rgba(15, 23, 42, 0.85) 0px, transparent 55%),
+    radial-gradient(at 50% 85%, rgba(17, 24, 39, 0.95) 0px, transparent 60%) !important;
+}
+
+[data-theme="dark"] body::before {
+  background: radial-gradient(circle, rgba(29, 78, 216, 0.18) 0%, rgba(14, 165, 233, 0.08) 60%, transparent 100%) !important;
+}
+
+[data-theme="dark"] body::after {
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, rgba(30, 58, 138, 0.15) 60%, transparent 100%) !important;
+}
+
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) body {
-    background-color: #070B14 !important;
+    background-color: #080C16 !important;
     background-image: 
-      radial-gradient(at 10% 10%, rgba(29, 78, 216, 0.28) 0px, transparent 50%),
-      radial-gradient(at 90% 15%, rgba(14, 165, 233, 0.22) 0px, transparent 55%),
-      radial-gradient(at 50% 85%, rgba(16, 185, 129, 0.18) 0px, transparent 60%),
-      radial-gradient(at 85% 80%, rgba(30, 41, 59, 0.45) 0px, transparent 50%) !important;
+      radial-gradient(at 10% 10%, rgba(30, 58, 138, 0.35) 0px, transparent 50%),
+      radial-gradient(at 90% 15%, rgba(15, 23, 42, 0.85) 0px, transparent 55%),
+      radial-gradient(at 50% 85%, rgba(17, 24, 39, 0.95) 0px, transparent 60%) !important;
   }
   :root:not([data-theme="light"]) body::before {
-    background: radial-gradient(circle, rgba(37, 99, 235, 0.45) 0%, rgba(14, 165, 233, 0.35) 60%, transparent 100%);
+    background: radial-gradient(circle, rgba(29, 78, 216, 0.18) 0%, rgba(14, 165, 233, 0.08) 60%, transparent 100%) !important;
   }
   :root:not([data-theme="light"]) body::after {
-    background: radial-gradient(circle, rgba(16, 185, 129, 0.35) 0%, rgba(30, 58, 138, 0.4) 60%, transparent 100%);
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, rgba(30, 58, 138, 0.15) 60%, transparent 100%) !important;
   }
 }
 
@@ -2074,12 +2089,11 @@ body::after {
 }
 
 [data-theme="dark"] .topbar {
-  background: rgba(15, 23, 42, 0.52) !important;
-  border-color: rgba(255, 255, 255, 0.22) !important;
+  background: rgba(18, 26, 43, 0.9) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
   box-shadow: 
-    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.28),
-    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.3),
-    0 20px 48px -12px rgba(0, 0, 0, 0.6) !important;
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.12),
+    0 20px 48px -12px rgba(0, 0, 0, 0.75) !important;
 }
 
 /* ---------------- Core iPhone Liquid Glass Containers ---------------- */
@@ -2117,13 +2131,23 @@ body::after {
 [data-theme="dark"] .overview-card,
 [data-theme="dark"] .memory-card,
 [data-theme="dark"] .drawer-content,
-[data-theme="dark"] .caretaker-banner,
 [data-theme="dark"] .onb-card {
-  background: rgba(15, 23, 42, 0.58) !important;
-  border-color: rgba(255, 255, 255, 0.18) !important;
+  background: rgba(18, 26, 43, 0.92) !important;
+  backdrop-filter: blur(24px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(160%) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
   box-shadow: 
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.18),
-    0 20px 45px -12px rgba(0, 0, 0, 0.6) !important;
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.1),
+    0 20px 45px -12px rgba(0, 0, 0, 0.7) !important;
+}
+
+[data-theme="dark"] .caretaker-banner {
+  background: rgba(30, 58, 138, 0.4) !important;
+  border-color: rgba(59, 130, 246, 0.35) !important;
+  color: #93C5FD !important;
+}
+[data-theme="dark"] .caretaker-banner div span {
+  color: #DBEAFE !important;
 }
 
 /* ---------------- iOS Control Center Action Items ---------------- */
@@ -2152,13 +2176,50 @@ body::after {
 
 [data-theme="dark"] .action,
 [data-theme="dark"] .user-chip,
-[data-theme="dark"] .pet-switcher-btn,
-[data-theme="dark"] .pill {
-  background: rgba(255, 255, 255, 0.1) !important;
-  border-color: rgba(255, 255, 255, 0.18) !important;
+[data-theme="dark"] .pet-switcher-btn {
+  background: rgba(30, 41, 59, 0.75) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
   box-shadow: 
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.15),
-    0 8px 24px -6px rgba(0, 0, 0, 0.45) !important;
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.12),
+    0 8px 24px -6px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme="dark"] .action:hover,
+[data-theme="dark"] .user-chip:hover,
+[data-theme="dark"] .pet-switcher-btn:hover {
+  background: rgba(51, 65, 85, 0.85) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+[data-theme="dark"] .pill {
+  background: rgba(30, 41, 59, 0.8) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  color: #F8FAFC !important;
+}
+
+[data-theme="dark"] .pill.p-ok {
+  background: rgba(16, 185, 129, 0.25) !important;
+  color: #34D399 !important;
+  border-color: rgba(16, 185, 129, 0.45) !important;
+}
+
+[data-theme="dark"] .pill.p-warn {
+  background: rgba(245, 158, 11, 0.25) !important;
+  color: #FBBF24 !important;
+  border-color: rgba(245, 158, 11, 0.45) !important;
+}
+
+[data-theme="dark"] .pill.p-crit,
+[data-theme="dark"] .pill.p-over {
+  background: rgba(239, 68, 68, 0.25) !important;
+  color: #F87171 !important;
+  border-color: rgba(239, 68, 68, 0.45) !important;
+}
+
+[data-theme="dark"] .pill.p-up {
+  background: rgba(148, 163, 184, 0.2) !important;
+  color: #CBD5E1 !important;
+  border-color: rgba(148, 163, 184, 0.3) !important;
 }
 
 /* ---------------- iOS Glossy Buttons ---------------- */
