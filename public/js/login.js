@@ -69,14 +69,16 @@ function wireLogin() {
     const btn = $("#btnSendLoginOtp");
     const orig = btn.textContent;
     btn.disabled = true;
-    btn.textContent = "Sending OTP…";
+    btn.textContent = "Verifying & sending OTP…";
     hideErrors();
+    if ($("#loginOtpGroup")) $("#loginOtpGroup").hidden = true;
     try {
-      await auth.sendOtpForEmail(creds.email);
-      $("#loginOtpGroup").hidden = false;
+      await auth.sendOtpForEmail(creds.email, "", creds.password, false);
+      if ($("#loginOtpGroup")) $("#loginOtpGroup").hidden = false;
       setTimeout(() => $("#loginOtpCode")?.focus(), 80);
     } catch (err) {
-      showError("#loginError", err.message || "Could not send OTP email.");
+      if ($("#loginOtpGroup")) $("#loginOtpGroup").hidden = true;
+      showError("#loginError", authMessage(err));
     } finally {
       btn.disabled = false;
       btn.textContent = orig;
@@ -121,14 +123,16 @@ function wireSignup() {
     const btn = $("#btnSendSignupOtp");
     const orig = btn.textContent;
     btn.disabled = true;
-    btn.textContent = "Sending OTP…";
+    btn.textContent = "Validating & sending OTP…";
     hideErrors();
+    if ($("#suOtpGroup")) $("#suOtpGroup").hidden = true;
     try {
-      await auth.sendOtpForEmail(details.email, details.firstName);
-      $("#suOtpGroup").hidden = false;
+      await auth.sendOtpForEmail(details.email, details.firstName, details.password, true);
+      if ($("#suOtpGroup")) $("#suOtpGroup").hidden = false;
       setTimeout(() => $("#suOtpCode")?.focus(), 80);
     } catch (err) {
-      showError("#signupError", err.message || "Could not send OTP email.");
+      if ($("#suOtpGroup")) $("#suOtpGroup").hidden = true;
+      showError("#signupError", authMessage(err));
     } finally {
       btn.disabled = false;
       btn.textContent = orig;

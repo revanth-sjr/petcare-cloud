@@ -324,8 +324,9 @@ function paintUser() {
   $("#caretakerBanner").hidden = r !== "caretaker";
   $("#exportCard").hidden = r === "caretaker";
   $("#careTeamCard").hidden = r === "caretaker";
-  /* Only the owner of the pet can edit pet details — hidden for caretakers */
+  /* Only the owner of the pet can edit pet details or view/manage the bin — hidden for caretakers */
   $("#btnEditPet").hidden = r !== "owner";
+  if ($("#btnOpenBin")) $("#btnOpenBin").hidden = r === "caretaker";
 }
 
 /* ------------------------------------------------------------------
@@ -794,76 +795,7 @@ function hideEmptyState() {
   $("#layout").hidden = false;
 }
 
-/* ------------------------------------------------------------------
-   Ultra-Smooth 3D Liquid Tilt Engine (Clean, Non-Shiny)
-   ------------------------------------------------------------------ */
-function initLiquidReflectionEngine() {
-  let activeEl = null;
-  let targetRx = 0, targetRy = 0;
-  let currentRx = 0, currentRy = 0;
-  let animating = false;
-
-  function update() {
-    currentRx += (targetRx - currentRx) * 0.12;
-    currentRy += (targetRy - currentRy) * 0.12;
-
-    if (activeEl) {
-      activeEl.style.transform = `perspective(1000px) rotateX(${currentRx.toFixed(2)}deg) rotateY(${currentRy.toFixed(2)}deg) translateZ(3px)`;
-    }
-
-    if (activeEl || Math.abs(currentRx) > 0.05 || Math.abs(currentRy) > 0.05) {
-      requestAnimationFrame(update);
-    } else {
-      animating = false;
-    }
-  }
-
-  document.addEventListener("mousemove", (e) => {
-    if (e.target.closest(".notif-dropdown")) {
-      if (activeEl) {
-        activeEl.style.transform = "";
-        activeEl = null;
-      }
-      return;
-    }
-    const el = e.target.closest(".card, .pet-flash-card, .overview-card, .memory-card, .action, .btn-primary, .btn-ghost, .btn-secondary, .pet-switcher-btn, .topbar");
-    
-    if (el !== activeEl) {
-      if (activeEl) {
-        activeEl.style.transform = "";
-      }
-      activeEl = el;
-      currentRx = 0; currentRy = 0;
-    }
-
-    if (!activeEl) return;
-
-    const rect = activeEl.getBoundingClientRect();
-    const px = (e.clientX - rect.left) / rect.width;
-    const py = (e.clientY - rect.top) / rect.height;
-
-    // Subtle 3D tilt (-4deg to +4deg)
-    targetRx = (0.5 - py) * 6;
-    targetRy = (px - 0.5) * 6;
-
-    if (!animating) {
-      animating = true;
-      requestAnimationFrame(update);
-    }
-  });
-
-  document.addEventListener("mouseout", (e) => {
-    if (activeEl && (!e.relatedTarget || !activeEl.contains(e.relatedTarget))) {
-      activeEl.style.transform = "";
-      targetRx = 0; targetRy = 0;
-      activeEl = null;
-    }
-  });
-}
-
-/* ------------------------------------------------------------------ */
 function wireStaticUi() {
-  initLiquidReflectionEngine();
 
   $$(".action").forEach((btn) => {
     btn.addEventListener("click", () => {

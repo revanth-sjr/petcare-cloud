@@ -87,7 +87,23 @@ export async function create() {
       return () => listeners.delete(cb);
     },
 
-    async sendOtpForEmail(email) {
+    async sendOtpForEmail(email, name = "", password = null, isSignup = false) {
+      const cleanEmail = String(email || "").trim().toLowerCase();
+      if (isSignup) {
+        if (users[cleanEmail]) {
+          const e = new Error("That email already has an account. Log in instead.");
+          e.code = "auth/email-already-in-use";
+          throw e;
+        }
+      } else if (password) {
+        const u = users[cleanEmail];
+        if (!u) {
+          const e = new Error("No user found"); e.code = "auth/user-not-found"; throw e;
+        }
+        if (u.password !== password) {
+          const e = new Error("Wrong password"); e.code = "auth/wrong-password"; throw e;
+        }
+      }
       return "123456";
     },
 

@@ -161,10 +161,33 @@ export async function create() {
       return () => listeners.delete(cb);
     },
 
-    async sendOtpForEmail(email, name = "") {
+    async sendOtpForEmail(email, name = "", password = null, isSignup = false) {
       const cleanEmail = String(email || "").trim().toLowerCase();
       if (!cleanEmail || !cleanEmail.includes("@")) {
         throw new Error("Enter a valid email address.");
+      }
+
+      if (isSignup) {
+        /* For signup: check if account already exists before sending OTP */
+        try {
+          const methods = await authMod.fetchSignInMethodsForEmail(auth, cleanEmail);
+          if (methods && methods.length > 0) {
+            const err = new Error("That email already has an account. Log in instead.");
+            err.code = "auth/email-already-in-use";
+            throw err;
+          }
+        } catch (err) {
+          if (err.code === "auth/email-already-in-use") throw err;
+          console.warn("[PetCare Auth] fetchSignInMethodsForEmail warn:", err);
+        }
+      } else if (password) {
+        /* For login: verify credentials with Firebase Auth BEFORE sending OTP */
+        try {
+          await authMod.signInWithEmailAndPassword(auth, cleanEmail, password);
+        } catch (err) {
+          console.warn("[PetCare Auth] Password verification failed before sending OTP:", err);
+          throw err;
+        }
       }
 
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
